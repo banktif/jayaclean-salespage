@@ -10,11 +10,133 @@
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{height:100%;overflow:hidden}
     #gjs{height:100%;width:100%}
-    .gjs-one-bg{background:#2E7D32}
-    .gjs-two-color{color:#2E7D32}
-    .gjs-three-bg{background:#1B5E20;color:#fff}
-    .gjs-four-color,.gjs-four-color-h:hover{color:#FFC107}
-    .loading-overlay{position:fixed;inset:0;z-index:9999;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .4s}
+
+    /* ===== ELEMENTOR-STYLE DARK THEME ===== */
+    /* Primary: panel bg, sidebar */
+    .gjs-one-bg{background:#1e1e1e!important}
+    /* Secondary: active text, icons, selection */
+    .gjs-two-color{color:#4CAF50!important}
+    /* Tertiary: headers, sub-panels */
+    .gjs-three-bg{background:#2d2d2d!important;color:#e0e0e0!important}
+    /* Accent: primary buttons, hover */
+    .gjs-four-color,.gjs-four-color-h:hover{color:#4CAF50!important}
+
+    /* Canvas area */
+    .gjs-cv-canvas{background-color:#f0f0f0!important}
+    .gjs-cv-canvas__frames{border:none!important}
+    .gjs-frame-wrapper{border:1px solid #d5d5d5!important;box-shadow:0 0 20px rgba(0,0,0,.08)!important}
+
+    /* Toolbar top */
+    .gjs-pn-panels,.gjs-pn-commands,.gjs-pn-options{background:#2d2d2d!important;border-bottom:1px solid #3a3a3a!important}
+    .gjs-pn-panel{background:#1e1e1e!important}
+    .gjs-pn-buttons{background:#1e1e1e!important}
+    .gjs-pn-btn{border:none!important;color:#b0b0b0!important;background:transparent!important;border-radius:4px!important;transition:all .15s!important}
+    .gjs-pn-btn:hover{background:#3a3a3a!important;color:#e0e0e0!important}
+    .gjs-pn-btn.gjs-pn-active{background:#4CAF50!important;color:#fff!important}
+    .gjs-pn-devices-c .gjs-pn-btn.gjs-pn-active{background:#4CAF50!important;color:#fff!important}
+
+    /* Blocks panel */
+    .gjs-blocks-c{background:#1e1e1e!important;padding:10px!important}
+    .gjs-block{background:#2d2d2d!important;border:1px solid #3a3a3a!important;color:#ccc!important;border-radius:6px!important;transition:all .15s!important}
+    .gjs-block:hover{background:#3a3a3a!important;border-color:#4CAF50!important}
+    .gjs-block svg{fill:#b0b0b0!important}
+    .gjs-block:hover svg{fill:#4CAF50!important}
+    .gjs-block__media{background:#252525!important;padding:12px!important}
+    .gjs-block__label{font-size:.72rem!important;color:#999!important}
+
+    /* Block categories */
+    .gjs-block-category .gjs-title{background:#2d2d2d!important;color:#ccc!important;font-weight:600!important;font-size:.8rem!important;padding:8px 12px!important;border-radius:4px!important;cursor:pointer!important}
+    .gjs-block-category.gjs-open .gjs-title{border-bottom:1px solid #3a3a3a!important}
+
+    /* Panels switcher */
+    .gjs-pn-switcher{background:#252525!important}
+    .gjs-pn-switcher .gjs-pn-btn{color:#999!important;font-size:.75rem!important;padding:8px 16px!important}
+    .gjs-pn-switcher .gjs-pn-active{background:#4CAF50!important;color:#fff!important}
+
+    /* Style Manager */
+    .gjs-sm-header,.gjs-sm-sector .gjs-sm-title{background:#2d2d2d!important;color:#ccc!important;font-weight:600!important;font-size:.8rem!important;padding:10px 14px!important;border-bottom:1px solid #3a3a3a!important;cursor:pointer!important}
+    .gjs-sm-sector{background:#1e1e1e!important}
+    .gjs-sm-sector .gjs-sm-properties{background:#1e1e1e!important;padding:8px 12px!important}
+    .gjs-sm-property{color:#b0b0b0!important;font-size:.78rem!important}
+    .gjs-sm-property .gjs-sm-label{color:#999!important;font-weight:500!important}
+    .gjs-sm-field input,.gjs-sm-field select{background:#252525!important;border:1px solid #3a3a3a!important;color:#e0e0e0!important;border-radius:4px!important;padding:6px 10px!important;font-size:.78rem!important}
+    .gjs-sm-field input:focus,.gjs-sm-field select:focus{border-color:#4CAF50!important;outline:none!important}
+    .gjs-sm-field select{background:#252525 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") no-repeat right 8px center!important;-webkit-appearance:none!important;appearance:none!important;padding-right:24px!important}
+    .gjs-sm-field .gjs-sm-colorp-c{background:#252525!important;border:1px solid #3a3a3a!important}
+    .gjs-clm-tags .gjs-clm-tag{background:#2d2d2d!important;color:#4CAF50!important;border-radius:3px!important;font-size:.7rem!important}
+
+    /* Layers panel */
+    .gjs-trt-traits{background:#1e1e1e!important}
+    .gjs-trt-trait{border-bottom:1px solid #2d2d2d!important;padding:6px 12px!important}
+    .gjs-trt-trait .gjs-label{color:#999!important;font-size:.75rem!important}
+    .gjs-trt-trait input{background:#252525!important;border:1px solid #3a3a3a!important;color:#e0e0e0!important;border-radius:4px!important;padding:4px 8px!important}
+
+    /* Layer items */
+    .gjs-layer{background:transparent!important;color:#ccc!important;padding:5px 10px!important;border-bottom:1px solid #2d2d2d!important;font-size:.8rem!important}
+    .gjs-layer:hover{background:#2d2d2d!important}
+    .gjs-layer.gjs-selected{background:#3a3a3a!important}
+    .gjs-layer-title{padding:4px 0!important}
+    .gjs-layer-name{font-size:.78rem!important;color:#ccc!important}
+    .gjs-layer-vis{color:#666!important}
+    .gjs-layer-vis.gjs-layer-on{color:#4CAF50!important}
+    .gjs-layer-caret{color:#888!important}
+
+    /* Selector Manager */
+    .gjs-sel-manager{padding:0!important;background:#1e1e1e!important}
+    .gjs-selector{background:#2d2d2d!important;color:#ccc!important;border:1px solid #3a3a3a!important;border-radius:4px!important;padding:4px 10px!important;font-size:.75rem!important;margin:2px!important}
+    .gjs-sel-selected{background:#4CAF50!important;color:#fff!important;border-color:#4CAF50!important}
+    .gjs-clm-tag-status{color:#888!important}
+
+    /* Context toolbar (when element selected on canvas) */
+    .gjs-toolbar{background:#1e1e1e!important;border:1px solid #3a3a3a!important;border-radius:6px!important;box-shadow:0 4px 16px rgba(0,0,0,.4)!important}
+    .gjs-toolbar-item{color:#b0b0b0!important;border-radius:3px!important;transition:all .1s!important}
+    .gjs-toolbar-item:hover{background:#3a3a3a!important;color:#4CAF50!important}
+    .gjs-toolbar-item svg{fill:#b0b0b0!important}
+
+    /* Badge */
+    .gjs-badge{background:#4CAF50!important;color:#fff!important;font-size:.7rem!important;padding:2px 8px!important;border-radius:10px!important}
+    .gjs-badge__name{color:#fff!important;font-weight:600!important}
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:8px;height:8px}
+    ::-webkit-scrollbar-track{background:#1e1e1e}
+    ::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:4px}
+    ::-webkit-scrollbar-thumb:hover{background:#4CAF50}
+
+    /* Resizer */
+    .gjs-resizer-c{border:1px dashed #4CAF50!important}
+    .gjs-ghost{opacity:.6!important}
+
+    /* Modal */
+    .gjs-mdl-dialog{background:#2d2d2d!important;color:#e0e0e0!important;border-radius:8px!important;box-shadow:0 8px 40px rgba(0,0,0,.5)!important}
+    .gjs-mdl-header{background:#252525!important;color:#e0e0e0!important;border-bottom:1px solid #3a3a3a!important}
+    .gjs-mdl-content{background:#2d2d2d!important}
+    .gjs-mdl-btn-close{color:#999!important}
+    .gjs-mdl-btn-close:hover{color:#e0e0e0!important}
+    .gjs-mdl-dialog input,.gjs-mdl-dialog textarea,.gjs-mdl-dialog select{background:#252525!important;border:1px solid #3a3a3a!important;color:#e0e0e0!important;border-radius:4px!important;padding:8px 12px!important}
+    .gjs-mdl-dialog input:focus,.gjs-mdl-dialog textarea:focus{border-color:#4CAF50!important}
+    .gjs-mdl-dialog label{color:#b0b0b0!important}
+    .gjs-mdl-btn{background:#4CAF50!important;color:#fff!important;border:none!important;border-radius:4px!important;padding:6px 16px!important;cursor:pointer!important}
+    .gjs-mdl-btn:hover{background:#388E3C!important}
+
+    /* Category open icon */
+    .gjs-block-category .gjs-title .fa-caret-down,.gjs-sm-sector .gjs-sm-title .fa-caret-down{color:#888!important}
+
+    /* Commands panel */
+    .gjs-pn-commands .gjs-pn-buttons{gap:2px!important}
+    .gjs-pn-devices-c{color:#999!important}
+    .gjs-pn-devices-c .gjs-pn-btn{font-size:.75rem!important}
+    .gjs-pn-device-label{color:#b0b0b0!important;font-size:.75rem!important}
+
+    /* Checkbox / radio in style manager */
+    .gjs-field input[type=range]{-webkit-appearance:none!important;height:4px!important;background:#3a3a3a!important;border-radius:2px!important;outline:none!important}
+    .gjs-field input[type=range]::-webkit-slider-thumb{-webkit-appearance:none!important;width:14px!important;height:14px!important;background:#4CAF50!important;border-radius:50%!important;cursor:pointer!important}
+
+    /* Four color panel */
+    .gjs-four-color-h:hover{color:#4CAF50!important}
+
+    /* Loading overlay tetap dark */
+    .loading-overlay{position:fixed;inset:0;z-index:9999;background:#1e1e1e;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .4s}
     .loading-overlay.hidden{opacity:0;pointer-events:none}
     .loading-overlay h2{color:#4CAF50;font-size:1.5rem}
     .loading-overlay p{color:#888}
