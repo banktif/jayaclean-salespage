@@ -50,7 +50,7 @@ async function routeByRole(){
   if(!user)return false;
   var {data:profile}=await SB.from('profiles').select('role,is_active').eq('id',user.id).single();
   if(!profile||!profile.is_active){await SB.auth.signOut();return false;}
-  location.href=profile.role==='admin'?'admin/':'worker/';
+  location.href=profile.role==='admin'?'/admin/':'/worker/';
   return true;
 }
 
