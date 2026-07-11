@@ -674,7 +674,7 @@ async function resetStaffPassword(id){
 }
 
 // ═══════════ SETTINGS ═══════════
-var SETTING_LABELS={business_name:'Business Name',bank_name:'Bank Name',bank_account_no:'Bank Account No',bank_account_holder:'Account Holder',qr_image_url:'Bank QR Image URL',price_total:'Price Total (RM)',price_deposit:'Deposit (RM)',price_balance:'Balance (RM)',wa_business_number:'Business WhatsApp Number',wa_tmpl_baki:'WA Template - Bank Transfer',wa_tmpl_balance_link:'WA Template - Payment Link',wa_tmpl_staff:'WA Template - Staff Assignment',coverage_area:'Coverage Area',max_slots_per_day:'Max Slots/Day',slots:'Time Slots',auto_confirm_payment:'Auto-confirm Payment',auto_assign_enabled:'Auto-assign Staff',auto_assign_rule:'Auto-assign Rule',auto_complete_task:'Auto-complete Task',auto_send_wa_balance:'Auto-send WA Balance',cloud_name:'Cloudinary Cloud Name',upload_preset:'Cloudinary Upload Preset',folder:'Cloudinary Folder'};
+var SETTING_LABELS={business_name:'Business Name',bank_name:'Bank Name',bank_account_no:'Bank Account No',bank_account_holder:'Account Holder',qr_image_url:'Bank QR Image URL',price_total:'Price Total (RM)',price_deposit:'Deposit (RM)',price_balance:'Balance (RM)',wa_business_number:'Business WhatsApp Number',wa_tmpl_baki:'WA Template - Bank Transfer',wa_tmpl_balance_link:'WA Template - Payment Link',wa_tmpl_staff:'WA Template - Staff Assignment',coverage_area:'Coverage Area',max_slots_per_day:'Max Slots/Day',slots:'Time Slots',service_areas:'Service Areas (comma-separated)',auto_confirm_payment:'Auto-confirm Payment',auto_assign_enabled:'Auto-assign Staff',auto_assign_rule:'Auto-assign Rule',auto_complete_task:'Auto-complete Task',auto_send_wa_balance:'Auto-send WA Balance',cloud_name:'Cloudinary Cloud Name',upload_preset:'Cloudinary Upload Preset',folder:'Cloudinary Folder'};
 async function showSettings(){
   currentView='settings';setChrome(false);clearNav();setNav('dsSettings');
   setHeader('Settings','Business configuration');
@@ -686,7 +686,7 @@ async function showSettings(){
     var map={};(data||[]).forEach(function(s){map[s.key]=s.value});
     function fld(key,label,type){if(!type)type='text';var v=map[key]||'',lbl=label||SETTING_LABELS[key]||key;
       if(type==='select_onoff')return '<div><label class="sLbl">'+esc(lbl)+'</label><select data-key="'+key+'" class="mv-sel"><option value="false"'+(v==='true'?'':' selected')+'>Off</option><option value="true"'+(v==='true'?' selected':'')+'>On</option></select></div>';
-      if(type==='select_rule')return '<div><label class="sLbl">'+esc(lbl)+'</label><select data-key="'+key+'" class="mv-sel"><option value="round_robin"'+(v==='least_loaded'?'':' selected')+'>Round-robin</option><option value="least_loaded"'+(v==='least_loaded'?' selected':'')+'>Least loaded</option></select></div>';
+      if(type==='select_rule')return '<div><label class="sLbl">'+esc(lbl)+'</label><select data-key="'+key+'" class="mv-sel"><option value="round_robin"'+(v==='least_loaded'||v==='area_based'?'':' selected')+'>Round-robin</option><option value="least_loaded"'+(v==='least_loaded'?' selected':'')+'>Least loaded</option><option value="area_based"'+(v==='area_based'?' selected':'')+'>Area-based</option></select></div>';
       if(type==='textarea')return '<div><label class="sLbl">'+esc(lbl)+'</label><textarea data-key="'+key+'" rows="3" class="sInp">'+esc(v)+'</textarea></div>';
       return '<div><label class="sLbl">'+esc(lbl)+'</label><input data-key="'+key+'" value="'+esc(v)+'" class="sInp" style="height:auto"></div>';
     }
@@ -695,7 +695,7 @@ async function showSettings(){
     h+=grp('Business',[fld('business_name'),fld('wa_business_number')]);
     h+=grp('Payment / Bank',[fld('bank_name'),fld('bank_account_no'),fld('bank_account_holder'),fld('qr_image_url'),fld('price_total','Price Total (RM)','text'),fld('price_deposit','Deposit (RM)','text'),fld('price_balance','Balance (RM)','text'),'<div><label class="sLbl">Bank QR Image</label><button class="d-btn" style="padding:10px 14px;font-size:.72rem" onclick="uploadQR()">Upload QR (Cloudinary)</button><div id="qrMsg" style="font-size:.72rem;color:var(--text3);margin-top:6px"></div></div>']);
     h+=grp('WhatsApp Templates (Malay)',[fld('wa_tmpl_baki','Bank Transfer (Manual)','textarea'),fld('wa_tmpl_balance_link','Payment Link (Bayarcash)','textarea'),fld('wa_tmpl_staff','Staff Assignment','textarea')]);
-    h+=grp('Scheduling',[fld('slots'),fld('max_slots_per_day'),fld('coverage_area')]);
+    h+=grp('Scheduling',[fld('slots'),fld('max_slots_per_day'),fld('coverage_area'),fld('service_areas','Service Areas','textarea')]);
     h+=grp('Automation',[fld('auto_confirm_payment','Auto-confirm Payment','select_onoff'),fld('auto_assign_enabled','Auto-assign Staff','select_onoff'),fld('auto_assign_rule','Assignment Rule','select_rule'),fld('auto_complete_task','Auto-complete Task','select_onoff'),fld('auto_send_wa_balance','Auto-send WA Balance','select_onoff')]);
     h+=grp('Cloudinary',[fld('cloud_name'),fld('upload_preset'),fld('folder')]);
     h+='<button class="d-btn acc" style="padding:12px" onclick="saveSettings()">Save All Settings</button>';
@@ -740,6 +740,11 @@ async function loadSettings(){try{var {data}=await SB.from('app_settings').selec
 function fillTemplate(tmpl,map){return (tmpl||'').replace(/\{(\w+)\}/g,function(m,k){return map[k]!==undefined?map[k]:m});}
 function mapsUrl(addr){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr||'');}
 function waNum(p){p=(p||'').replace(/[^0-9]/g,'');if(p.indexOf('0')===0)p='6'+p.substring(1);return p;}
+function detectArea(addr){
+  var areas=(settings.service_areas||'').split(',').map(function(s){return s.trim()}).filter(Boolean);
+  for(var i=0;i<areas.length;i++){if(addr.toLowerCase().indexOf(areas[i].toLowerCase())>-1)return areas[i]}
+  return null;
+}
 function fmtTs(ts){if(!ts)return null;var d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function taskBadge(s){var m={unassigned:'Unassigned',assigned:'Assigned',in_progress:'In Progress',awaiting_review:'Review',completed:'Completed',cancelled:'Cancelled'};return '<span class="bc-badge '+s+'"><span class="bdot"></span>'+(m[s]||s)+'</span>';}
 
@@ -789,8 +794,18 @@ function slotOrder(s){var slots=(settings.slots||'9am,11am,2pm,4pm').split(',').
 function showDay(ds,keep){
   selDate=ds;
   var jobs=taskList.filter(function(x){return x.b.booking_date===ds}).sort(function(a,b){return slotOrder(a.b.booking_time)-slotOrder(b.b.booking_time)});
+  var areas=(settings.service_areas||'').split(',').map(function(s){return s.trim()}).filter(Boolean);
   var h='<div class="day-head"><h3>'+fd(ds)+'</h3><span class="sec-count">'+jobs.length+' job(s)</span></div>';
   if(!jobs.length){h+='<div class="empty" style="padding:32px"><div class="eicon"><i data-lucide="calendar"></i></div><p>No jobs on this date.</p></div>';}
+  else if(areas.length){
+    var grp={};jobs.forEach(function(x){var a=detectArea(x.b.customer_address)||'Other';if(!grp[a])grp[a]=[];grp[a].push(x)});
+    Object.keys(grp).sort().forEach(function(a){
+      if(areas.length>1)h+='<div style="font-size:.68rem;font-weight:700;color:var(--accent);padding:10px 4px 4px;display:flex;align-items:center;gap:6px"><i data-lucide="map-pin"></i> '+esc(a)+' <span class="sec-count">'+grp[a].length+'</span></div>';
+      grp[a].forEach(function(x){
+        h+='<div class="tk-card" onclick="openTask(\''+x.t.id+'\')"><span class="tk-slot">'+ft(x.b.booking_time)+'</span><div class="tk-body"><div class="tk-name">'+esc(x.b.customer_name)+'</div><div class="tk-addr"><i data-lucide="map-pin"></i> '+esc(x.b.customer_address)+'</div><div style="margin-top:4px;font-size:.68rem;color:var(--text3)">'+(x.s?'<i data-lucide="user"></i> '+esc(x.s.full_name):'<i data-lucide="alert-triangle"></i> Unassigned')+'</div></div>'+taskBadge(x.t.status)+'</div>';
+      });
+    });
+  }
   else{jobs.forEach(function(x){
     h+='<div class="tk-card" onclick="openTask(\''+x.t.id+'\')"><span class="tk-slot">'+ft(x.b.booking_time)+'</span><div class="tk-body"><div class="tk-name">'+esc(x.b.customer_name)+'</div><div class="tk-addr"><i data-lucide="map-pin"></i> '+esc(x.b.customer_address)+'</div><div style="margin-top:4px;font-size:.68rem;color:var(--text3)">'+(x.s?'<i data-lucide="user"></i> '+esc(x.s.full_name):'<i data-lucide="alert-triangle"></i> Unassigned')+'</div></div>'+taskBadge(x.t.status)+'</div>';
   });}
@@ -814,10 +829,12 @@ async function openTask(taskId){
   staffList.forEach(function(s){opts+='<option value="'+s.id+'"'+(t.assigned_to===s.id?' selected':'')+'>'+esc(s.full_name)+' ('+esc(s.phone)+')</option>';});
   function row(k,v){return '<div class="tl-item"><span class="tk">'+k+'</span><span class="tv">'+(v||'-')+'</span></div>';}
   var tl=row('Created',fmtTs(t.created_at))+row('Started',fmtTs(t.started_at))+row('Finished',fmtTs(t.finished_at))+row('Completed',fmtTs(t.completed_at));
+  var area=detectArea(b.customer_address);
   document.getElementById('mBody').innerHTML=
     '<div class="m-row"><span class="mk">Date & Time</span><span class="mv">'+fd(b.booking_date)+' &middot; '+ft(b.booking_time)+'</span></div>'+
     '<div class="m-row"><span class="mk">Status</span><span class="mv">'+taskBadge(t.status)+'</span></div>'+
     '<div class="m-row"><span class="mk">Address</span><span class="mv">'+esc(b.customer_address)+'</span></div>'+
+    (area?'<div class="m-row"><span class="mk">Area</span><span class="mv"><i data-lucide="map-pin"></i> '+esc(area)+'</span></div>':'')+
     '<div class="m-row"><span class="mk">Payment</span><span class="mv">Deposit '+esc(b.payment_status)+' &middot; Balance RM'+esc(settings.price_balance||b.deposit_amount||'150')+'</span></div>'+
     '<div style="margin:14px 0 6px;font-size:.72rem;color:var(--text3);font-weight:600">Before Photos ('+beforeP.length+')</div>'+thumbs(beforeP)+
     '<div style="margin:14px 0 6px;font-size:.72rem;color:var(--text3);font-weight:600">After Photos ('+afterP.length+')</div>'+thumbs(afterP)+
