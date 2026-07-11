@@ -56,19 +56,44 @@ async function googleTokenFromSA(sa: { client_email: string; private_key: string
   if (!d.access_token) throw new Error(d.error_description || d.error || "google auth failed");
   return d.access_token as string;
 }
-async function driveUpload(token: string, folderId: string, filename: string, content: string) {
+async function driveUpload(token: string, folderId: string, filename: string, data: Uint8Array) {
   const boundary = "bkp" + Date.now();
   const meta: Record<string, unknown> = { name: filename };
   if (folderId) meta.parents = [folderId];
-  const body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n${content}\r\n--${boundary}--`;
+  const pre = new TextEncoder().encode(`--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${boundary}\r\nContent-Type: application/gzip\r\n\r\n`);
+  const post = new TextEncoder().encode(`\r\n--${boundary}--`);
+  const bodyBytes = new Uint8Array(pre.length + data.length + post.length);
+  bodyBytes.set(pre, 0); bodyBytes.set(data, pre.length); bodyBytes.set(post, pre.length + data.length);
   const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true", {
-    method: "POST", headers: { Authorization: "Bearer " + token, "Content-Type": "multipart/related; boundary=" + boundary }, body,
+    method: "POST", headers: { Authorization: "Bearer " + token, "Content-Type": "multipart/related; boundary=" + boundary }, body: bodyBytes,
   });
   if (!res.ok) throw new Error("drive upload " + res.status + ": " + (await res.text()).slice(0, 200));
   return await res.json();
 }
 
+async function gzipBytes(str: string): Promise<Uint8Array> {
+  const cs = new CompressionStream("gzip");
+  const stream = new Blob([str]).stream().pipeThrough(cs);
+  const buf = await new Response(stream).arrayBuffer();
+  return new Uint8Array(buf);
+}
+async function fetchAll(sb: ReturnType<typeof admin>, table: string): Promise<any[]> {
+  const out: any[] = [];
+  const page = 1000;
+  let from = 0;
+  for (;;) {
+    const { data, error } = await sb.from(table).select("*").range(from, from + page - 1);
+    if (error) throw new Error(table + ": " + error.message);
+    if (!data || data.length === 0) break;
+    for (const r of data) out.push(r);
+    if (data.length < page) break;
+    from += page;
+  }
+  return out;
+}
+
 const TABLES = ["app_settings", "profiles", "bookings", "slots", "tasks", "task_photos"];
+const KEEP_BACKUPS = 48;
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -84,15 +109,26 @@ Deno.serve(async (req: Request) => {
       const dump: Record<string, unknown> = { _meta: { project: "jayaclean", at: new Date().toISOString() } };
       let total = 0;
       for (const t of TABLES) {
-        const { data } = await sb.from(t).select("*");
-        dump[t] = data || [];
-        total += (data || []).length;
+        const rows = await fetchAll(sb, t);
+        dump[t] = rows;
+        total += rows.length;
       }
       const content = JSON.stringify(dump);
+      const gz = await gzipBytes(content);
+      const sizeKB = Math.round(gz.length / 1024);
       const ts = new Date().toISOString().replace(/[:.]/g, "-").replace("Z", "");
-      const path = `db/db-backup-${ts}.json`;
-      const up = await sb.storage.from("backups").upload(path, new Blob([content], { type: "application/json" }), { contentType: "application/json", upsert: true });
+      const fname = `db-backup-${ts}.json.gz`;
+      const path = `db/${fname}`;
+      const up = await sb.storage.from("backups").upload(path, gz, { contentType: "application/gzip", upsert: true });
       if (up.error) throw new Error("storage: " + up.error.message);
+
+      // Retention: keep only the most recent KEEP_BACKUPS files
+      try {
+        const { data: files } = await sb.storage.from("backups").list("db", { limit: 1000, sortBy: { column: "name", order: "desc" } });
+        if (files && files.length > KEEP_BACKUPS) {
+          await sb.storage.from("backups").remove(files.slice(KEEP_BACKUPS).map((f: any) => "db/" + f.name));
+        }
+      } catch (_e) { /* retention best-effort */ }
 
       let drive = "skipped";
       const priv: Record<string, string> = {};
@@ -104,21 +140,21 @@ Deno.serve(async (req: Request) => {
       if (email && pkey) {
         try {
           const tk = await googleTokenFromSA({ client_email: email, private_key: pkey });
-          await driveUpload(tk, folder, `db-backup-${ts}.json`, content);
+          await driveUpload(tk, folder, fname, gz);
           drive = "ok";
         } catch (e) { drive = "error: " + (e as Error).message; }
       } else if (Deno.env.get("GOOGLE_SA_JSON")) {
         try {
           const saj = JSON.parse(Deno.env.get("GOOGLE_SA_JSON")!);
           const tk = await googleTokenFromSA({ client_email: saj.client_email, private_key: saj.private_key });
-          await driveUpload(tk, folder, `db-backup-${ts}.json`, content);
+          await driveUpload(tk, folder, fname, gz);
           drive = "ok";
         } catch (e) { drive = "error: " + (e as Error).message; }
       }
-      const status = `ok (${total} rows, storage:ok, drive:${drive})`;
+      const status = `ok (${total} rows, ${sizeKB} KB gz, storage:ok, drive:${drive})`;
       await setKV(sb, "backup_last_db_at", new Date().toISOString());
       await setKV(sb, "backup_last_db_status", status);
-      return json({ status: "ok", data: { path, rows: total, drive } });
+      return json({ status: "ok", data: { path, rows: total, sizeKB, drive } });
     }
 
     if (action === "list") {
