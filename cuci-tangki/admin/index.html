@@ -575,14 +575,14 @@ function setChrome(show){var g=document.querySelector('.stats-grid'),s=document.
 function clearNav(){document.querySelectorAll('.d-nav-item,.bnav-item').forEach(function(n){n.classList.remove('active')});}
 function setNav(id){var el=document.getElementById(id);if(el)el.classList.add('active');}
 function setHeader(title,sub){var t=document.getElementById('dTitle'),s=document.getElementById('dSub');if(t)t.textContent=title;if(s)s.textContent=sub;}
-function showBookings(filter){currentView='bookings';setChrome(true);setHeader('Bookings','All customer bookings');document.getElementById('secTitle').textContent='Bookings';load(filter);}
+function showBookings(filter){currentView='bookings';setChrome(true);setHeader('Bookings','All customer bookings');document.getElementById('secTitle').textContent='Bookings';location.hash='#bookings';if(filter)location.hash='#pending';load(filter);}
 function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else load(cf);}
 
 // ═══════════ DASHBOARD ═══════════
 function mrow(x){var b=x.b,t=x.t;return '<div class="mrow" onclick="openTask(\''+t.id+'\')"><span class="mslot">'+ft(b.booking_time)+'</span><div class="mb"><div class="mn">'+esc(b.customer_name)+'</div><div class="ma"><i data-lucide="map-pin"></i><span class="txt">'+esc(b.customer_address)+'</span></div></div>'+taskBadge(t.status)+'</div>';}
 async function showDashboard(){
   currentView='dashboard';setChrome(false);clearNav();setNav('dsDash');setNav('navDash');
-  setHeader('Dashboard','Overview of operations');
+  setHeader('Dashboard','Overview of operations');location.hash='#home';
   var l=document.getElementById('list');
   l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
   try{
@@ -634,7 +634,7 @@ async function showDashboard(){
 // ═══════════ REPORTS ═══════════
 async function showReports(){
   currentView='reports';setChrome(false);clearNav();setNav('dsReports');
-  setHeader('Reports','Performance & revenue analytics');
+  setHeader('Reports','Performance & revenue analytics');location.hash='#reports';
   var l=document.getElementById('list');
   l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
   try{
@@ -741,7 +741,7 @@ async function showReports(){
 // ═══════════ STAFF MANAGEMENT ═══════════
 async function showStaff(){
   currentView='staff';setChrome(false);clearNav();setNav('dsStaff');setNav('navStaff');
-  setHeader('Staff','Manage staff accounts');
+  setHeader('Staff','Manage staff accounts');location.hash='#staff';
   newStaffAvatar='';
   var l=document.getElementById('list');
   l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
@@ -859,7 +859,7 @@ async function resetStaffPassword(id){
 var SETTING_LABELS={business_name:'Business Name',bank_name:'Bank Name',bank_account_no:'Bank Account No',bank_account_holder:'Account Holder',qr_image_url:'Bank QR Image URL',price_total:'Price Total (RM)',price_deposit:'Deposit (RM)',price_balance:'Balance (RM)',wa_business_number:'Business WhatsApp Number',wa_tmpl_baki:'WA Template - Bank Transfer',wa_tmpl_balance_link:'WA Template - Payment Link',wa_tmpl_staff:'WA Template - Staff Assignment',wa_api_enabled:'WhatsApp Cloud API (auto-send)',coverage_area:'Coverage Area',max_slots_per_day:'Max Slots/Day',slots:'Time Slots',service_areas:'Service Areas (comma-separated)',auto_confirm_payment:'Auto-confirm Payment',auto_assign_enabled:'Auto-assign Staff',auto_assign_rule:'Auto-assign Rule',auto_complete_task:'Auto-complete Task',auto_send_wa_balance:'Auto-send WA Balance',cloud_name:'Cloudinary Cloud Name',upload_preset:'Cloudinary Upload Preset',folder:'Cloudinary Folder'};
 async function showSettings(){
   currentView='settings';setChrome(false);clearNav();setNav('dsSettings');
-  setHeader('Settings','Business configuration');
+  setHeader('Settings','Business configuration');location.hash='#settings';
   var l=document.getElementById('list');
   l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
   try{
@@ -943,7 +943,7 @@ async function loadTaskData(){
 }
 async function showSchedule(){
   currentView='schedule';setChrome(false);clearNav();setNav('dsSchedule');setNav('navSchedule');
-  setHeader('Schedule','Tasks by date. Click a day to see jobs.');
+  setHeader('Schedule','Tasks by date. Click a day to see jobs.');location.hash='#schedule';
   var l=document.getElementById('list');
   l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
   try{await loadTaskData();renderCalendar();}catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
@@ -1116,7 +1116,13 @@ async function checkAccess(){
     if(!profile||profile.role!=='admin'||!profile.is_active){await SB.auth.signOut();showLogin();return}
     document.getElementById('loginOverlay').classList.add('hidden');
     await loadSettings();
-    showDashboard();
+    var h=location.hash;
+    if(h==='#bookings'||h==='#pending')showBookings(h==='#pending'?'pending_payment':null);
+    else if(h==='#schedule')showSchedule();
+    else if(h==='#staff')showStaff();
+    else if(h==='#reports')showReports();
+    else if(h==='#settings')showSettings();
+    else showDashboard();
   }catch(e){showLogin()}
 }
 function showLogin(){document.getElementById('loginOverlay').classList.remove('hidden');document.getElementById('authErr').style.display='none'}
