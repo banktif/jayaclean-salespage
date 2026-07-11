@@ -493,7 +493,7 @@ async function showDashboard(){
     await loadTaskData();
     var bq=await SB.from('bookings').select('*').order('created_at',{ascending:false});
     var bookings=bq.data||[];all=bookings;
-    var t=today();
+    var _n=new Date(),t=_n.getFullYear()+'-'+String(_n.getMonth()+1).padStart(2,'0')+'-'+String(_n.getDate()).padStart(2,'0');
     var cnt=function(f){return taskList.filter(f).length};
     var kToday=taskList.filter(function(x){return x.b.booking_date===t}).length;
     var kUn=cnt(function(x){return x.t.status==='unassigned'});
