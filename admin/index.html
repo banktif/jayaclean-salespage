@@ -363,7 +363,6 @@
   <button class="d-nav-item" id="dsStaff" onclick="showStaff()"><span class="dni"><i data-lucide="users"></i></span> Staff</button>
   <button class="d-nav-item" id="dsReports" onclick="showReports()"><span class="dni"><i data-lucide="bar-chart-3"></i></span> Reports</button>
   <button class="d-nav-item" id="dsSettings" onclick="showSettings()"><span class="dni"><i data-lucide="settings"></i></span> Settings</button>
-  <button class="d-nav-item" id="dsBackup" onclick="showBackup()"><span class="dni"><i data-lucide="database-backup"></i></span> Backup</button>
   <div class="d-sidebar-footer">
     <button onclick="refreshView()"><i data-lucide="refresh-cw"></i> Refresh</button>
     <button onclick="toggleTheme()"><i data-lucide="sun-moon"></i> Theme</button>
@@ -416,7 +415,6 @@
     <button class="drawer-item" onclick="showStaff();toggleDrawer()"><span><i data-lucide="users"></i></span> Staff</button>
     <button class="drawer-item" onclick="showReports();toggleDrawer()"><span><i data-lucide="bar-chart-3"></i></span> Reports</button>
     <button class="drawer-item" onclick="showSettings();toggleDrawer()"><span><i data-lucide="settings"></i></span> Settings</button>
-    <button class="drawer-item" onclick="showBackup();toggleDrawer()"><span><i data-lucide="database-backup"></i></span> Backup</button>
   </div>
   <div class="drawer-menu" style="border-top:1px solid var(--border);padding-top:8px">
     <button class="drawer-item" onclick="refreshView();toggleDrawer()"><span><i data-lucide="refresh-cw"></i></span> Refresh</button>
@@ -436,11 +434,16 @@
 <!-- ═══════════ MODAL ═══════════ -->
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="m-sheet"><h3 id="mTitle"></h3><div id="mBody"></div><div class="m-acts" id="mActs"></div></div></div>
 
-<!-- ═══════════ AUTH GATE (loading / redirect) ═══════════ -->
+<!-- ═══════════ AUTH GATE ═══════════ -->
 <div class="login" id="loginOverlay"><div class="login-box">
   <div class="login-avatar">JC</div>
   <h2>JAYACLEAN</h2>
-  <p class="sub" id="authMsg">Checking access...</p>
+  <p class="sub">Admin Sign In</p>
+  <input type="text" id="loginEmail" placeholder="Email" autocomplete="email">
+  <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
+  <div class="err" id="authErr" style="display:none;color:var(--danger);font-size:.72rem;margin-bottom:6px;text-align:center"></div>
+  <button onclick="doLogin()">Sign In</button>
+  <p style="margin-top:14px;font-size:.68rem;color:var(--text3);text-align:center">Admin access only</p>
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -562,74 +565,7 @@ function clearNav(){document.querySelectorAll('.d-nav-item,.bnav-item').forEach(
 function setNav(id){var el=document.getElementById(id);if(el)el.classList.add('active');}
 function setHeader(title,sub){var t=document.getElementById('dTitle'),s=document.getElementById('dSub');if(t)t.textContent=title;if(s)s.textContent=sub;}
 function showBookings(filter){currentView='bookings';setChrome(true);setHeader('Bookings','All customer bookings');document.getElementById('secTitle').textContent='Bookings';load(filter);}
-function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else if(currentView==='backup')showBackup();else load(cf);}
-
-// ═══════════ BACKUP ═══════════
-async function callBackup(action){
-  var token=await authToken();
-  var res=await fetch('https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/backup',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:action})});
-  return {ok:res.ok,body:await res.json()};
-}
-function bkPanel(label,icon,at,status){
-  var when=at?new Date(at).toLocaleString():'Never';
-  var ok=(status||'').indexOf('ok')===0||(status||'').indexOf('triggered')===0;
-  var col=at?(ok?'var(--accent)':'var(--danger)'):'var(--text3)';
-  return '<div class="panel"><div class="panel-h"><h3><i data-lucide="'+icon+'"></i> '+label+'</h3></div>'+
-    '<div style="font-size:.8rem;color:var(--text2)">Last: <strong>'+when+'</strong></div>'+
-    '<div style="font-size:.72rem;color:'+col+';margin-top:6px;word-break:break-word">'+esc(status||'No backup yet')+'</div></div>';
-}
-async function showBackup(){
-  currentView='backup';setChrome(false);clearNav();setNav('dsBackup');
-  setHeader('Backup','Code + database backups (auto hourly)');
-  var l=document.getElementById('list');
-  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
-  try{
-    var st=((await callBackup('status')).body.data)||{};
-    var priv={};try{var pv=await SB.from('private_settings').select('key,value').in('key',['gdrive_client_email','gdrive_private_key','gdrive_folder_id']);(pv.data||[]).forEach(function(r){priv[r.key]=r.value});}catch(e){}
-    var driveOn=st.drive_configured==='true';
-    var h='<div class="panels">'+bkPanel('Database Backup','database',st.backup_last_db_at,st.backup_last_db_status)+bkPanel('Code Backup (GitLab)','git-branch',st.backup_last_code_at,st.backup_last_code_status)+'</div>';
-    h+='<div class="sGrp"><div class="sGrpH">Run Backup Now</div><div style="display:flex;gap:10px;flex-wrap:wrap">';
-    h+='<button class="btn-primary" style="width:auto" onclick="backupNow(\'db\')"><i data-lucide="database"></i> Backup Database</button>';
-    h+='<button class="btn-primary" style="width:auto;background:var(--accent2)" onclick="backupNow(\'code\')"><i data-lucide="git-branch"></i> Backup Code to GitLab</button>';
-    h+='</div><div id="bkMsg" style="font-size:.78rem;color:var(--text3);margin-top:10px"></div></div>';
-    h+='<div class="sGrp"><div class="sGrpH">Auto Backup</div><div style="font-size:.82rem">&#9989; Runs hourly automatically. Database &rarr; Supabase Storage'+(driveOn?' + Google Drive':'')+'. Code &rarr; GitLab (all repos).</div></div>';
-    h+='<div class="sGrp"><div class="sGrpH">Google Drive '+(driveOn?'&#9989; Connected':'&#9888; Not configured')+'</div><div style="display:grid;gap:12px;max-width:640px">';
-    h+='<div><div class="sLbl">Service Account Email</div><input id="gdEmail" class="sInp" value="'+esc(priv.gdrive_client_email||'')+'" placeholder="name@project.iam.gserviceaccount.com"></div>';
-    h+='<div><div class="sLbl">Private Key</div><textarea id="gdKey" class="sInp" rows="4" placeholder="-----BEGIN PRIVATE KEY-----">'+esc(priv.gdrive_private_key||'')+'</textarea></div>';
-    h+='<div><div class="sLbl">Drive Folder ID</div><input id="gdFolder" class="sInp" value="'+esc(priv.gdrive_folder_id||'')+'" placeholder="folder id from the Drive folder URL"></div>';
-    h+='<button class="btn-primary" style="width:auto" onclick="saveBackupCfg()"><i data-lucide="save"></i> Save Google Drive Settings</button>';
-    h+='<div id="bkCfgMsg" style="font-size:.75rem;color:var(--text3)"></div></div>';
-    h+='<div style="font-size:.72rem;color:var(--text3);margin-top:12px;line-height:1.7">One-time setup: (1) Google Cloud Console &rarr; create a <strong>Service Account</strong> + JSON key. (2) Enable the <strong>Google Drive API</strong>. (3) From the JSON, copy <code>client_email</code> and <code>private_key</code> into the fields above. (4) In Google Drive, share your backup folder with that Service Account email as <strong>Editor</strong>, then paste the folder ID.</div></div>';
-    h+='<div class="sGrp"><div class="sGrpH">Recent Database Backups</div><div id="bkList"><div style="font-size:.78rem;color:var(--text3)">Loading...</div></div></div>';
-    l.innerHTML=h;
-    loadBackupList();
-  }catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
-}
-async function backupNow(kind){
-  var msg=document.getElementById('bkMsg');msg.style.color='var(--text3)';msg.textContent=(kind==='db'?'Backing up database...':'Triggering code backup...');
-  var r=await callBackup(kind);
-  if(r.ok){msg.style.color='var(--accent)';msg.textContent=(kind==='db'?'Database backup done.':'Code backup triggered (GitHub Actions running).');setTimeout(showBackup,1400);}
-  else{msg.style.color='var(--danger)';msg.textContent='Error: '+(r.body.error||'failed');}
-}
-async function saveBackupCfg(){
-  var m=document.getElementById('bkCfgMsg');m.style.color='var(--text3)';m.textContent='Saving...';
-  var now=new Date().toISOString();
-  var rows=[
-    {key:'gdrive_client_email',value:document.getElementById('gdEmail').value.trim(),updated_at:now},
-    {key:'gdrive_private_key',value:document.getElementById('gdKey').value.trim(),updated_at:now},
-    {key:'gdrive_folder_id',value:document.getElementById('gdFolder').value.trim(),updated_at:now}
-  ];
-  try{var {error}=await SB.from('private_settings').upsert(rows);if(error)throw error;m.style.color='var(--accent)';m.textContent='Saved. Google Drive will be used on the next backup.';setTimeout(showBackup,1200);}catch(e){m.style.color='var(--danger)';m.textContent='Error: '+e.message;}
-}
-async function loadBackupList(){
-  var el=document.getElementById('bkList');
-  try{
-    var items=((await callBackup('list')).body.data)||[];
-    if(!items.length){el.innerHTML='<div style="font-size:.78rem;color:var(--text3)">No backups yet.</div>';return;}
-    var h='';items.forEach(function(f){h+='<div class="mrow" style="cursor:default"><i data-lucide="file-json"></i><div class="mb"><div class="mn">'+esc(f.name)+'</div><div class="ma">'+(f.size?Math.round(f.size/1024)+' KB':'')+'</div></div><a class="d-btn" href="'+esc(f.url)+'" target="_blank">Download</a></div>';});
-    el.innerHTML=h;
-  }catch(e){el.innerHTML='<div style="font-size:.78rem;color:var(--danger)">'+esc(e.message)+'</div>';}
-}
+function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else load(cf);}
 
 // ═══════════ DASHBOARD ═══════════
 function mrow(x){var b=x.b,t=x.t;return '<div class="mrow" onclick="openTask(\''+t.id+'\')"><span class="mslot">'+ft(b.booking_time)+'</span><div class="mb"><div class="mn">'+esc(b.customer_name)+'</div><div class="ma"><i data-lucide="map-pin"></i><span class="txt">'+esc(b.customer_address)+'</span></div></div>'+taskBadge(t.status)+'</div>';}
@@ -1149,19 +1085,32 @@ async function autoAssignAll(){
 }
 
 // AUTH (Supabase)
-async function guard(){
+async function doLogin(){
+  var msg=document.getElementById('authErr');
+  var em=document.getElementById('loginEmail').value.trim();
+  var pw=document.getElementById('loginPass').value;
+  if(!em||!pw){msg.style.display='block';msg.textContent='Enter email and password';return}
+  msg.style.display='none';
+  try{
+    var {error}=await SB.auth.signInWithPassword({email:em,password:pw});
+    if(error){msg.style.display='block';msg.textContent=error.message;return}
+    await checkAccess();
+  }catch(e){msg.style.display='block';msg.textContent=e.message}
+}
+async function checkAccess(){
   try{
     var {data:{user}}=await SB.auth.getUser();
-    if(!user){location.href='/login/';return;}
+    if(!user){showLogin();return}
     var {data:profile}=await SB.from('profiles').select('role,is_active,full_name').eq('id',user.id).single();
-    if(!profile||profile.role!=='admin'||!profile.is_active){await SB.auth.signOut();location.href='/login/';return;}
+    if(!profile||profile.role!=='admin'||!profile.is_active){await SB.auth.signOut();showLogin();return}
     document.getElementById('loginOverlay').classList.add('hidden');
     await loadSettings();
     showDashboard();
-  }catch(e){document.getElementById('authMsg').textContent='Error: '+e.message;}
+  }catch(e){showLogin()}
 }
-async function logout(){try{await SB.auth.signOut()}catch(e){}location.href='/login/';}
-guard();relucide();
+function showLogin(){document.getElementById('loginOverlay').classList.remove('hidden');document.getElementById('authErr').style.display='none'}
+async function logout(){try{await SB.auth.signOut()}catch(e){}location.reload()}
+checkAccess();relucide();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){})}
 
 // PULL TO REFRESH (mobile)

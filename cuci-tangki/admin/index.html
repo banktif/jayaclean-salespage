@@ -434,11 +434,16 @@
 <!-- ═══════════ MODAL ═══════════ -->
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="m-sheet"><h3 id="mTitle"></h3><div id="mBody"></div><div class="m-acts" id="mActs"></div></div></div>
 
-<!-- ═══════════ AUTH GATE (loading / redirect) ═══════════ -->
+<!-- ═══════════ AUTH GATE ═══════════ -->
 <div class="login" id="loginOverlay"><div class="login-box">
   <div class="login-avatar">JC</div>
   <h2>JAYACLEAN</h2>
-  <p class="sub" id="authMsg">Checking access...</p>
+  <p class="sub">Admin Sign In</p>
+  <input type="text" id="loginEmail" placeholder="Email" autocomplete="email">
+  <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
+  <div class="err" id="authErr" style="display:none;color:var(--danger);font-size:.72rem;margin-bottom:6px;text-align:center"></div>
+  <button onclick="doLogin()">Sign In</button>
+  <p style="margin-top:14px;font-size:.68rem;color:var(--text3);text-align:center">Admin access only</p>
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1080,19 +1085,32 @@ async function autoAssignAll(){
 }
 
 // AUTH (Supabase)
-async function guard(){
+async function doLogin(){
+  var msg=document.getElementById('authErr');
+  var em=document.getElementById('loginEmail').value.trim();
+  var pw=document.getElementById('loginPass').value;
+  if(!em||!pw){msg.style.display='block';msg.textContent='Enter email and password';return}
+  msg.style.display='none';
+  try{
+    var {error}=await SB.auth.signInWithPassword({email:em,password:pw});
+    if(error){msg.style.display='block';msg.textContent=error.message;return}
+    await checkAccess();
+  }catch(e){msg.style.display='block';msg.textContent=e.message}
+}
+async function checkAccess(){
   try{
     var {data:{user}}=await SB.auth.getUser();
-    if(!user){location.href='/login/';return;}
+    if(!user){showLogin();return}
     var {data:profile}=await SB.from('profiles').select('role,is_active,full_name').eq('id',user.id).single();
-    if(!profile||profile.role!=='admin'||!profile.is_active){await SB.auth.signOut();location.href='/login/';return;}
+    if(!profile||profile.role!=='admin'||!profile.is_active){await SB.auth.signOut();showLogin();return}
     document.getElementById('loginOverlay').classList.add('hidden');
     await loadSettings();
     showDashboard();
-  }catch(e){document.getElementById('authMsg').textContent='Error: '+e.message;}
+  }catch(e){showLogin()}
 }
-async function logout(){try{await SB.auth.signOut()}catch(e){}location.href='/login/';}
-guard();relucide();
+function showLogin(){document.getElementById('loginOverlay').classList.remove('hidden');document.getElementById('authErr').style.display='none'}
+async function logout(){try{await SB.auth.signOut()}catch(e){}location.reload()}
+checkAccess();relucide();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){})}
 
 // PULL TO REFRESH (mobile)

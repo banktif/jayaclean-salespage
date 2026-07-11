@@ -63,7 +63,12 @@
   </style>
 </head>
 <body>
-<div class="login" id="loading"><div class="logo">JC</div><div class="spin"><div class="sd"></div><div class="sd"></div><div class="sd"></div></div></div>
+<div class="login" id="loading"><div class="logo">JC</div><h2 style="font-size:1rem;font-weight:700;margin-top:8px">JAYACLEAN</h2><p class="sub" style="font-size:.74rem;color:var(--text3);margin-top:4px">Worker Sign In</p>
+  <input type="text" id="loginPhone" placeholder="Phone number" autocomplete="tel" style="padding:12px;border:2px solid var(--border-strong);border-radius:12px;font-family:var(--font);font-size:.85rem;width:260px;text-align:center;background:var(--elevated);color:var(--text)">
+  <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" style="padding:12px;border:2px solid var(--border-strong);border-radius:12px;font-family:var(--font);font-size:.85rem;width:260px;text-align:center;background:var(--elevated);color:var(--text)">
+  <div id="authErr" style="color:var(--danger);font-size:.72rem;text-align:center;display:none;max-width:260px"></div>
+  <button id="loginBtn" onclick="doLogin()" style="padding:12px 40px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:var(--font)">Sign In</button>
+</div>
 
 <header class="hdr" id="hdr" style="display:none">
   <div class="hdr-l"><div class="logo">JC</div><div><h1>My Jobs</h1><div class="who" id="who"></div></div></div>
@@ -107,23 +112,39 @@ function badge(s){var m={assigned:'Assigned',in_progress:'In Progress',awaiting_
 
 async function loadSettings(){try{var {data}=await SB.from('app_settings').select('*');settings={};(data||[]).forEach(function(s){settings[s.key]=s.value})}catch(e){}}
 
-async function guard(){
-  var {data:{user}}=await SB.auth.getUser();
-  if(!user){location.href='/login/';return}
-  me=user;
-  var {data:p}=await SB.from('profiles').select('role,is_active,full_name,avatar_url,service_area').eq('id',user.id).single();
-  if(!p||!p.is_active){await SB.auth.signOut();location.href='/login/';return}
-  if(p.role==='admin'){location.href='/admin/';return}
-  profile=p;
-  document.getElementById('who').textContent=(p.full_name||'Worker')+(p.service_area?' \u2022 '+p.service_area:'');
-  if(p.avatar_url){var lg=document.querySelector('.hdr .logo');if(lg){lg.style.overflow='hidden';lg.innerHTML='<img src="'+p.avatar_url+'" style="width:100%;height:100%;object-fit:cover">';}}
-  await loadSettings();
-  document.getElementById('loading').style.display='none';
-  document.getElementById('hdr').style.display='flex';
-  document.getElementById('wrap').style.display='block';
-  await loadJobs();
+async function doLogin(){
+  var msg=document.getElementById('authErr'),btn=document.getElementById('loginBtn');
+  var phone=document.getElementById('loginPhone').value.trim();
+  var pw=document.getElementById('loginPass').value;
+  if(!phone||!pw){msg.style.display='block';msg.textContent='Enter phone and password';return}
+  var digits=phone.replace(/[^0-9]/g,'');
+  msg.style.display='none';btn.disabled=true;btn.textContent='Signing in...';
+  try{
+    var {error}=await SB.auth.signInWithPassword({email:digits+'@staff.jayabina.local',password:pw});
+    if(error){msg.style.display='block';msg.textContent=error.message;btn.disabled=false;btn.textContent='Sign In';return}
+    await checkAccess();
+  }catch(e){msg.style.display='block';msg.textContent=e.message;btn.disabled=false;btn.textContent='Sign In'}
 }
-async function logout(){try{await SB.auth.signOut()}catch(e){}location.href='/login/'}
+async function checkAccess(){
+  try{
+    var {data:{user}}=await SB.auth.getUser();
+    if(!user){showLogin();return}
+    var {data:p}=await SB.from('profiles').select('role,is_active,full_name,avatar_url,service_area').eq('id',user.id).single();
+    if(!p||!p.is_active){await SB.auth.signOut();showLogin();return}
+    if(p.role==='admin'){location.href='/admin/';return}
+    profile=p;me=user;
+    document.getElementById('who').textContent=(p.full_name||'Worker')+(p.service_area?' \u2022 '+p.service_area:'');
+    if(p.avatar_url){var lg=document.querySelector('.hdr .logo');if(lg){lg.style.overflow='hidden';lg.innerHTML='<img src="'+p.avatar_url+'" style="width:100%;height:100%;object-fit:cover">';}}
+    await loadSettings();
+    document.getElementById('loading').style.display='none';
+    document.getElementById('hdr').style.display='flex';
+    document.getElementById('wrap').style.display='block';
+    await loadJobs();
+  }catch(e){showLogin()}
+}
+function showLogin(){document.getElementById('loading').style.display='flex';document.getElementById('hdr').style.display='none';document.getElementById('wrap').style.display='none';document.getElementById('authErr').style.display='none'}
+async function logout(){try{await SB.auth.signOut()}catch(e){}location.reload()}
+checkAccess();relucide();
 
 async function loadJobs(){
   var j=document.getElementById('jobs');
@@ -234,7 +255,7 @@ async function finishJob(id){
     openJob(id)}catch(e){toast('Error: '+e.message)}
 }
 
-guard();relucide();
+checkAccess();relucide();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){})}
 </script>
 </body>
