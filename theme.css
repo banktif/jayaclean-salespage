@@ -1,0 +1,109 @@
+/* ============================================================
+   JAYACLEAN — Shared Theme (admin / staff / login)
+   Modern design tokens + Lucide icon defaults + global polish.
+   Single source of truth for colors. Customer pages NOT affected.
+   ============================================================ */
+
+/* ---------- LIGHT (default) ---------- */
+:root{
+  --bg:#f6f8fb;
+  --surface:#ffffff;
+  --elevated:#ffffff;
+  --overlay:rgba(255,255,255,.82);
+  --border:#edf0f4;
+  --border-strong:#e0e5ec;
+  --text:#0b1220;
+  --text2:#48546a;
+  --text3:#8b95a7;
+  --accent:#0ea364;
+  --accent-hover:#0b8a54;
+  --accent-light:#e9f9f1;
+  --accent-glow:rgba(14,163,100,.18);
+  --accent2:#3b82f6;
+  --accent2-light:#eaf1ff;
+  --warning:#d99a0b;
+  --warning-light:#fbf4e3;
+  --danger:#e5484d;
+  --danger-light:#fdecec;
+  --font:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:14px;
+  --radius-lg:20px;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 2px 6px rgba(16,24,40,.05);
+  --shadow-lg:0 12px 34px rgba(16,24,40,.10);
+}
+
+/* ---------- DARK (forced via html.dark) ---------- */
+html.dark{
+  --bg:#0b0f14;
+  --surface:#121821;
+  --elevated:#171e29;
+  --overlay:rgba(11,15,20,.85);
+  --border:rgba(255,255,255,.06);
+  --border-strong:rgba(255,255,255,.11);
+  --text:#e9eef5;
+  --text2:#9aa7b8;
+  --text3:#66748a;
+  --accent:#1db974;
+  --accent-hover:#25c980;
+  --accent-light:rgba(29,185,116,.12);
+  --accent-glow:rgba(29,185,116,.26);
+  --accent2:#5b9dff;
+  --accent2-light:rgba(91,157,255,.12);
+  --warning:#f0b429;
+  --warning-light:rgba(240,180,41,.12);
+  --danger:#f0595e;
+  --danger-light:rgba(240,89,94,.12);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35);
+  --shadow-lg:0 14px 40px rgba(0,0,0,.5);
+}
+
+/* ---------- DARK (system pref, unless page forces light/dark) ---------- */
+@media (prefers-color-scheme: dark){
+  html:not(.light):not(.dark){
+    --bg:#0b0f14;
+    --surface:#121821;
+    --elevated:#171e29;
+    --overlay:rgba(11,15,20,.85);
+    --border:rgba(255,255,255,.06);
+    --border-strong:rgba(255,255,255,.11);
+    --text:#e9eef5;
+    --text2:#9aa7b8;
+    --text3:#66748a;
+    --accent:#1db974;
+    --accent-hover:#25c980;
+    --accent-light:rgba(29,185,116,.12);
+    --accent-glow:rgba(29,185,116,.26);
+    --accent2:#5b9dff;
+    --accent2-light:rgba(91,157,255,.12);
+    --warning:#f0b429;
+    --warning-light:rgba(240,180,41,.12);
+    --danger:#f0595e;
+    --danger-light:rgba(240,89,94,.12);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35);
+    --shadow-lg:0 14px 40px rgba(0,0,0,.5);
+  }
+}
+
+/* ---------- Lucide icon defaults ---------- */
+[data-lucide],svg.lucide{
+  width:1.15em;height:1.15em;
+  stroke-width:2;
+  vertical-align:-.15em;
+  flex-shrink:0;
+}
+
+/* ---------- Global polish ---------- */
+*{ -webkit-tap-highlight-color:transparent; }
+button{ transition:transform .12s ease, background .18s ease, color .18s ease, border-color .18s ease; }
+button:active{ transform:scale(.97); }
+a,button,input,select,textarea{ outline:none; }
+:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
+
+/* Modern thin scrollbars */
+*{ scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent; }
+*::-webkit-scrollbar{ width:9px;height:9px; }
+*::-webkit-scrollbar-thumb{ background:var(--border-strong); border-radius:20px; border:2px solid transparent; background-clip:content-box; }
+*::-webkit-scrollbar-thumb:hover{ background:var(--text3); background-clip:content-box; }
+*::-webkit-scrollbar-track{ background:transparent; }
+
+::selection{ background:var(--accent); color:#fff; }

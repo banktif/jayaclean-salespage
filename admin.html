@@ -12,27 +12,8 @@
   <link rel="manifest" href="/manifest.json">
   <title>JAYACLEAN — Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
   <style>
-    :root{
-      --bg:#f2f4f8;--surface:#fff;--elevated:#fff;--overlay:rgba(242,244,248,.88);
-      --border:rgba(0,0,0,.05);--border-strong:rgba(0,0,0,.09);
-      --text:#0d1116;--text2:#566478;--text3:#8f9bb3;
-      --accent:#0ea364;--accent-light:#ebfaf2;--accent-glow:rgba(14,163,100,.15);
-      --accent2:#2d7fff;--accent2-light:#eef4ff;
-      --warning:#e6a31d;--warning-light:#fef9ed;
-      --danger:#e54545;--danger-light:#fef2f2;
-      --font:'Plus Jakarta Sans',-apple-system,sans-serif
-    }
-    .dark{
-      --bg:#0f1218;--surface:#161b23;--elevated:#1c2330;--overlay:rgba(15,18,24,.92);
-      --border:rgba(255,255,255,.04);--border-strong:rgba(255,255,255,.08);
-      --text:#eef1f6;--text2:#8798ad;--text3:#5a697a;
-      --accent:#1db974;--accent-light:rgba(29,185,116,.1);--accent-glow:rgba(29,185,116,.2);
-      --accent2:#4d9aff;--accent2-light:rgba(77,154,255,.1);
-      --warning:#f0ae2a;--warning-light:rgba(240,174,42,.1);
-      --danger:#f05a5a;--danger-light:rgba(240,90,90,.1);
-    }
-    @media(prefers-color-scheme:dark){html:not(.light):not(.dark){--bg:#0f1218;--surface:#161b23;--elevated:#1c2330;--overlay:rgba(15,18,24,.92);--border:rgba(255,255,255,.04);--border-strong:rgba(255,255,255,.08);--text:#eef1f6;--text2:#8798ad;--text3:#5a697a;--accent:#1db974;--accent-light:rgba(29,185,116,.1);--accent-glow:rgba(29,185,116,.2);--accent2:#4d9aff;--accent2-light:rgba(77,154,255,.1);--warning:#f0ae2a;--warning-light:rgba(240,174,42,.1);--danger:#f05a5a;--danger-light:rgba(240,90,90,.1)}}
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background .4s,color .4s}
     ::selection{background:var(--accent);color:#fff}
@@ -263,17 +244,17 @@
     <div class="hdr-logo">JC</div>
     <div class="d-brand-text"><h1>JAYACLEAN</h1><span>Admin Panel</span></div>
   </div>
-  <button class="d-nav-item active" id="dsAll" onclick="showBookings()"><span class="dni">&#9635;</span> All Bookings</button>
-  <button class="d-nav-item" id="dsWait" onclick="showBookings('pending_payment')"><span class="dni">&#9200;</span> Pending <span class="d-nav-badge" id="dsBadge">0</span></button>
-  <button class="d-nav-item" id="dsOK" onclick="showBookings('confirmed')"><span class="dni">&#10003;</span> Confirmed</button>
-  <button class="d-nav-item" id="dsDone" onclick="showBookings('completed')"><span class="dni">&#10004;</span> Completed</button>
-  <button class="d-nav-item" id="dsSchedule" onclick="showSchedule()"><span class="dni">&#128197;</span> Schedule</button>
-  <button class="d-nav-item" id="dsStaff" onclick="showStaff()"><span class="dni">&#128101;</span> Staff</button>
-  <button class="d-nav-item" id="dsSettings" onclick="showSettings()"><span class="dni">&#9881;</span> Settings</button>
+  <button class="d-nav-item active" id="dsAll" onclick="showBookings()"><span class="dni"><i data-lucide="layout-grid"></i></span> All Bookings</button>
+  <button class="d-nav-item" id="dsWait" onclick="showBookings('pending_payment')"><span class="dni"><i data-lucide="clock"></i></span> Pending <span class="d-nav-badge" id="dsBadge">0</span></button>
+  <button class="d-nav-item" id="dsOK" onclick="showBookings('confirmed')"><span class="dni"><i data-lucide="check"></i></span> Confirmed</button>
+  <button class="d-nav-item" id="dsDone" onclick="showBookings('completed')"><span class="dni"><i data-lucide="check-check"></i></span> Completed</button>
+  <button class="d-nav-item" id="dsSchedule" onclick="showSchedule()"><span class="dni"><i data-lucide="calendar"></i></span> Schedule</button>
+  <button class="d-nav-item" id="dsStaff" onclick="showStaff()"><span class="dni"><i data-lucide="users"></i></span> Staff</button>
+  <button class="d-nav-item" id="dsSettings" onclick="showSettings()"><span class="dni"><i data-lucide="settings"></i></span> Settings</button>
   <div class="d-sidebar-footer">
-    <button onclick="refreshView()">&#8635; Refresh</button>
-    <button onclick="toggleTheme()">&#9788; Theme</button>
-    <button onclick="logout()" style="color:var(--danger)">&#10005; Logout</button>
+    <button onclick="refreshView()"><i data-lucide="refresh-cw"></i> Refresh</button>
+    <button onclick="toggleTheme()"><i data-lucide="sun-moon"></i> Theme</button>
+    <button onclick="logout()" style="color:var(--danger)"><i data-lucide="log-out"></i> Logout</button>
   </div>
 </aside>
 
@@ -284,9 +265,9 @@
   </div>
 
   <div class="stats-grid">
-    <div class="stat today"><div class="stat-icon">&#128197;</div><div class="stat-val" id="sToday">0</div><div class="stat-lbl">Today</div></div>
-    <div class="stat total"><div class="stat-icon">&#128202;</div><div class="stat-val" id="sTotal">0</div><div class="stat-lbl">Total</div></div>
-    <div class="stat wait"><div class="stat-icon">&#9203;</div><div class="stat-val" id="sWait">0</div><div class="stat-lbl">Pending</div></div>
+    <div class="stat today"><div class="stat-icon"><i data-lucide="calendar"></i></div><div class="stat-val" id="sToday">0</div><div class="stat-lbl">Today</div></div>
+    <div class="stat total"><div class="stat-icon"><i data-lucide="bar-chart-3"></i></div><div class="stat-val" id="sTotal">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat wait"><div class="stat-icon"><i data-lucide="hourglass"></i></div><div class="stat-val" id="sWait">0</div><div class="stat-lbl">Pending</div></div>
   </div>
 
   <div class="sec"><span class="sec-title" id="secTitle">Bookings</span><span class="sec-count" id="secCount">0</span></div>
@@ -296,12 +277,12 @@
 <!-- ═══════════ MOBILE HEADER ═══════════ -->
 <header class="hdr">
   <div class="hdr-l">
-    <button class="hdr-btn" id="burgerBtn" onclick="toggleDrawer()" style="font-size:1.3rem">&#9776;</button>
+    <button class="hdr-btn" id="burgerBtn" onclick="toggleDrawer()" style="font-size:1.3rem"><i data-lucide="menu"></i></button>
     <div class="hdr-logo">JC</div>
     <div class="hdr-title"><h1>JAYACLEAN</h1><span>Admin</span></div>
   </div>
   <div class="hdr-r">
-    <button class="hdr-btn" onclick="toggleTheme()">&#9788;</button>
+    <button class="hdr-btn" onclick="toggleTheme()"><i data-lucide="sun-moon"></i></button>
   </div>
 </header>
 
@@ -313,28 +294,28 @@
     <div><div style="font-weight:700;font-size:.9rem">JAYACLEAN</div><div style="font-size:.62rem;color:var(--text3)">Admin Panel</div></div>
   </div>
   <div class="drawer-menu">
-    <button class="drawer-item" onclick="showBookings();toggleDrawer()"><span>&#9635;</span> All Bookings</button>
-    <button class="drawer-item" onclick="showBookings('pending_payment');toggleDrawer()"><span>&#9200;</span> Pending <span class="d-nav-badge" id="drBadge" style="margin-left:auto">0</span></button>
-    <button class="drawer-item" onclick="showBookings('confirmed');toggleDrawer()"><span>&#10003;</span> Confirmed</button>
-    <button class="drawer-item" onclick="showBookings('completed');toggleDrawer()"><span>&#10004;</span> Completed</button>
-    <button class="drawer-item" onclick="showSchedule();toggleDrawer()"><span>&#128197;</span> Schedule</button>
-    <button class="drawer-item" onclick="showStaff();toggleDrawer()"><span>&#128101;</span> Staff</button>
-    <button class="drawer-item" onclick="showSettings();toggleDrawer()"><span>&#9881;</span> Settings</button>
+    <button class="drawer-item" onclick="showBookings();toggleDrawer()"><span><i data-lucide="layout-grid"></i></span> All Bookings</button>
+    <button class="drawer-item" onclick="showBookings('pending_payment');toggleDrawer()"><span><i data-lucide="clock"></i></span> Pending <span class="d-nav-badge" id="drBadge" style="margin-left:auto">0</span></button>
+    <button class="drawer-item" onclick="showBookings('confirmed');toggleDrawer()"><span><i data-lucide="check"></i></span> Confirmed</button>
+    <button class="drawer-item" onclick="showBookings('completed');toggleDrawer()"><span><i data-lucide="check-check"></i></span> Completed</button>
+    <button class="drawer-item" onclick="showSchedule();toggleDrawer()"><span><i data-lucide="calendar"></i></span> Schedule</button>
+    <button class="drawer-item" onclick="showStaff();toggleDrawer()"><span><i data-lucide="users"></i></span> Staff</button>
+    <button class="drawer-item" onclick="showSettings();toggleDrawer()"><span><i data-lucide="settings"></i></span> Settings</button>
   </div>
   <div class="drawer-menu" style="border-top:1px solid var(--border);padding-top:8px">
-    <button class="drawer-item" onclick="refreshView();toggleDrawer()"><span>&#8635;</span> Refresh</button>
-    <button class="drawer-item" onclick="toggleTheme();toggleDrawer()"><span>&#9788;</span> Theme</button>
-    <button class="drawer-item" onclick="logout()" style="color:var(--danger)"><span>&#10005;</span> Logout</button>
+    <button class="drawer-item" onclick="refreshView();toggleDrawer()"><span><i data-lucide="refresh-cw"></i></span> Refresh</button>
+    <button class="drawer-item" onclick="toggleTheme();toggleDrawer()"><span><i data-lucide="sun-moon"></i></span> Theme</button>
+    <button class="drawer-item" onclick="logout()" style="color:var(--danger)"><span><i data-lucide="log-out"></i></span> Logout</button>
   </div>
 </div>
 
 <!-- ═══════════ MOBILE BOTTOM NAV ═══════════ -->
 <nav class="bnav">
-  <button class="bnav-item active" id="navAll" onclick="showBookings()"><span class="bni">&#9635;</span><span class="bnl">All</span></button>
-  <button class="bnav-item" id="navSchedule" onclick="showSchedule()"><span class="bni">&#128197;</span><span class="bnl">Schedule</span></button>
-  <button class="bnav-item" id="navOK" onclick="showBookings('confirmed')"><span class="bni">&#10003;</span><span class="bnl">Confirmed</span></button>
-  <button class="bnav-item" id="navDone" onclick="showBookings('completed')"><span class="bni">&#10004;</span><span class="bnl">Done</span></button>
-  <button class="bnav-item" id="navStaff" onclick="showStaff()"><span class="bni">&#128101;</span><span class="bnl">Staff</span></button>
+  <button class="bnav-item active" id="navAll" onclick="showBookings()"><span class="bni"><i data-lucide="layout-grid"></i></span><span class="bnl">All</span></button>
+  <button class="bnav-item" id="navSchedule" onclick="showSchedule()"><span class="bni"><i data-lucide="calendar"></i></span><span class="bnl">Schedule</span></button>
+  <button class="bnav-item" id="navOK" onclick="showBookings('confirmed')"><span class="bni"><i data-lucide="check"></i></span><span class="bnl">Confirmed</span></button>
+  <button class="bnav-item" id="navDone" onclick="showBookings('completed')"><span class="bni"><i data-lucide="check-check"></i></span><span class="bnl">Done</span></button>
+  <button class="bnav-item" id="navStaff" onclick="showStaff()"><span class="bni"><i data-lucide="users"></i></span><span class="bnl">Staff</span></button>
 </nav>
 
 <!-- ═══════════ MODAL ═══════════ -->
@@ -348,8 +329,11 @@
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
 var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
+var _lt;function relucide(){clearTimeout(_lt);_lt=setTimeout(function(){try{if(window.lucide)lucide.createIcons()}catch(e){}},30);}
+var _mo=new MutationObserver(relucide);_mo.observe(document.body,{childList:true,subtree:true});
 var FN_STAFF_ADMIN='https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/staff-admin';
 var cf=null,all=[],cid=null,currentView='bookings';
 var taskList=[],staffList=[],settings={},scMonth=new Date().getMonth(),scYear=new Date().getFullYear(),selDate=null;
@@ -373,8 +357,8 @@ function toggleTheme(){
 function fd(d){if(!d)return'-';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
 function ft(t){return{'9am':'9:00 AM','11am':'11:00 AM','2pm':'2:00 PM','4pm':'4:00 PM'}[t]||t}
 function badge(s){
-  var m={confirmed:['confirmed','&#10003; Confirmed'],completed:['completed','&#10004; Completed'],cancelled:['cancelled','&#10007; Cancelled']};
-  var x=m[s]||['pending','&#9200; Pending'];
+  var m={confirmed:['confirmed','<i data-lucide="check"></i> Confirmed'],completed:['completed','<i data-lucide="check-check"></i> Completed'],cancelled:['cancelled','<i data-lucide="x"></i> Cancelled']};
+  var x=m[s]||['pending','<i data-lucide="clock"></i> Pending'];
   return'<span class="bc-badge '+x[0]+'"><span class="bdot"></span>'+x[1]+'</span>';
 }
 
@@ -392,10 +376,10 @@ async function load(filter){
     updateStats(all);document.getElementById('secCount').textContent=f.length;
     document.getElementById('dsBadge').textContent=all.filter(function(b){return b.status==='pending_payment'}).length;
     document.getElementById('drBadge').textContent=all.filter(function(b){return b.status==='pending_payment'}).length;
-    if(!f.length){l.innerHTML='<div class="empty"><div class="eicon">&#128588;</div><h2>No Bookings</h2><p>New bookings will appear here.</p></div>';return}
+    if(!f.length){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="inbox"></i></div><h2>No Bookings</h2><p>New bookings will appear here.</p></div>';return}
 
     if(isDesktop){renderTable(f);}else{renderCards(f);}
-  }catch(e){l.innerHTML='<div class="empty"><div class="eicon">&#9888;</div><h2>Error</h2><p>'+e.message+'</p></div>'}
+  }catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+e.message+'</p></div>'}
 }
 
 function renderCards(f){
@@ -403,12 +387,12 @@ function renderCards(f){
     h+='<div class="card" onclick="showModal(\''+b.id+'\')"><div class="card-body">';
     h+='<div class="card-meta"><span class="card-date">'+fd(b.booking_date)+'</span><span class="card-date">'+ft(b.booking_time)+'</span></div>';
     h+='<div class="card-name">'+b.customer_name.replace(/</g,'&lt;')+'</div>';
-    h+='<div class="card-addr">&#128205; '+b.customer_address.replace(/</g,'&lt;')+'</div>';
-    h+='<div class="card-phone">&#128241; '+b.customer_phone.replace(/</g,'&lt;')+'</div>';
+    h+='<div class="card-addr"><i data-lucide="map-pin"></i> '+b.customer_address.replace(/</g,'&lt;')+'</div>';
+    h+='<div class="card-phone"><i data-lucide="phone"></i> '+b.customer_phone.replace(/</g,'&lt;')+'</div>';
     h+='<div class="qact" onclick="event.stopPropagation()">';
-    if(b.status==='pending_payment')h+='<button class="qact-btn accept" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')">&#10003; Confirm</button>';
-    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="qact-btn done" onclick="quickUpdate(\''+b.id+'\',\'completed\')">&#10004; Complete</button>';
-    h+='<button class="qact-btn decline" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')">&#10007; Cancel</button></div>';
+    if(b.status==='pending_payment')h+='<button class="qact-btn accept" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')"><i data-lucide="check"></i> Confirm</button>';
+    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="qact-btn done" onclick="quickUpdate(\''+b.id+'\',\'completed\')"><i data-lucide="check-check"></i> Complete</button>';
+    h+='<button class="qact-btn decline" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')"><i data-lucide="x"></i> Cancel</button></div>';
     h+='</div><div>'+badge(b.status)+'</div></div>';
   });
   document.getElementById('list').innerHTML=h;
@@ -445,16 +429,16 @@ function showModal(id){
   var ph=b.customer_phone.replace(/[^0-9]/g,'');if(ph.startsWith('0'))ph='6'+ph.substring(1);
   document.getElementById('mBody').innerHTML=
     '<div class="m-row"><span class="mk">Date & Time</span><span class="mv">'+fd(b.booking_date)+' · '+ft(b.booking_time)+'</span></div>'+
-    '<div class="m-row"><span class="mk">Phone</span><span class="mv"><a class="m-wa" href="https://wa.me/'+ph+'" target="_blank">&#128172; WhatsApp</a></span></div>'+
+    '<div class="m-row"><span class="mk">Phone</span><span class="mv"><a class="m-wa" href="https://wa.me/'+ph+'" target="_blank"><i data-lucide="message-circle"></i> WhatsApp</a></span></div>'+
     '<div class="m-row"><span class="mk">Address</span><span class="mv">'+b.customer_address.replace(/</g,'&lt;')+'</span></div>'+
     '<div class="m-row"><span class="mk">Total</span><span class="mv">RM'+b.amount+'</span></div>'+
     '<div class="m-row"><span class="mk">Deposit</span><span class="mv">RM'+b.deposit_amount+'</span></div>'+
     '<div class="m-row"><span class="mk">Payment</span><span class="mv">'+b.payment_status+'</span></div>'+
     '<div class="m-row"><span class="mk">Ref</span><span class="mv" style="font-size:.65rem;opacity:.6">'+b.id+'</span></div>';
   var a='';
-  if(b.status==='pending_payment')a+='<button class="m-btn accept" onclick="updateStatus(\''+id+'\',\'confirmed\')">&#10003; Confirm</button>';
-  if(b.status==='confirmed'||b.status==='pending_payment')a+='<button class="m-btn done" onclick="updateStatus(\''+id+'\',\'completed\')">&#10004; Complete</button>';
-  a+='<button class="m-btn decline" onclick="updateStatus(\''+id+'\',\'cancelled\')">&#10007; Cancel</button>';
+  if(b.status==='pending_payment')a+='<button class="m-btn accept" onclick="updateStatus(\''+id+'\',\'confirmed\')"><i data-lucide="check"></i> Confirm</button>';
+  if(b.status==='confirmed'||b.status==='pending_payment')a+='<button class="m-btn done" onclick="updateStatus(\''+id+'\',\'completed\')"><i data-lucide="check-check"></i> Complete</button>';
+  a+='<button class="m-btn decline" onclick="updateStatus(\''+id+'\',\'cancelled\')"><i data-lucide="x"></i> Cancel</button>';
   a+='<button class="m-btn close" onclick="closeModal()">Close</button>';
   document.getElementById('mActs').innerHTML=a;document.getElementById('modal').classList.add('show');
 }
@@ -491,7 +475,7 @@ async function showStaff(){
     h+='<div id="stMsg" style="font-size:.75rem;color:var(--text3)"></div>';
     h+='</div></div>';
     h+='<div class="sec"><span class="sec-title">Staff List</span><span class="sec-count">'+staff.length+'</span></div>';
-    if(!staff.length){h+='<div class="empty"><div class="eicon">&#128101;</div><h2>No staff yet</h2><p>Add your first staff above.</p></div>';}
+    if(!staff.length){h+='<div class="empty"><div class="eicon"><i data-lucide="users"></i></div><h2>No staff yet</h2><p>Add your first staff above.</p></div>';}
     else{
       h+='<div class="d-card"><table><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
       staff.forEach(function(p){
@@ -505,7 +489,7 @@ async function showStaff(){
       h+='</tbody></table></div>';
     }
     l.innerHTML=h;
-  }catch(e){l.innerHTML='<div class="empty"><div class="eicon">&#9888;</div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
+  }catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
 }
 
 async function callStaffAdmin(payload){
@@ -561,7 +545,7 @@ async function showSettings(){
     h+='<div id="setMsg" style="font-size:.75rem;color:var(--text3)"></div>';
     h+='</div>';
     l.innerHTML=h;
-  }catch(e){l.innerHTML='<div class="empty"><div class="eicon">&#9888;</div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
+  }catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
 }
 async function saveSettings(){
   var msg=document.getElementById('setMsg');msg.style.color='var(--text3)';msg.textContent='Saving...';
@@ -617,7 +601,7 @@ async function showSchedule(){
   setHeader('Schedule','Tasks by date. Click a day to see jobs.');
   var l=document.getElementById('list');
   l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
-  try{await loadTaskData();renderCalendar();}catch(e){l.innerHTML='<div class="empty"><div class="eicon">&#9888;</div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
+  try{await loadTaskData();renderCalendar();}catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
 }
 function scPrev(){if(scMonth===0){scMonth=11;scYear--}else scMonth--;renderCalendar();}
 function scNext(){if(scMonth===11){scMonth=0;scYear++}else scMonth++;renderCalendar();}
@@ -626,8 +610,8 @@ function renderCalendar(){
   var byDay={};taskList.forEach(function(x){var d=x.b.booking_date;if(!d)return;(byDay[d]=byDay[d]||[]).push(x)});
   var fdw=new Date(scYear,scMonth,1).getDay(),dim=new Date(scYear,scMonth+1,0).getDate();
   var now=new Date(),todayStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-  var h='<div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="d-btn acc" style="padding:10px 16px" onclick="autoAssignAll()">&#9889; Auto-assign unassigned</button></div>';
-  h+='<div class="cal-wrap"><div class="cal-head"><h3>'+mn[scMonth]+' '+scYear+'</h3><div class="cal-nav"><button onclick="scPrev()">&#8249;</button><button onclick="scNext()">&#8250;</button></div></div><div class="cal-grid">';
+  var h='<div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="d-btn acc" style="padding:10px 16px" onclick="autoAssignAll()"><i data-lucide="zap"></i> Auto-assign unassigned</button></div>';
+  h+='<div class="cal-wrap"><div class="cal-head"><h3>'+mn[scMonth]+' '+scYear+'</h3><div class="cal-nav"><button onclick="scPrev()"><i data-lucide="chevron-left"></i></button><button onclick="scNext()"><i data-lucide="chevron-right"></i></button></div></div><div class="cal-grid">';
   ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function(d){h+='<div class="cal-dh">'+d+'</div>'});
   for(var i=0;i<fdw;i++)h+='<div class="cal-cell empty"></div>';
   for(var d=1;d<=dim;d++){
@@ -649,9 +633,9 @@ function showDay(ds,keep){
   selDate=ds;
   var jobs=taskList.filter(function(x){return x.b.booking_date===ds}).sort(function(a,b){return slotOrder(a.b.booking_time)-slotOrder(b.b.booking_time)});
   var h='<div class="day-head"><h3>'+fd(ds)+'</h3><span class="sec-count">'+jobs.length+' job(s)</span></div>';
-  if(!jobs.length){h+='<div class="empty" style="padding:32px"><div class="eicon">&#128197;</div><p>No jobs on this date.</p></div>';}
+  if(!jobs.length){h+='<div class="empty" style="padding:32px"><div class="eicon"><i data-lucide="calendar"></i></div><p>No jobs on this date.</p></div>';}
   else{jobs.forEach(function(x){
-    h+='<div class="tk-card" onclick="openTask(\''+x.t.id+'\')"><span class="tk-slot">'+ft(x.b.booking_time)+'</span><div class="tk-body"><div class="tk-name">'+esc(x.b.customer_name)+'</div><div class="tk-addr">&#128205; '+esc(x.b.customer_address)+'</div><div style="margin-top:4px;font-size:.68rem;color:var(--text3)">'+(x.s?'&#128100; '+esc(x.s.full_name):'&#9888; Unassigned')+'</div></div>'+taskBadge(x.t.status)+'</div>';
+    h+='<div class="tk-card" onclick="openTask(\''+x.t.id+'\')"><span class="tk-slot">'+ft(x.b.booking_time)+'</span><div class="tk-body"><div class="tk-name">'+esc(x.b.customer_name)+'</div><div class="tk-addr"><i data-lucide="map-pin"></i> '+esc(x.b.customer_address)+'</div><div style="margin-top:4px;font-size:.68rem;color:var(--text3)">'+(x.s?'<i data-lucide="user"></i> '+esc(x.s.full_name):'<i data-lucide="alert-triangle"></i> Unassigned')+'</div></div>'+taskBadge(x.t.status)+'</div>';
   });}
   document.getElementById('dayList').innerHTML=h;
   if(!keep)document.getElementById('dayList').scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -685,10 +669,10 @@ async function openTask(taskId){
     '<div class="tl">'+tl+'</div>';
   var ph=waNum(b.customer_phone);
   var a='<button class="m-btn accept" onclick="saveAssign(\''+t.id+'\')">Save Assignment</button>';
-  a+='<button class="m-btn" style="background:var(--accent2);color:#fff" onclick="window.open(\''+mapsUrl(b.customer_address)+'\',\'_blank\')">&#128205; Maps</button>';
-  a+='<button class="m-btn" style="background:#25D366;color:#fff" onclick="waStaff(\''+t.id+'\')">&#128172; WA Staff</button>';
-  a+='<button class="m-btn" style="background:#25D366;color:#fff" onclick="window.open(\'https://wa.me/'+ph+'\',\'_blank\')">&#128172; WA Customer</button>';
-  if(t.status==='in_progress'||t.status==='awaiting_review')a+='<button class="m-btn done" style="grid-column:1/-1" onclick="completeTask(\''+t.id+'\')">&#10004; Complete &amp; Request Balance (WhatsApp)</button>';
+  a+='<button class="m-btn" style="background:var(--accent2);color:#fff" onclick="window.open(\''+mapsUrl(b.customer_address)+'\',\'_blank\')"><i data-lucide="map-pin"></i> Maps</button>';
+  a+='<button class="m-btn" style="background:#25D366;color:#fff" onclick="waStaff(\''+t.id+'\')"><i data-lucide="message-circle"></i> WA Staff</button>';
+  a+='<button class="m-btn" style="background:#25D366;color:#fff" onclick="window.open(\'https://wa.me/'+ph+'\',\'_blank\')"><i data-lucide="message-circle"></i> WA Customer</button>';
+  if(t.status==='in_progress'||t.status==='awaiting_review')a+='<button class="m-btn done" style="grid-column:1/-1" onclick="completeTask(\''+t.id+'\')"><i data-lucide="check-check"></i> Complete &amp; Request Balance (WhatsApp)</button>';
   a+='<button class="m-btn close" onclick="closeModal()">Close</button>';
   document.getElementById('mActs').innerHTML=a;
 }
@@ -749,7 +733,7 @@ async function guard(){
   }catch(e){document.getElementById('authMsg').textContent='Error: '+e.message;}
 }
 async function logout(){try{await SB.auth.signOut()}catch(e){}location.href='login.html';}
-guard();
+guard();relucide();
 
 // PULL TO REFRESH (mobile)
 var ts=0;document.addEventListener('touchstart',function(e){ts=e.touches[0].clientY});document.addEventListener('touchend',function(e){if(window.scrollY===0&&e.changedTouches[0].clientY-ts>80)load(cf)});

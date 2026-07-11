@@ -115,6 +115,7 @@ Template placeholders: `{nama}`, `{alamat}`, `{tarikh}`, `{slot}`, `{baki}`, `{b
 ## 8. FILE MAP
 | File | Purpose | Language |
 |------|---------|----------|
+| `theme.css` | Shared design tokens (light/dark) + Lucide icon defaults + polish. Used by admin/staff/login ONLY (not customer pages). Single source of truth for colors. | - |
 | `index.html` | Public sales page + booking + Bayarcash | Malay |
 | `success.html` | Payment status page | Malay |
 | `test-pay.html` | RM2 test payment page | Malay |
@@ -133,7 +134,7 @@ Template placeholders: `{nama}`, `{alamat}`, `{tarikh}`, `{slot}`, `{baki}`, `{b
 - JS: `camelCase` functions/vars, plain ES5-ish inline (match existing style). No build tooling.
 - SQL: snake_case. Tables created via migrations in `supabase/migrations/`. Always `NOTIFY pgrst,'reload schema'` after DDL affecting API.
 - Edge Functions: Deno + TypeScript. CORS headers on browser-facing routes. Verify caller role for admin actions.
-- Design: green theme, pill/rounded buttons, mobile-first. Admin uses Plus Jakarta Sans; sales page Poppins.
+- Design: green theme, pill/rounded buttons, mobile-first. Admin/staff/login use Plus Jakarta Sans + `theme.css` (shared tokens) + **Lucide icons** (`<i data-lucide="name">`, auto-rendered via MutationObserver + `relucide()`). Customer pages use Poppins with their own inline styles.
 - API responses from Edge Functions: `{"status":"ok","data":...}` or `{"error":"message"}`. Never leak raw exceptions.
 
 ---

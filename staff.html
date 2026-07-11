@@ -8,9 +8,8 @@
   <meta name="theme-color" content="#0ea364">
   <title>JAYACLEAN — Staff</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
   <style>
-    :root{--bg:#f2f4f8;--surface:#fff;--elevated:#fff;--border:rgba(0,0,0,.06);--border-strong:rgba(0,0,0,.1);--text:#0d1116;--text2:#566478;--text3:#8f9bb3;--accent:#0ea364;--accent-light:#ebfaf2;--accent-glow:rgba(14,163,100,.15);--accent2:#2d7fff;--accent2-light:#eef4ff;--warning:#e6a31d;--warning-light:#fef9ed;--danger:#e54545;--danger-light:#fef2f2;--font:'Plus Jakarta Sans',-apple-system,sans-serif}
-    @media(prefers-color-scheme:dark){:root{--bg:#0f1218;--surface:#161b23;--elevated:#1c2330;--border:rgba(255,255,255,.05);--border-strong:rgba(255,255,255,.09);--text:#eef1f6;--text2:#8798ad;--text3:#5a697a;--accent:#1db974;--accent-light:rgba(29,185,116,.1);--accent-glow:rgba(29,185,116,.2);--accent2:#4d9aff;--accent2-light:rgba(77,154,255,.1);--warning:#f0ae2a;--warning-light:rgba(240,174,42,.1);--danger:#f05a5a;--danger-light:rgba(240,90,90,.1)}}
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;padding-bottom:40px}
     .hdr{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
@@ -82,15 +81,18 @@
 
 <!-- JOB DETAIL OVERLAY -->
 <div class="ov" id="ov">
-  <div class="ov-hdr"><button onclick="closeJob()">&#8592;</button><h2 id="ovTitle">Job</h2></div>
+  <div class="ov-hdr"><button onclick="closeJob()"><i data-lucide="arrow-left"></i></button><h2 id="ovTitle">Job</h2></div>
   <div class="ov-body" id="ovBody"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
 var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
+var _lt;function relucide(){clearTimeout(_lt);_lt=setTimeout(function(){try{if(window.lucide)lucide.createIcons()}catch(e){}},30);}
+var _mo=new MutationObserver(relucide);_mo.observe(document.body,{childList:true,subtree:true});
 var me=null,profile=null,settings={},jobs=[],photos={},filter='active',openId=null;
 
 function esc(s){return(s||'').toString().replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
@@ -134,7 +136,7 @@ async function loadJobs(){
     var tids=tasks.map(function(t){return t.id});photos={};
     if(tids.length){var pq=await SB.from('task_photos').select('*').in('task_id',tids);(pq.data||[]).forEach(function(ph){(photos[ph.task_id]=photos[ph.task_id]||[]).push(ph)})}
     renderJobs();
-  }catch(e){j.innerHTML='<div class="empty"><div class="ei">&#9888;</div><p>'+esc(e.message)+'</p></div>'}
+  }catch(e){j.innerHTML='<div class="empty"><div class="ei"><i data-lucide="alert-triangle"></i></div><p>'+esc(e.message)+'</p></div>'}
 }
 
 function slotOrder(s){return{'9am':1,'11am':2,'2pm':3,'4pm':4}[s]||9}
@@ -147,11 +149,11 @@ function renderJobs(){
   else if(filter==='completed')list=list.filter(function(x){return x.t.status==='completed'});
   list.sort(function(a,b){return(a.b.booking_date+String(slotOrder(a.b.booking_time))).localeCompare(b.b.booking_date+String(slotOrder(b.b.booking_time)))});
   var el=document.getElementById('jobs');
-  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">&#128203;</div><p>No jobs here.</p></div>';return}
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei"><i data-lucide="clipboard-list"></i></div><p>No jobs here.</p></div>';return}
   var h='',lastDate=null;
   list.forEach(function(x){
     if(x.b.booking_date!==lastDate){lastDate=x.b.booking_date;var lbl=x.b.booking_date===t?'TODAY - '+fd(x.b.booking_date):fd(x.b.booking_date);h+='<div class="daygrp">'+lbl+'</div>'}
-    h+='<div class="job" onclick="openJob(\''+x.t.id+'\')"><div class="slot">'+ft(x.b.booking_time)+'</div><div class="jb"><div class="jn">'+esc(x.b.customer_name)+'</div><div class="ja">&#128205; '+esc(x.b.customer_address)+'</div></div>'+badge(x.t.status)+'</div>';
+    h+='<div class="job" onclick="openJob(\''+x.t.id+'\')"><div class="slot">'+ft(x.b.booking_time)+'</div><div class="jb"><div class="jn">'+esc(x.b.customer_name)+'</div><div class="ja"><i data-lucide="map-pin"></i> '+esc(x.b.customer_address)+'</div></div>'+badge(x.t.status)+'</div>';
   });
   el.innerHTML=h;
 }
@@ -169,27 +171,27 @@ function openJob(id){
     '<div class="row"><span class="k">Customer</span><span class="v">'+esc(b.customer_name)+'</span></div>'+
     '<div class="row"><span class="k">Address</span><span class="v">'+esc(b.customer_address)+'</span></div>'+
     '</div>';
-  h+='<a class="abtn blue" href="'+mapsUrl(b.customer_address)+'" target="_blank">&#128205; Open in Google Maps</a>';
-  h+='<a class="abtn wa" href="https://wa.me/'+waNum(b.customer_phone)+'" target="_blank">&#128172; WhatsApp Customer</a>';
+  h+='<a class="abtn blue" href="'+mapsUrl(b.customer_address)+'" target="_blank"><i data-lucide="map-pin"></i> Open in Google Maps</a>';
+  h+='<a class="abtn wa" href="https://wa.me/'+waNum(b.customer_phone)+'" target="_blank"><i data-lucide="message-circle"></i> WhatsApp Customer</a>';
 
   // BEFORE photos
   h+='<div class="card"><div class="sec-h"><span>Before Photos</span><span style="color:var(--text3);font-weight:600">'+beforeP.length+'</span></div>'+thumbs(beforeP);
-  if(t.status==='assigned')h+='<div class="up" id="upBefore" onclick="pickPhoto(\''+id+'\',\'before\')">&#128247; Tap to add BEFORE photo</div>';
+  if(t.status==='assigned')h+='<div class="up" id="upBefore" onclick="pickPhoto(\''+id+'\',\'before\')"><i data-lucide="camera"></i> Tap to add BEFORE photo</div>';
   h+='</div>';
 
   // Action / after based on status
   if(t.status==='assigned'){
-    h+='<button class="abtn primary" id="startBtn" onclick="startJob(\''+id+'\')"'+(beforeP.length?'':' disabled')+'>&#9654; Start Job'+(beforeP.length?'':' (add before photo)')+'</button>';
+    h+='<button class="abtn primary" id="startBtn" onclick="startJob(\''+id+'\')"'+(beforeP.length?'':' disabled')+'><i data-lucide="play"></i> Start Job'+(beforeP.length?'':' (add before photo)')+'</button>';
   }else if(t.status==='in_progress'){
     h+='<div class="card"><div class="sec-h"><span>After Photos</span><span style="color:var(--text3);font-weight:600">'+afterP.length+'</span></div>'+thumbs(afterP);
-    h+='<div class="up" id="upAfter" onclick="pickPhoto(\''+id+'\',\'after\')">&#128247; Tap to add AFTER photo</div></div>';
-    h+='<button class="abtn primary" id="finishBtn" onclick="finishJob(\''+id+'\')"'+(afterP.length?'':' disabled')+'>&#10004; Finish Job'+(afterP.length?'':' (add after photo)')+'</button>';
+    h+='<div class="up" id="upAfter" onclick="pickPhoto(\''+id+'\',\'after\')"><i data-lucide="camera"></i> Tap to add AFTER photo</div></div>';
+    h+='<button class="abtn primary" id="finishBtn" onclick="finishJob(\''+id+'\')"'+(afterP.length?'':' disabled')+'><i data-lucide="check"></i> Finish Job'+(afterP.length?'':' (add after photo)')+'</button>';
   }else if(t.status==='awaiting_review'){
     h+='<div class="card"><div class="sec-h"><span>After Photos</span><span style="color:var(--text3);font-weight:600">'+afterP.length+'</span></div>'+thumbs(afterP)+'</div>';
-    h+='<div class="note">&#9203; Waiting for admin review &amp; approval.</div>';
+    h+='<div class="note"><i data-lucide="clock"></i> Waiting for admin review &amp; approval.</div>';
   }else if(t.status==='completed'){
     h+='<div class="card"><div class="sec-h"><span>After Photos</span><span style="color:var(--text3);font-weight:600">'+afterP.length+'</span></div>'+thumbs(afterP)+'</div>';
-    h+='<div class="note">&#10004; Job completed. Thank you!</div>';
+    h+='<div class="note"><i data-lucide="check"></i> Job completed. Thank you!</div>';
   }
   document.getElementById('ovBody').innerHTML=h;
   document.getElementById('ov').classList.add('show');
@@ -213,7 +215,7 @@ async function doUpload(id,type,file){
     if(error)throw error;
     (photos[id]=photos[id]||[]).push({task_id:id,type:type,url:data.secure_url});
     toast('Photo uploaded');openJob(id);
-  }catch(e){toast('Error: '+e.message);if(box){box.classList.remove('busy');box.textContent='&#128247; Tap to retry'}}
+  }catch(e){toast('Error: '+e.message);if(box){box.classList.remove('busy');box.textContent='<i data-lucide="camera"></i> Tap to retry'}}
 }
 async function startJob(id){
   if(!photosFor(id,'before').length){toast('Add at least 1 before photo');return}
@@ -226,7 +228,7 @@ async function finishJob(id){
     var x=jobs.find(function(y){return y.t.id===id});if(x)x.t.status='awaiting_review';toast('Sent for review');openJob(id)}catch(e){toast('Error: '+e.message)}
 }
 
-guard();
+guard();relucide();
 </script>
 </body>
 </html>
