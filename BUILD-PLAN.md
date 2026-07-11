@@ -62,13 +62,14 @@ Verify: confirmed booking creates a task; assign works; calendar counts correct.
 ## PHASE 3 — Staff Dashboard
 Goal: staff see their schedule, start/finish jobs with photos.
 
-- [ ] `staff.html`: auth guard (role=staff); "My Jobs" schedule by date + Maps + WhatsApp customer
-- [ ] Cloudinary unsigned upload preset wired (before/after)
-- [ ] "Start Job" → require >=1 BEFORE photo → status `in_progress`, set started_at
-- [ ] "Finish Job" → require >=1 AFTER photo → status `awaiting_review`, set finished_at
-- [ ] Photos saved to `task_photos`
+- [x] `staff.html`: auth guard (role=staff); "My Jobs" with filters (Active/Today/All/Done), date-grouped, Maps + WhatsApp customer
+- [x] Cloudinary unsigned upload wired (before/after) using app_settings cloud_name/upload_preset/folder
+- [x] "Start Job" -> require >=1 BEFORE photo -> status `in_progress`, set started_at
+- [x] "Finish Job" -> require >=1 AFTER photo -> status `awaiting_review`, set finished_at
+- [x] Photos saved to `task_photos`
 
-Verify: staff uploads before/after; status transitions; admin sees photos.
+Verify: staff RLS end-to-end tested (read own task, read booking, update status, insert photo) - all OK. Syntax checked.
+- [ ] Owner action: create Cloudinary unsigned preset `jayaclean_tasks` (folder `jayaclean/tasks`) so real uploads work
 
 ---
 
