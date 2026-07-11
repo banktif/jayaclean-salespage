@@ -41,7 +41,7 @@ async function requireAdmin(req: Request, sb: ReturnType<typeof admin>) {
   return data.user;
 }
 
-async function createStaff(sb: ReturnType<typeof admin>, s: { full_name?: string; phone?: string; password?: string }) {
+async function createStaff(sb: ReturnType<typeof admin>, s: { full_name?: string; phone?: string; password?: string; email?: string; address?: string; avatar_url?: string }) {
   const phone = (s.phone || "").replace(/[^0-9]/g, "");
   if (!phone || !s.full_name) return { ok: false, phone, error: "full_name and phone required" };
   if (!s.password || s.password.length < 6) return { ok: false, phone, error: "password min 6 chars" };
@@ -49,7 +49,14 @@ async function createStaff(sb: ReturnType<typeof admin>, s: { full_name?: string
     email: staffEmail(phone),
     password: s.password,
     email_confirm: true,
-    user_metadata: { full_name: s.full_name, phone, role: "staff" },
+    user_metadata: {
+      full_name: s.full_name,
+      phone,
+      role: "staff",
+      email: s.email || "",
+      address: s.address || "",
+      avatar_url: s.avatar_url || "",
+    },
   });
   if (error) return { ok: false, phone, error: error.message };
   return { ok: true, phone, id: data.user?.id, name: s.full_name };
@@ -81,6 +88,19 @@ Deno.serve(async (req: Request) => {
       const results = [];
       for (const s of list) results.push(await createStaff(sb, s));
       return json({ status: "ok", data: results });
+    }
+
+    if (action === "update") {
+      const userId = String(body.user_id || "");
+      if (!userId) return json({ error: "user_id required" }, 400);
+      const patch: Record<string, unknown> = {};
+      for (const k of ["full_name", "email", "address", "avatar_url"]) {
+        if (body[k] !== undefined) patch[k] = String(body[k] ?? "");
+      }
+      if (Object.keys(patch).length === 0) return json({ error: "nothing to update" }, 400);
+      const { error } = await sb.from("profiles").update(patch).eq("id", userId);
+      if (error) return json({ error: error.message }, 400);
+      return json({ status: "ok", data: { user_id: userId } });
     }
 
     if (action === "set_active") {
