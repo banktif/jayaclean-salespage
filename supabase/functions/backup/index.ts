@@ -37,15 +37,15 @@ function pemToDer(pem: string) {
   for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
   return arr.buffer;
 }
-async function googleToken(saJson: string) {
-  const sa = JSON.parse(saJson);
+async function googleTokenFromSA(sa: { client_email: string; private_key: string }) {
   const now = Math.floor(Date.now() / 1000);
   const enc = (o: unknown) => b64url(new TextEncoder().encode(JSON.stringify(o)));
   const unsigned = enc({ alg: "RS256", typ: "JWT" }) + "." + enc({
     iss: sa.client_email, scope: "https://www.googleapis.com/auth/drive.file",
     aud: "https://oauth2.googleapis.com/token", iat: now, exp: now + 3600,
   });
-  const key = await crypto.subtle.importKey("pkcs8", pemToDer(sa.private_key), { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
+  const pem = (sa.private_key || "").replace(/\\n/g, "\n");
+  const key = await crypto.subtle.importKey("pkcs8", pemToDer(pem), { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
   const sig = await crypto.subtle.sign({ name: "RSASSA-PKCS1-v1_5" }, key, new TextEncoder().encode(unsigned));
   const jwt = unsigned + "." + b64url(new Uint8Array(sig));
   const res = await fetch("https://oauth2.googleapis.com/token", {
@@ -95,11 +95,22 @@ Deno.serve(async (req: Request) => {
       if (up.error) throw new Error("storage: " + up.error.message);
 
       let drive = "skipped";
-      const sa = Deno.env.get("GOOGLE_SA_JSON");
-      const folder = Deno.env.get("GDRIVE_FOLDER_ID") || "";
-      if (sa) {
+      const priv: Record<string, string> = {};
+      const pr = await sb.from("private_settings").select("key,value").in("key", ["gdrive_client_email", "gdrive_private_key", "gdrive_folder_id"]);
+      (pr.data || []).forEach((r: any) => (priv[r.key] = r.value));
+      const email = priv.gdrive_client_email || "";
+      const pkey = priv.gdrive_private_key || "";
+      const folder = priv.gdrive_folder_id || Deno.env.get("GDRIVE_FOLDER_ID") || "";
+      if (email && pkey) {
         try {
-          const tk = await googleToken(sa);
+          const tk = await googleTokenFromSA({ client_email: email, private_key: pkey });
+          await driveUpload(tk, folder, `db-backup-${ts}.json`, content);
+          drive = "ok";
+        } catch (e) { drive = "error: " + (e as Error).message; }
+      } else if (Deno.env.get("GOOGLE_SA_JSON")) {
+        try {
+          const saj = JSON.parse(Deno.env.get("GOOGLE_SA_JSON")!);
+          const tk = await googleTokenFromSA({ client_email: saj.client_email, private_key: saj.private_key });
           await driveUpload(tk, folder, `db-backup-${ts}.json`, content);
           drive = "ok";
         } catch (e) { drive = "error: " + (e as Error).message; }
@@ -137,9 +148,15 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === "status") {
-      const { data } = await sb.from("app_settings").select("key,value").in("key", ["backup_enabled", "backup_last_db_at", "backup_last_db_status", "backup_last_code_at", "backup_last_code_status", "gdrive_folder_id"]);
+      const { data } = await sb.from("app_settings").select("key,value").in("key", ["backup_enabled", "backup_last_db_at", "backup_last_db_status", "backup_last_code_at", "backup_last_code_status"]);
       const m: Record<string, string> = {};
       (data || []).forEach((r: any) => (m[r.key] = r.value));
+      const pr = await sb.from("private_settings").select("key,value").in("key", ["gdrive_client_email", "gdrive_private_key", "gdrive_folder_id"]);
+      const priv: Record<string, string> = {};
+      (pr.data || []).forEach((r: any) => (priv[r.key] = r.value));
+      m.gdrive_folder_id = priv.gdrive_folder_id || "";
+      m.gdrive_client_email = priv.gdrive_client_email || "";
+      m.drive_configured = (priv.gdrive_client_email && priv.gdrive_private_key) ? "true" : "false";
       return json({ status: "ok", data: m });
     }
 

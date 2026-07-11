@@ -11,7 +11,8 @@
   <link rel="stylesheet" href="/theme.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;padding-bottom:40px}
+    html{overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar{display:none}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;padding-bottom:40px;scrollbar-width:none;-ms-overflow-style:none}body::-webkit-scrollbar{display:none}
     .hdr{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
     .hdr-l{display:flex;align-items:center;gap:10px}
     .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#16a34a);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem}
