@@ -505,27 +505,38 @@ async function load(filter){
 
 function initials(n){var p=(n||'').trim().split(/\s+/);return ((((p[0]||'')[0]||'')+((p[1]||'')[0]||'')).toUpperCase())||'?';}
 function renderBookings(f){
-  var h='<div class="bk-grid">';
-  f.forEach(function(b){
-    var pay=(b.payment_status==='paid'?'Paid':(b.payment_status||'pending'));
-    var waph=waNum(b.customer_phone);
-    h+='<div class="bk-card s-'+b.status+'" onclick="showModal(\''+b.id+'\')">';
-    h+='<div class="bk-top"><div class="bk-cust"><div class="bk-ava">'+initials(b.customer_name)+'</div><div style="min-width:0"><div class="bk-name">'+esc(b.customer_name)+'</div><div class="bk-sub">#'+String(b.id).substring(0,8)+'</div></div></div>'+badge(b.status)+'</div>';
-    h+='<div class="bk-meta">';
-    h+='<div class="bk-mrow"><i data-lucide="calendar"></i><span class="pill">'+fd(b.booking_date)+'</span><span class="pill">'+ft(b.booking_time)+'</span></div>';
-    h+='<div class="bk-mrow"><i data-lucide="map-pin"></i><span class="txt">'+esc(b.customer_address)+'</span></div>';
-    h+='<div class="bk-mrow"><i data-lucide="phone"></i><span class="txt">'+esc(b.customer_phone)+'</span></div>';
-    h+='<div class="bk-mrow"><i data-lucide="credit-card"></i><span class="txt">Deposit RM'+esc(b.deposit_amount)+' &middot; '+esc(pay)+'</span></div>';
-    h+='</div>';
-    h+='<div class="bk-foot" onclick="event.stopPropagation()">';
-    if(b.status==='pending_payment')h+='<button class="bk-act acc" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')"><i data-lucide="check"></i>Confirm</button>';
-    if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="bk-act don" onclick="quickUpdate(\''+b.id+'\',\'completed\')"><i data-lucide="check-check"></i>Complete</button>';
-    h+='<button class="bk-act wa" onclick="window.open(\'https://wa.me/'+waph+'\',\'_blank\')"><i data-lucide="message-circle"></i>WA</button>';
-    if(b.status!=='cancelled'&&b.status!=='completed')h+='<button class="bk-act del" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')"><i data-lucide="x"></i></button>';
-    h+='</div></div>';
-  });
-  h+='</div>';
-  document.getElementById('list').innerHTML=h;
+  var isDesktop=matchMedia('(min-width:1024px)').matches;
+  if(isDesktop){
+    var h='<div class="d-card"><table><thead><tr><th>Customer</th><th>Date &amp; Time</th><th>Payment</th><th>Status</th><th></th></tr></thead><tbody>';
+    f.forEach(function(b){
+      var pay=(b.payment_status==='paid'?'Paid':'pending');
+      h+='<tr onclick="showModal(\''+b.id+'\')" style="cursor:pointer">';
+      h+='<td><div style="display:flex;align-items:center;gap:10px"><div class="bk-ava" style="width:38px;height:38px;border-radius:11px;font-size:.8rem">'+initials(b.customer_name)+'</div><div style="min-width:0"><div class="d-name"><strong>'+esc(b.customer_name)+'</strong></div><div class="d-addr" style="max-width:200px">'+esc(b.customer_address)+'</div></div></div></td>';
+      h+='<td><span class="d-date">'+fd(b.booking_date)+'</span><span class="d-dot"></span><span class="d-date">'+ft(b.booking_time)+'</span></td>';
+      h+='<td><span style="font-size:.78rem;font-weight:600;color:'+(pay==='Paid'?'var(--accent)':'var(--warning)')+'">RM'+esc(b.deposit_amount)+' &middot; '+pay+'</span></td>';
+      h+='<td>'+badge(b.status)+'</td>';
+      h+='<td><div class="d-acts" onclick="event.stopPropagation()">';
+      if(b.status==='pending_payment')h+='<button class="d-btn acc" onclick="quickUpdate(\''+b.id+'\',\'confirmed\')"><i data-lucide="check"></i></button>';
+      if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="d-btn don" onclick="quickUpdate(\''+b.id+'\',\'completed\')"><i data-lucide="check-check"></i></button>';
+      h+='<button class="d-btn" style="color:#25D366;border-color:#25D366" onclick="window.open(\'https://wa.me/'+waNum(b.customer_phone)+'\',\'_blank\')"><i data-lucide="message-circle"></i></button>';
+      if(b.status!=='cancelled'&&b.status!=='completed')h+='<button class="d-btn del" onclick="quickUpdate(\''+b.id+'\',\'cancelled\')"><i data-lucide="x"></i></button>';
+      h+='</div></td></tr>';
+    });
+    h+='</tbody></table></div>';
+    document.getElementById('list').innerHTML=h;
+  }else{
+    var h='';
+    f.forEach(function(b){
+      var pay=(b.payment_status==='paid'?'Paid':'Pending');
+      h+='<div class="card" onclick="showModal(\''+b.id+'\')"><div class="bk-ava" style="width:44px;height:44px;border-radius:12px;font-size:.9rem;flex-shrink:0">'+initials(b.customer_name)+'</div><div class="card-body"><div class="card-meta"><span class="card-date">'+fd(b.booking_date)+' '+ft(b.booking_time)+'</span>'+badge(b.status)+'</div><div class="card-name">'+esc(b.customer_name)+'</div><div class="card-addr">'+esc(b.customer_address)+'</div><div class="card-phone">RM'+esc(b.deposit_amount)+' &middot; '+pay+'</div><div class="qact">';
+      if(b.status==='pending_payment')h+='<button class="qact-btn accept" onclick="event.stopPropagation();quickUpdate(\''+b.id+'\',\'confirmed\')">Confirm</button>';
+      if(b.status==='confirmed'||b.status==='pending_payment')h+='<button class="qact-btn done" onclick="event.stopPropagation();quickUpdate(\''+b.id+'\',\'completed\')">Complete</button>';
+      h+='<button class="qact-btn" style="color:#25D366;border-color:#25D366" onclick="event.stopPropagation();window.open(\'https://wa.me/'+waNum(b.customer_phone)+'\',\'_blank\')">WA</button>';
+      if(b.status!=='cancelled'&&b.status!=='completed')h+='<button class="qact-btn decline" onclick="event.stopPropagation();quickUpdate(\''+b.id+'\',\'cancelled\')">Cancel</button>';
+      h+='</div></div></div>';
+    });
+    document.getElementById('list').innerHTML=h;
+  }
 }
 
 function updateStats(d){
