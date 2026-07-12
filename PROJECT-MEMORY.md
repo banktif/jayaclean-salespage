@@ -41,7 +41,7 @@ Root `admin.html`/`staff.html`/etc. = redirect stubs. `/login/` removed (login i
 - Admin login: `banktifweb1@gmail.com` / `Salman43!` (Supabase Auth)
 - GitHub repo secrets (Actions): GH_PAT, GL_TOKEN, GL_USER
 - Cloudflare zone id (jayabina.com): `916289c458db6233106080096fe910ed`
-- Cloudinary: cloud `dkibczut`, unsigned preset `jayaclean_tasks` (staff/QR/avatar uploads)
+- Cloudinary: cloud `dkibczut`, unsigned preset **`jayaclean_tasks` CREATED** (folder `jayaclean/tasks`) — photo uploads (staff before/after, avatar, QR) working. Admin creds in `cloudinary-onboard.js` (api_key 495611476556691) ⚠️ rotate.
 - ⚠️ Tokens shared in chat (GitHub/GitLab/Cloudflare) should be **rotated**.
 
 ## Payment (Bayarcash)
