@@ -344,6 +344,13 @@
     .btn-primary:hover{background:var(--accent-hover);box-shadow:0 6px 20px var(--accent-glow)}
     .btn-primary:active{transform:scale(.98)}
     .btn-primary svg{width:1.05em;height:1.05em}
+    /* Settings form spacing (modern) */
+    .sGrp{padding:22px}
+    .sGrpH{margin-bottom:18px;padding-bottom:12px}
+    .sFields{display:grid;gap:18px}
+    .sLbl{margin-bottom:8px;letter-spacing:.2px;font-size:.72rem}
+    .sInp,.mv-sel{padding:12px 14px;font-size:.85rem;border-radius:11px;line-height:1.4}
+    .sInp:focus,.mv-sel:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
     /* Menu theming */
     .drawer{background:var(--menu-bg)}
     .hdr,.bnav{background:var(--menu-bg)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
@@ -889,7 +896,7 @@ async function showSettings(){
       if(type==='textarea')return '<div><label class="sLbl">'+esc(lbl)+'</label><textarea data-key="'+key+'" rows="3" class="sInp">'+esc(v)+'</textarea></div>';
       return '<div><label class="sLbl">'+esc(lbl)+'</label><input data-key="'+key+'" value="'+esc(v)+'" class="sInp" style="height:auto"></div>';
     }
-    function grp(title,items){var s='<div class="sGrp"><div class="sGrpH">'+title+'</div>';items.forEach(function(i){s+=i});return s+'</div>'}
+    function grp(title,items){var s='<div class="sGrp"><div class="sGrpH">'+title+'</div><div class="sFields">';items.forEach(function(i){s+=i});return s+'</div></div>'}
     var h='<div style="display:grid;gap:16px;max-width:700px">';
     h+=grp('Business',[fld('business_name'),fld('wa_business_number')]);
     h+=grp('Payment / Bank',[fld('bank_name'),fld('bank_account_no'),fld('bank_account_holder'),fld('qr_image_url'),fld('price_total','Price Total (RM)','text'),fld('price_deposit','Deposit (RM)','text'),fld('price_balance','Balance (RM)','text'),'<div><label class="sLbl">Bank QR Image</label><button class="d-btn" style="padding:10px 14px;font-size:.72rem" onclick="uploadQR()">Upload QR (Cloudinary)</button><div id="qrMsg" style="font-size:.72rem;color:var(--text3);margin-top:6px"></div></div>']);
@@ -898,7 +905,6 @@ async function showSettings(){
     h+=grp('WhatsApp API',[fld('wa_api_enabled','Enable Cloud API','select_onoff'),'<div style="font-size:.68rem;color:var(--text3);padding:6px 0">Set WA_PHONE_NUMBER_ID + WA_ACCESS_TOKEN in Supabase Edge Function secrets. Templates share settings with WhatsApp Templates above.</div>']);
     h+=grp('Automation',[fld('auto_confirm_payment','Auto-confirm Payment','select_onoff'),fld('auto_assign_enabled','Auto-assign Staff','select_onoff'),fld('auto_assign_rule','Assignment Rule','select_rule'),fld('auto_complete_task','Auto-complete Task','select_onoff'),fld('auto_send_wa_balance','Auto-send WA Balance','select_onoff')]);
     h+=grp('Cloudinary',[fld('cloud_name'),fld('upload_preset'),fld('folder')]);
-    h+=grpEditorSites(map);
     h+='<button class="d-btn acc" style="padding:12px" onclick="saveSettings()">Save All Settings</button>';
     h+='<div id="setMsg" style="font-size:.75rem;color:var(--text3)"></div>';
     h+='</div>';
@@ -906,40 +912,14 @@ async function showSettings(){
   }catch(e){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(e.message)+'</p></div>';}
 }
 async function saveSettings(){
-  // Save editor_sites before main save
-  var sites=[];document.querySelectorAll('.edit-site-row').forEach(function(r){var n=r.querySelector('.es-name'),o=r.querySelector('.es-repo'),f=r.querySelector('.es-file'),b=r.querySelector('.es-branch');if(n&&o&&n.value.trim()&&o.value.trim())sites.push({name:n.value.trim(),repo:o.value.trim(),file:f.value.trim()||'index.html',branch:b.value.trim()||'master'})});
-  var siteEl=document.querySelector('[data-key="editor_sites"]');if(!siteEl){siteEl=document.createElement('input');siteEl.setAttribute('data-key','editor_sites');siteEl.type='hidden';document.body.appendChild(siteEl)}
-  siteEl.value=JSON.stringify(sites);
-
   var msg=document.getElementById('setMsg');msg.style.color='var(--text3)';msg.textContent='Saving...';
   var rows=[];document.querySelectorAll('[data-key]').forEach(function(el){rows.push({key:el.getAttribute('data-key'),value:el.value,updated_at:new Date().toISOString()});});
   try{var {error}=await SB.from('app_settings').upsert(rows);if(error)throw error;msg.style.color='var(--accent)';msg.textContent='Saved.';await loadSettings()}catch(e){msg.style.color='var(--danger)';msg.textContent='Error: '+e.message}
 }
 function grpEditorSites(map){
-  var sites=[];try{sites=JSON.parse(map['editor_sites']||'[]')}catch(e){}
-  var h='<div class="sGrp"><div class="sGrpH">GrapesJS Sites</div>';
-  h+='<div id="editorSitesList">';
-  sites.forEach(function(s,i){
-    h+='<div class="edit-site-row" style="display:grid;grid-template-columns:1fr 1fr 80px 70px 40px;gap:6px;margin-bottom:8px;align-items:end">';
-    h+='<div><input class="es-name sInp" style="height:auto;font-size:.75rem" placeholder="Site Name" value="'+esc(s.name)+'"></div>';
-    h+='<div><input class="es-repo sInp" style="height:auto;font-size:.75rem" placeholder="user/repo" value="'+esc(s.repo)+'"></div>';
-    h+='<div><input class="es-file sInp" style="height:auto;font-size:.75rem" placeholder="file" value="'+esc(s.file||'index.html')+'"></div>';
-    h+='<div><input class="es-branch sInp" style="height:auto;font-size:.75rem" placeholder="branch" value="'+esc(s.branch||'master')+'"></div>';
-    h+='<button class="d-btn del" style="padding:6px 8px" onclick="this.parentElement.remove()"><i data-lucide="x"></i></button>';
-    h+='</div>';
-  });
-  h+='</div>';
-  h+='<button class="d-btn acc" style="padding:8px 16px;margin-top:6px;font-size:.72rem" onclick="addEditorSite()">+ Add Site</button>';
-  h+='</div>';
-  return h;
+  return '';
 }
-function addEditorSite(){
-  var div=document.createElement('div');
-  div.className='edit-site-row';
-  div.style.cssText='display:grid;grid-template-columns:1fr 1fr 80px 70px 40px;gap:6px;margin-bottom:8px;align-items:end';
-  div.innerHTML='<div><input class="es-name sInp" style="height:auto;font-size:.75rem" placeholder="Site Name"></div><div><input class="es-repo sInp" style="height:auto;font-size:.75rem" placeholder="user/repo"></div><div><input class="es-file sInp" style="height:auto;font-size:.75rem" placeholder="file" value="index.html"></div><div><input class="es-branch sInp" style="height:auto;font-size:.75rem" placeholder="branch" value="master"></div><button class="d-btn del" style="padding:6px 8px" onclick="this.parentElement.remove()"><i data-lucide="x"></i></button>';
-  document.getElementById('editorSitesList').appendChild(div);
-}
+function addEditorSite(){}
 function uploadQR(){
   var cn=settings.cloud_name,up=settings.upload_preset;
   var cnEl=document.querySelector('[data-key="cloud_name"]'),upEl=document.querySelector('[data-key="upload_preset"]');
