@@ -1,77 +1,77 @@
 # JAYACLEAN — Project Memory
 
 > Full rules & schema: see `AGENTS.md`. Build progress: see `BUILD-PLAN.md`.
+> Last updated: 2026-07-12
 
 ## TL;DR
-Water-tank cleaning business. Brand: **JAYACLEAN** (company: Jaya Bina Services). Sales page + booking + Bayarcash payment + admin panel. Building: staff task manager (50 staff, assignment, before/after photos, schedule, WhatsApp). Free stack.
+Water-tank cleaning business (**JAYACLEAN**, company: Jaya Bina Services). Static site (GitHub Pages + Cloudflare) + Supabase backend. Public sales page + Bayarcash deposit + full staff task manager + auto backups. Domain: **cuci.jayabina.com**. Free stack.
 
 ## Language rule
-Admin/staff system + docs = English. WhatsApp templates = Malay. Customer pages (index/success/test-pay) = Malay.
+Admin/staff (worker) system + docs = **English**. WhatsApp templates = **Malay**. Customer-facing pages (sales/success/customer portal) = **Malay**.
 
-## URLs
-| Page | URL |
-|------|-----|
-| Sales page | https://cuci.jayabina.com |
-| Editor | https://cuci.jayabina.com/editor |
-| Admin panel | https://cuci.jayabina.com/admin |
-| Test calendar | https://cuci.jayabina.com/test-cal.html |
-| Test payment (RM2) | https://cuci.jayabina.com/test-pay.html |
-| GitHub repo | https://github.com/banktif/jayaclean-salespage |
+## Design
+- **Forest-green theme** (accent `#166534`), `theme.css` shared (tokens + Lucide icons + `--menu-bg`/`--menu-overlay`).
+- Favicon: `/favicon.svg` — single letter **J** on green.
+- Admin sidebar: deep green (`#14532d`) + light text + sticky brand; mobile menu = soft green (opaque, no blur).
+- Fonts: Plus Jakarta Sans (apps), Poppins (sales page).
 
-## Tech Stack (RM0)
-- Hosting: GitHub Pages + Cloudflare CDN/DNS (proxy ON, orange cloud)
-- Backend: Supabase (PostgreSQL + REST API)
-- Images: Cloudinary (dkibczut)
-- Payment: Bayarcash v3 (integrated via Supabase Edge Function `bayarcash` — solves CORS; PAT stored as Supabase secret)
-- Editor: GrapesJS 0.21.13 + preset-webpage 1.0.3 (CDN)
-- Fonts: Plus Jakarta Sans (admin) / Poppins (sales page)
+## URL structure (clean URLs — refactored)
+GitHub Pages serves from **repo root** (`banktif/jayaclean-salespage`).
+| URL | File | Who |
+|-----|------|-----|
+| `/` | `index.html` | Customer sales page (Malay) |
+| `/admin/` | `admin/index.html` | Admin panel (inline login) |
+| `/worker/` | `worker/index.html` | Staff portal (was "staff") |
+| `/customer/` | `customer/index.html` | Customer self-service |
+| `/editor` | `editor.html` | GrapesJS — **LOCKED to sales page only** |
+| `/success.html`, `/test-pay.html` | payment pages |
+| `/theme.css`, `/favicon.svg`, `/sw.js`, `/manifest.json` | shared assets |
+Root `admin.html`/`staff.html`/etc. = redirect stubs. `/login/` removed (login inline on /admin + /worker).
 
-## Credentials Location
-All API keys, tokens, passwords are in the chat history. Ask user to re-provide or check dashboards:
-- Supabase: https://thbscwlcyhcnqsppoyfn.supabase.co
-- Bayarcash: https://console.bayar.cash
-- Cloudinary: https://console.cloudinary.com (dkibczut)
-- GitHub: account banktif, repo jayaclean-salespage
+## Supabase (project ref `thbscwlcyhcnqsppoyfn`)
+- URL: https://thbscwlcyhcnqsppoyfn.supabase.co
+- Anon/publishable key: `sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR`
+- **Tables:** bookings, slots, profiles, tasks, task_photos, app_settings, **private_settings** (admin-only secrets), + storage bucket `backups` (legacy, unused)
+- **Auth:** Supabase Auth. `profiles` (role admin/staff, + email/address/avatar_url). Staff login = phone → `<digits>@staff.jayabina.local`.
+- **Edge Functions:** `bayarcash` (payment), `staff-admin` (create/manage staff), `backup` (DB→Drive+R2, code trigger), `wa-messenger` (WhatsApp)
+- **pg_cron:** `jayaclean-db-backup` hourly tick → backup function honors per-destination frequency
+- **Secrets (Supabase):** BAYARCASH_PAT/API_SECRET/PORTAL_KEY/PAYMENT_CHANNEL(5=DuitNow)/SITE_URL, BACKUP_SECRET, GH_PAT
 
-## Database (Supabase)
-- Tables: bookings, slots (+ building: profiles, tasks, task_photos, app_settings)
-- RPC: get_available_slots, check_slot, create_booking
-- PostgREST schema cache needs `NOTIFY pgrst, 'reload schema'` after migrations
+## Accounts / credentials
+- Admin login: `banktifweb1@gmail.com` / `Salman43!` (Supabase Auth)
+- GitHub repo secrets (Actions): GH_PAT, GL_TOKEN, GL_USER
+- Cloudflare zone id (jayabina.com): `916289c458db6233106080096fe910ed`
+- Cloudinary: cloud `dkibczut`, unsigned preset `jayaclean_tasks` (staff/QR/avatar uploads)
+- ⚠️ Tokens shared in chat (GitHub/GitLab/Cloudflare) should be **rotated**.
 
-## Admin Panel
-- Auth: migrating to Supabase Auth (admin `banktifweb1@gmail.com`, role=admin). Old client-side password (Salman43!, hash 6e5574b72c57535f) being replaced.
-- Brand: JAYACLEAN, logo: JC
-- Theme: light/dark/system, responsive (mobile <1024px, desktop >=1024px)
-- Mobile: hamburger drawer + bottom nav 4 tabs
-- Desktop: 260px sidebar + data table
+## Payment (Bayarcash)
+- Deposit RM150, balance RM150, total RM300. Channel 5 (DuitNow). Amount computed server-side from DB.
+- Flow: booking (pending) → create-intent → DuitNow → callback (checksum) → status=confirmed → task auto-created.
 
-## Sales Page (10 sections)
-Hero (wudhu) → Masalah → Edukasi → Solusi → Proses (4 steps) → Kenapa Kami → Booking Form → FAQ → Tentang Kami → Final CTA
-- 10 image placeholders [GAMBAR 1-10]
-- Pricing: RM300 (deposit RM150, baki RM150)
-- Coverage: Lembah Klang, max 4 slots/day (9am,11am,2pm,4pm)
+## Task Manager
+- **Admin dashboard**: KPI cards + Needs Attention + Today's Schedule + Recent Bookings.
+- **Schedule/Calendar**: month view, click date → jobs by slot, task detail (assign, Maps, WA staff/customer, complete).
+- **Worker portal** (`/worker/`): My Jobs, Start (before photo) → Finish (after photo) → awaiting review. Photos → Cloudinary.
+- **Complete** → task+booking completed → semi-auto WhatsApp balance (Malay, bank + QR).
+- **Auto-assign**: round-robin / least-loaded (DB trigger on booking confirmed + distribute RPC).
+- **Staff fields**: name, email, phone, address, profile picture.
 
-## Colors
-- Primary: #2E7D32 / #1B5E20
-- Admin accent: #0ea364 (light) / #1db974 (dark)
-- Yellow: #FFC107
-- Admin BG: #f2f4f8 (light) / #0f1218 (dark)
+## Backup system
+- **Code → GitLab**: GitHub Actions `.github/workflows/mirror-to-gitlab.yml`, **daily 3AM MYT** (`0 19 * * *`), mirrors ALL owned repos (private). Manual trigger from admin.
+- **DB → Google Drive + Cloudflare R2** (NOT Supabase Storage): Edge Function `backup`, per-destination frequency (hourly/daily/weekly/monthly), **gzip + full-table pagination + retention keep-48 + auto-delete** on both. Creds in `private_settings` (admin-only): gdrive_client_email/private_key/folder_id, r2_account_id/access_key/secret_key/bucket.
+- Admin **Backup page** (`/admin/` → Backup): status panels, manual buttons, frequency dropdowns, Drive + R2 config, R2 Test, recent backups (presigned).
+- R2 uses AWS SigV4 (put/list/delete/presign) implemented in the function.
 
-## Pending Tasks
-1. ~~Bayarcash auto-payment~~ DONE — live, tested, PAT rotated, channel=DuitNow(5)
-2. Replace 10 image placeholders with real photos
-3. ~~Replace WhatsApp placeholder number~~ DONE — now 60139373275
-4. Enable HTTPS enforcement on GitHub Pages
-5. **Staff Task Manager** (in progress) — see BUILD-PLAN.md phases 1-5. Rename JAYACUCI→JAYACLEAN done in docs.
+## PWA / caching
+- `sw.js` = **network-first**, cache `jayaclean-v3` (offline fallback only).
+- Cloudflare **cache rule**: bypass cache for `/sw.js`, `/theme.css`, and all HTML (`ends_with "/"` or `.html`) → updates always fresh. Static assets still edge-cached.
+- If stale: purge Cloudflare + clear browser SW/site data once.
 
-## Payment Flow (Bayarcash)
-- Browser: insert booking (pending) → POST {booking_id} to Edge Function `/create-intent`
-- Function: reads booking from DB (service role, amount server-side = deposit RM150), calls Bayarcash v3 payment-intents, returns `url` → browser redirects
-- Bayarcash → POST `/callback` (server-to-server): checksum HMAC-SHA256 verified → set payment_status=paid/failed, status=confirmed
-- return_url → `success.html?order=<id>` polls booking.payment_status for live status
-- Channel 5 = DuitNow (env BAYARCASH_PAYMENT_CHANNEL, override to 1 for FPX). Amount format = Ringgit string "150.00"
+## GrapesJS Editor — LOCKED
+`editor.html` is **hard-locked** to edit ONLY the sales page (`index.html` on `banktif/jayaclean-salespage`). No multi-site, no repo picker. Save preserves original `<script>` tags. **Never use it on admin/worker/customer.**
 
-## File Structure (cuci-tangki/)
-Docs: AGENTS.md, BUILD-PLAN.md, PROJECT-MEMORY.md
-Pages: index.html, editor.html, admin.html, staff.html (new), login.html (new), success.html, test-pay.html, test-cal.html, CNAME, manifest.json
-Supabase: config.toml, functions/bayarcash/, functions/staff-admin/ (new), migrations/*.sql
+## Pending / notes
+1. Enter Google Drive + Cloudflare R2 creds in Backup page to activate DB backups.
+2. Replace 10 sales-page image placeholders + WhatsApp number already set (60139373275).
+3. Rotate shared tokens (GitHub/GitLab/Cloudflare/Bayarcash).
+4. Concurrent editing caused repeated overwrites — run ONE session at a time; editor now locked so it can't wipe admin.

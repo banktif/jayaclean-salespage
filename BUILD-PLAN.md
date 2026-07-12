@@ -99,3 +99,26 @@ Verify: new confirmed booking auto-assigned (round-robin) OK; distribute RPC ass
 - [ ] 50 staff list (name + phone) for bulk import
 - [ ] Bank details + QR image (upload to Cloudinary)
 - [ ] Cloudinary: create unsigned upload preset (folder `jayaclean/tasks`) + rotate exposed api_secret
+
+---
+
+## PHASE 6+ — Post-launch work (all DONE unless noted) — updated 2026-07-12
+- [x] Staff profile fields: email, address, profile picture (Cloudinary avatar) — `profiles` + `staff-admin` update action
+- [x] Admin **Dashboard redesign**: KPI cards + Needs Attention + Today's Schedule + Recent Bookings panels
+- [x] **Modern UI**: `theme.css` shared tokens + Lucide icons; forest-green theme; modern booking cards; spacing normalization; green sidebar (deep) + soft-green mobile menu; sticky brand
+- [x] **Backup system**:
+  - [x] Code → GitLab (GitHub Actions `mirror-to-gitlab.yml`, daily, all repos, private)
+  - [x] DB → **Google Drive + Cloudflare R2** (NOT Supabase Storage) — Edge Function `backup` with gzip + pagination + retention-48 + auto-delete
+  - [x] Per-destination **frequency** (hourly/daily/weekly/monthly) via `app_settings` + hourly pg_cron tick
+  - [x] Admin **Backup page** (`#backup`): status, manual run, frequency, Drive + R2 config (in `private_settings`), R2 SigV4 + Test, recent backups (presigned)
+- [x] **Clean URL refactor** (by owner session): `/admin`, `/worker`, `/customer`; root stubs redirect
+- [x] **GrapesJS editor LOCKED** to sales page only (`editor.html`) — preserves original `<script>` tags on save
+- [x] **PWA fix**: `sw.js` network-first (v3) + Cloudflare cache-bypass rule (sw.js/theme.css/HTML)
+- [x] **Favicon**: single-letter `J` (`favicon.svg`) on all pages
+- [ ] Owner: enter Google Drive SA + Cloudflare R2 creds in Backup page to activate DB backups
+- [ ] Owner: rotate shared tokens (GitHub/GitLab/Cloudflare/Bayarcash)
+
+### CRITICAL WARNINGS for future sessions
+- Edit `admin/index.html` (served), NOT root `admin.html` or `cuci-tangki/*`.
+- Run ONE session at a time — concurrent edits repeatedly wiped the Backup page.
+- Never point GrapesJS at admin/worker/customer — it strips JS. Editor is now locked to sales page.

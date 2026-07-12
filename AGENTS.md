@@ -1,6 +1,9 @@
 # JAYACLEAN — AGENTS.md
 # Project rules & memory anchor. READ THIS FIRST every new session.
-# Last updated: 2026-07-11
+# Last updated: 2026-07-12
+# ⚠️ Site refactored to CLEAN URLS — real apps live in folders: admin/index.html,
+#    worker/index.html (staff), customer/index.html. Root *.html are redirect stubs.
+#    Served from repo ROOT by GitHub Pages. See section 13 for current architecture.
 
 ---
 
@@ -47,6 +50,11 @@ Domain: `cuci.jayabina.com` (GitHub Pages; CNAME file present)
 - **Config:** Non-secret config in `app_settings` table (Settings UI). Secrets in Supabase Edge secrets. Staff credentials in Supabase Auth (never plaintext).
 - **Payment amount:** Always computed server-side from DB (`bookings.deposit_amount`), never trusted from client.
 - **Pricing:** Total RM300, deposit RM150, balance RM150 (configurable via `app_settings`).
+- **Theme:** Forest-green (accent `#166534`). `theme.css` is the single source of truth (tokens incl. `--menu-bg`/`--menu-overlay`). Favicon `/favicon.svg` = single letter **J**.
+- **URL structure:** Clean URLs. Apps in folders (`admin/`, `worker/`, `customer/`), served from repo root. Editing the wrong file = broken app.
+- **GrapesJS editor:** HARD-LOCKED to the sales page only (`index.html` on `banktif/jayaclean-salespage`). NEVER let it touch admin/worker/customer (it strips JS and destroys apps). `editor.html` has the lock baked in.
+- **DB backup destinations:** Google Drive + Cloudflare R2 ONLY. **Do NOT use Supabase Storage** (protect the 1 GB free quota). Retention keep-48 + auto-delete on both.
+- **PWA:** `sw.js` MUST stay network-first (never cache-first) so updates show. Cloudflare cache rule bypasses `/sw.js`, `/theme.css`, HTML.
 
 ---
 
@@ -164,3 +172,54 @@ Template placeholders: `{nama}`, `{alamat}`, `{tarikh}`, `{slot}`, `{baki}`, `{b
 ## 12. ACCOUNTS
 - Admin (first): `banktifweb1@gmail.com` (Supabase Auth, role=admin)
 - Old admin login (client-side password `Salman43!` hash) — being replaced by Supabase Auth.
+
+---
+
+## 13. CURRENT ARCHITECTURE (2026-07-12) — authoritative
+
+### URL / file structure (clean URLs)
+GitHub Pages serves from repo **root**. Real apps in folders; edit THESE:
+| URL | Real file | Notes |
+|-----|-----------|-------|
+| `/` | `index.html` | Sales page (Malay). GrapesJS-editable. |
+| `/admin/` | `admin/index.html` | Admin SPA. Inline Supabase Auth login. Hash routes (`#home,#bookings,#schedule,#staff,#reports,#settings,#backup`). |
+| `/worker/` | `worker/index.html` | Staff portal (renamed from "staff"). |
+| `/customer/` | `customer/index.html` | Customer self-service. |
+| `/editor` | `editor.html` | LOCKED to sales page only. |
+| shared | `theme.css`, `favicon.svg`, `sw.js`, `manifest.json` | |
+Root `admin.html`, `staff.html`, `login.html` = redirect stubs. `login/` removed.
+⚠️ Always edit `admin/index.html` (NOT root `admin.html` or the old `cuci-tangki/` copy).
+
+### New tables (beyond section 5)
+- `private_settings` — key/value, **RLS admin-only** (`is_admin()`), for secrets: `gdrive_client_email/private_key/folder_id`, `r2_account_id/access_key/secret_key/bucket`. Staff CANNOT read.
+- `profiles` extra columns: `email`, `address`, `avatar_url`.
+
+### Edge Functions (all in `supabase/functions/`, config in `supabase/config.toml`, verify_jwt=false + custom auth)
+- `bayarcash` — payment intent + callback (checksum).
+- `staff-admin` — admin-only: create/bulk/update/set_active/reset_password staff.
+- `backup` — DB export → gzip → Google Drive + Cloudflare R2 (SigV4). Actions: `db` (force optional), `list`, `status`, `code` (trigger GitHub Actions), `test_r2`. Per-destination frequency + retention 48. Auth: admin JWT OR header `x-backup-key: BACKUP_SECRET` (for pg_cron).
+- `wa-messenger` — WhatsApp messaging (added by owner).
+
+### Backup system
+- **Code → GitLab:** `.github/workflows/mirror-to-gitlab.yml`, cron `0 19 * * *` (daily 3AM MYT) + manual dispatch. Mirrors ALL owned repos (private) via `push --mirror`. Repo secrets: `GH_PAT`, `GL_TOKEN`, `GL_USER`.
+- **DB → Google Drive + Cloudflare R2:** hourly pg_cron `jayaclean-db-backup` calls `backup` fn with `x-backup-key`; fn honors `backup_freq_drive` / `backup_freq_r2` (hourly/daily/weekly/monthly). Config entered in admin Backup page → `private_settings`.
+- Admin Backup page = `showBackup()` in `admin/index.html` (nav `dsBackup`, hash `#backup`). If it disappears, a GrapesJS/overwrite happened — re-add from PROJECT-MEMORY/BUILD-PLAN.
+
+### app_settings — backup keys
+`backup_freq_drive`, `backup_freq_r2`, `backup_last_drive_at/status`, `backup_last_r2_at/status`, `backup_last_code_at/status`, `backup_last_db_at/status`.
+
+### Secrets — additions to section 4
+| Secret | Location |
+|--------|----------|
+| `BACKUP_SECRET` | Supabase secret (pg_cron auth) |
+| `GH_PAT` | Supabase secret (trigger workflow) + GitHub repo secret (mirror) |
+| `GL_TOKEN`, `GL_USER` | GitHub repo secrets |
+| Google Drive SA + R2 creds | DB `private_settings` (admin-only) |
+| Cloudflare | zone `916289c458db6233106080096fe910ed`; cache-bypass rule set for sw.js/theme.css/HTML |
+
+### PWA / cache
+`sw.js` network-first, cache `jayaclean-v3`. Cloudflare cache rule bypasses `/sw.js`, `/theme.css`, HTML. To force update: purge Cloudflare + clear browser SW/site data once.
+
+### Deploy note
+Deploy Edge Functions + git ops from repo root (`Downloads/Jayaclean`). Management API for SQL:
+`POST https://api.supabase.com/v1/projects/thbscwlcyhcnqsppoyfn/database/query` with `SUPABASE_ACCESS_TOKEN` (read SQL via `[System.IO.File]::ReadAllText` to avoid PS note-property JSON bug; keep SQL ASCII — no em-dashes).
