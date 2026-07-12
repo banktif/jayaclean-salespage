@@ -596,7 +596,7 @@ function bkPanel(label,icon,at,status){
 }
 async function showBackup(){
   currentView='backup';setChrome(false);clearNav();setNav('dsBackup');
-  setHeader('Backup','Code + database backups (auto hourly)');location.hash='#backup';
+  setHeader('Backup','Code + database backups (auto daily)');location.hash='#backup';
   var l=document.getElementById('list');
   l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
   try{
@@ -608,7 +608,7 @@ async function showBackup(){
     h+='<button class="btn-primary" style="width:auto" onclick="backupNow(\'db\')"><i data-lucide="database"></i> Backup Database</button>';
     h+='<button class="btn-primary" style="width:auto;background:var(--accent2)" onclick="backupNow(\'code\')"><i data-lucide="git-branch"></i> Backup Code to GitLab</button>';
     h+='</div><div id="bkMsg" style="font-size:.78rem;color:var(--text3);margin-top:10px"></div></div>';
-    h+='<div class="sGrp"><div class="sGrpH">Auto Backup</div><div style="font-size:.82rem">&#9989; Runs hourly automatically. Database &rarr; Supabase Storage'+(driveOn?' + Google Drive':'')+'. Code &rarr; GitLab (all repos).</div></div>';
+    h+='<div class="sGrp"><div class="sGrpH">Auto Backup</div><div style="font-size:.82rem">&#9989; Runs daily (3 AM) automatically. Database &rarr; Supabase Storage'+(driveOn?' + Google Drive':'')+'. Code &rarr; GitLab (all repos).</div></div>';
     h+='<div class="sGrp"><div class="sGrpH">Google Drive '+(driveOn?'&#9989; Connected':'&#9888; Not configured')+'</div><div style="display:grid;gap:12px;max-width:640px">';
     h+='<div><div class="sLbl">Service Account Email</div><input id="gdEmail" class="sInp" value="'+esc(priv.gdrive_client_email||'')+'" placeholder="name@project.iam.gserviceaccount.com"></div>';
     h+='<div><div class="sLbl">Private Key</div><textarea id="gdKey" class="sInp" rows="4" placeholder="-----BEGIN PRIVATE KEY-----">'+esc(priv.gdrive_private_key||'')+'</textarea></div>';

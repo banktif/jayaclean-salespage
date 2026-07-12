@@ -2,7 +2,7 @@ name: Mirror to GitLab
 
 on:
   schedule:
-    - cron: '0 * * * *'   # hourly
+    - cron: '0 19 * * *'   # daily 03:00 MYT
   workflow_dispatch: {}
 
 jobs:
