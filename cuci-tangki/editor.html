@@ -139,10 +139,10 @@ async function checkPassword(){
 function unlockEditor(){
   document.getElementById('pwGate').classList.add('hidden');
   document.getElementById('topbar').style.display='flex';
-  initEditor();
+  localStorage.setItem('editor_unlock_time',Date.now());
 }
 
-function doLogout(){document.getElementById('pwGate').classList.remove('hidden');document.getElementById('topbar').style.display='none';if(editor){editor.destroy();editor=null}document.getElementById('gjs').innerHTML='';document.getElementById('pwInput').value='';document.getElementById('pwErr').style.display='none'}
+function doLogout(){document.getElementById('pwGate').classList.remove('hidden');document.getElementById('topbar').style.display='none';if(editor){editor.destroy();editor=null}document.getElementById('gjs').innerHTML='';document.getElementById('pwInput').value='';document.getElementById('pwErr').style.display='none';localStorage.removeItem('editor_unlock_time')}
 
 // ═══════════ SITE MANAGEMENT (localStorage) ═══════════
 function loadSites(){
@@ -217,6 +217,10 @@ function initEditor(){
   pat=localStorage.getItem('gh_pat')||'';
   loadSites();
   if(!PASSWORD_HASH){document.getElementById('pwSub').textContent='Set a password to protect this editor'}
+  else{
+    var lastUnlock=parseInt(localStorage.getItem('editor_unlock_time')||'0');
+    if(Date.now()-lastUnlock<43200000){unlockEditor()};
+  }
 }
 function fillPAT(){document.getElementById('patInput').value=pat}
 
