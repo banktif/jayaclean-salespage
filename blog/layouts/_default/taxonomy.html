@@ -1,0 +1,17 @@
+{{ define "main" }}
+<section class="blog-hero">
+  <div class="blog-hero-inner">
+    <h1 class="blog-hero-title">{{ .Title }}</h1>
+  </div>
+</section>
+
+<section class="blog-content">
+  <div class="blog-layout">
+    <div class="blog-posts">
+      {{ range .Pages }}
+      {{ partial "article-card.html" . }}
+      {{ end }}
+    </div>
+  </div>
+</section>
+{{ end }}

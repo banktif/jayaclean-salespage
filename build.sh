@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+
+echo "=== JAYACLEAN Build ==="
+
+SRC_DIR="blog"
+OUT_DIR="public"
+
+rm -rf "$OUT_DIR"
+mkdir -p "$OUT_DIR"
+
+# 1. Build Hugo blog
+echo "-> Building Hugo blog..."
+cd "$SRC_DIR"
+hugo --minify --destination "../$OUT_DIR"
+cd ..
+
+# 2. Copy root static files
+echo "-> Copying root static files..."
+for f in index.html success.html test-pay.html favicon.svg sw.js manifest.json theme.css .nojekyll CNAME; do
+  if [ -f "$f" ]; then
+    cp "$f" "$OUT_DIR/"
+    echo "   $f -> $OUT_DIR/"
+  fi
+done
+
+# 3. Copy app folders
+echo "-> Copying app folders..."
+for dir in admin worker customer; do
+  if [ -d "$dir" ]; then
+    cp -r "$dir" "$OUT_DIR/"
+    echo "   $dir/ -> $OUT_DIR/$dir/"
+  fi
+done
+
+echo "=== Build complete. Deploy folder: $OUT_DIR ==="

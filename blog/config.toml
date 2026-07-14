@@ -1,0 +1,30 @@
+baseURL = "https://cuci.jayabina.com/"
+languageCode = "ms"
+title = "Blog JAYACLEAN"
+disableKinds = ["home"]
+
+[taxonomies]
+  category = "kategori"
+  tag = "tag"
+
+[permalinks]
+  kategori = "/blog/kategori/:slug/"
+  tag = "/blog/tag/:slug/"
+
+[pagination]
+  pagerSize = 12
+
+[outputs]
+  section = ["HTML", "RSS"]
+
+[sitemap]
+  changefreq = "weekly"
+  priority = 0.7
+
+[params]
+  description = "Panduan cuci tangki air, penyelenggaraan rumah, kesihatan air & tips penjagaan tangki untuk rumah anda."
+  businessName = "Jaya Bina Services"
+  brandName = "JAYACLEAN"
+  siteTitle = "Blog JAYACLEAN"
+  accent = "#166534"
+  font = "Poppins"

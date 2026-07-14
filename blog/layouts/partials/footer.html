@@ -1,0 +1,23 @@
+<footer class="blog-footer">
+  <div class="blog-footer-inner">
+    <div class="blog-footer-col">
+      <span class="blog-footer-brand">JAYACLEAN</span>
+      <p class="blog-footer-desc">Servis cuci tangki air profesional. Oleh {{ .Site.Params.businessName }}.</p>
+    </div>
+    <div class="blog-footer-col">
+      <strong>Pautan</strong>
+      <a href="https://cuci.jayabina.com/">Laman Utama</a>
+      <a href="/blog/">Blog</a>
+      <a href="https://cuci.jayabina.com/#tempah">Tempah Servis</a>
+    </div>
+    <div class="blog-footer-col">
+      <strong>Kategori</strong>
+      {{ range first 5 .Site.Taxonomies.kategori.ByCount }}
+      <a href="{{ .Page.Permalink }}">{{ .Page.Title }}</a>
+      {{ end }}
+    </div>
+  </div>
+  <div class="blog-footer-bottom">
+    <p>&copy; {{ now.Format "2006" }} {{ .Site.Params.businessName }}. Hak cipta terpelihara.</p>
+  </div>
+</footer>

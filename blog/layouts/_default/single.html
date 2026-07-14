@@ -1,0 +1,63 @@
+{{ define "main" }}
+<article class="article-single">
+  <header class="article-header">
+    <div class="article-breadcrumb">
+      <a href="/blog/">Blog</a>
+      <span>/</span>
+      {{ range .Params.kategori }}
+      <a href="{{ "/blog/kategori/" | relURL }}{{ . | urlize }}/">{{ . }}</a>
+      <span>/</span>
+      {{ end }}
+      <span class="current">{{ .Title }}</span>
+    </div>
+
+    <h1 class="article-title">{{ .Title }}</h1>
+
+    <div class="article-meta">
+      {{ range .Params.kategori }}
+      <a href="{{ "/blog/kategori/" | relURL }}{{ . | urlize }}/" class="article-cat">{{ . }}</a>
+      {{ end }}
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 Januari 2006" }}</time>
+    </div>
+
+    {{ with .Params.image }}
+    <div class="article-featured">
+      <img src="{{ . }}" alt="{{ $.Title }}" class="article-featured-img">
+    </div>
+    {{ end }}
+  </header>
+
+  <div class="article-body">
+    {{ .Content }}
+  </div>
+
+  <footer class="article-footer">
+    {{ $tags := .Params.tag }}
+    {{ if $tags }}
+    <div class="article-tags">
+      {{ range $tags }}
+      <a href="{{ "/blog/tag/" | relURL }}{{ . | urlize }}/" class="article-tag">{{ . }}</a>
+      {{ end }}
+    </div>
+    {{ end }}
+
+    <div class="article-share">
+      <span>Kongsi:</span>
+      <a href="https://wa.me/?text={{ .Title }}%20{{ .Permalink }}" target="_blank" rel="noopener" class="share-btn share-wa">WhatsApp</a>
+      <a href="https://www.facebook.com/sharer.php?u={{ .Permalink }}" target="_blank" rel="noopener" class="share-btn share-fb">Facebook</a>
+    </div>
+  </footer>
+</article>
+
+{{ $related := .Site.RegularPages.Related . | first 3 }}
+{{ if $related }}
+<section class="related-posts">
+  <h2 class="related-title">Artikel Berkaitan</h2>
+  <div class="articles-grid">
+    {{ range $related }}
+    {{ partial "article-card.html" . }}
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+{{ end }}

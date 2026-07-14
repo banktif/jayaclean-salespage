@@ -1,0 +1,51 @@
+{{ define "main" }}
+<section class="blog-hero">
+  <div class="blog-hero-inner">
+    <h1 class="blog-hero-title">{{ .Title }}</h1>
+    <p class="blog-hero-desc">{{ .Site.Params.description }}</p>
+  </div>
+</section>
+
+<section class="blog-content">
+  <div class="blog-layout">
+    <div class="blog-posts">
+      {{ $paginator := .Paginate .Pages }}
+      {{ if gt $paginator.TotalPages 0 }}
+      <div class="articles-grid">
+        {{ range $paginator.Pages }}
+        {{ partial "article-card.html" . }}
+        {{ end }}
+      </div>
+
+      {{ if gt $paginator.TotalPages 1 }}
+      <nav class="pagination">
+        {{ if $paginator.HasPrev }}
+        <a href="{{ $paginator.Prev.URL }}" class="pagination-prev">&larr; Sebelum</a>
+        {{ end }}
+        <span class="pagination-info">Halaman {{ $paginator.PageNumber }} / {{ $paginator.TotalPages }}</span>
+        {{ if $paginator.HasNext }}
+        <a href="{{ $paginator.Next.URL }}" class="pagination-next">Seterusnya &rarr;</a>
+        {{ end }}
+      </nav>
+      {{ end }}
+      {{ else }}
+      <p class="blog-empty">Belum ada artikel. Nantikan kandungan berkualiti tidak lama lagi!</p>
+      {{ end }}
+    </div>
+
+    <aside class="blog-sidebar">
+      {{ $kategori := .Site.Taxonomies.kategori }}
+      {{ if $kategori }}
+      <div class="sidebar-widget">
+        <h3>Kategori</h3>
+        <ul class="sidebar-cats">
+          {{ range $name, $taxonomy := $kategori }}
+          <li><a href="{{ "/blog/kategori/" | relURL }}{{ $name | urlize }}/">{{ $name | humanize }}</a> <span>{{ len $taxonomy }}</span></li>
+          {{ end }}
+        </ul>
+      </div>
+      {{ end }}
+    </aside>
+  </div>
+</section>
+{{ end }}

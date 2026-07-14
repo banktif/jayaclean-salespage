@@ -1,0 +1,20 @@
+<article class="article-card">
+  {{ with .Params.image }}
+  <a href="{{ $.RelPermalink }}" class="article-card-img-wrap">
+    <img src="{{ . }}" alt="{{ $.Title }}" loading="lazy" class="article-card-img">
+  </a>
+  {{ end }}
+  <div class="article-card-body">
+    <div class="article-card-meta">
+      {{ range .Params.kategori }}
+      <a href="{{ "/blog/kategori/" | relURL }}{{ . | urlize }}/" class="article-card-cat">{{ . }}</a>
+      {{ end }}
+      <time class="article-card-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 Jan 2006" }}</time>
+    </div>
+    <h3 class="article-card-title">
+      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+    </h3>
+    <p class="article-card-excerpt">{{ .Description | truncate 160 }}</p>
+    <a href="{{ .RelPermalink }}" class="article-card-readmore">Baca Lagi &rarr;</a>
+  </div>
+</article>

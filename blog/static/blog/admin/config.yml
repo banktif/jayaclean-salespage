@@ -1,0 +1,31 @@
+backend:
+  name: github
+  repo: banktif/jayaclean-salespage
+  branch: master
+  base_url: https://decapcms-oauth-gateway.netlify.com
+
+media_folder: "blog/static/img"
+public_folder: "/blog/img"
+
+site_url: https://cuci.jayabina.com
+display_url: https://cuci.jayabina.com
+
+locale: "ms"
+
+collections:
+  - name: "blog"
+    label: "Artikel Blog"
+    label_singular: "Artikel"
+    folder: "blog/content/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - {label: "Tajuk", name: "title", widget: "string"}
+      - {label: "Tarikh", name: "date", widget: "datetime", format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false}
+      - {label: "Kategori", name: "kategori", widget: "list", default: ["panduan"]}
+      - {label: "Tag", name: "tag", widget: "list", default: ["cuci-tangki"]}
+      - {label: "Penerangan", name: "description", widget: "text"}
+      - {label: "Gambar", name: "image", widget: "image", required: false}
+      - {label: "Kandungan", name: "body", widget: "markdown"}

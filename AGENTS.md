@@ -1,9 +1,10 @@
 # JAYACLEAN — AGENTS.md
 # Project rules & memory anchor. READ THIS FIRST every new session.
-# Last updated: 2026-07-12
+# Last updated: 2026-07-14
 # ⚠️ Site refactored to CLEAN URLS — real apps live in folders: admin/index.html,
 #    worker/index.html (staff), customer/index.html. Root *.html are redirect stubs.
-#    Served from repo ROOT by GitHub Pages. See section 13 for current architecture.
+#    Hosted on Cloudflare Pages (migrated from GitHub Pages). See section 13 for
+#    current architecture. See section 14 for Hugo blog system.
 
 ---
 
@@ -28,7 +29,7 @@ Owner: Abdul Latif / banktifweb@gmail.com
 ## 2. TECH STACK (RM0 philosophy)
 | Layer | Tech |
 |-------|------|
-| Hosting | GitHub Pages + Cloudflare (DNS/CDN, proxy ON) |
+| Hosting | Cloudflare Pages (build + CDN) + Cloudflare DNS |
 | Backend | Supabase (PostgreSQL + PostgREST + Auth + Edge Functions) |
 | Images | Cloudinary (cloud_name `dkibczut`) |
 | Payment | Bayarcash v3 (via Supabase Edge Function proxy) |
@@ -37,7 +38,7 @@ Owner: Abdul Latif / banktifweb@gmail.com
 
 Supabase project ref: `thbscwlcyhcnqsppoyfn` — https://thbscwlcyhcnqsppoyfn.supabase.co
 GitHub repo: `banktif/jayaclean-salespage` (branch `master`)
-Domain: `cuci.jayabina.com` (GitHub Pages; CNAME file present)
+Domain: `cuci.jayabina.com` (Cloudflare Pages; CNAME file present for migration)
 
 ---
 
@@ -140,6 +141,12 @@ Template placeholders: `{nama}`, `{alamat}`, `{tarikh}`, `{slot}`, `{baki}`, `{b
 | `supabase/functions/bayarcash/` | Payment intent + callback proxy | — |
 | `supabase/functions/staff-admin/` | Admin-only staff account management | — |
 | `supabase/migrations/*.sql` | DB schema + RLS | — |
+| `build.sh` | Cloudflare Pages build script (Hugo + static copy) | — |
+| `blog/config.toml` | Hugo configuration | — |
+| `blog/content/blog/` | Blog articles (Markdown) | Malay |
+| `blog/layouts/` | Custom JAYACLEAN blog templates | — |
+| `blog/assets/css/blog.css` | Blog stylesheet (Poppins, green theme) | — |
+| `blog/static/blog/admin/` | Decap CMS editor (blog admin) | — |
 
 ---
 
@@ -153,7 +160,7 @@ Template placeholders: `{nama}`, `{alamat}`, `{tarikh}`, `{slot}`, `{baki}`, `{b
 ---
 
 ## 10. DEPLOY
-- Frontend: `git push origin master` → GitHub Pages auto-builds (~1 min). Hard refresh to see changes.
+- Frontend: `git push origin master` → Cloudflare Pages auto-builds (`bash build.sh` → Hugo + static copy → deploy).
 - Edge Function: `supabase functions deploy <name> --project-ref thbscwlcyhcnqsppoyfn` (needs `SUPABASE_ACCESS_TOKEN` env).
 - Secrets: `supabase secrets set KEY="..." --project-ref thbscwlcyhcnqsppoyfn`.
 - Migrations: `supabase db push` (needs DB password) OR run SQL in Supabase dashboard SQL editor.
@@ -176,16 +183,26 @@ Template placeholders: `{nama}`, `{alamat}`, `{tarikh}`, `{slot}`, `{baki}`, `{b
 
 ---
 
-## 13. CURRENT ARCHITECTURE (2026-07-12) — authoritative
+## 13. CURRENT ARCHITECTURE (2026-07-14) — authoritative
+
+### Hosting
+**Cloudflare Pages** (migrated from GitHub Pages). Build command: `bash build.sh`. Output: `public/`.
+Repo source: `banktif/jayaclean-salespage` (branch `master`).
+Cloudflare Pages auto-deploys on every push to master.
 
 ### URL / file structure (clean URLs)
-GitHub Pages serves from repo **root**. Real apps in folders; edit THESE:
+Cloudflare Pages serves the `public/` output directory. Real apps in folders; edit THESE:
 | URL | Real file | Notes |
 |-----|-----------|-------|
 | `/` | `index.html` | Sales page (Malay). GrapesJS-editable. |
 | `/admin/` | `admin/index.html` | Admin SPA. Inline Supabase Auth login. Hash routes (`#home,#bookings,#schedule,#staff,#reports,#settings,#backup`). |
 | `/worker/` | `worker/index.html` | Staff portal (renamed from "staff"). |
 | `/customer/` | `customer/index.html` | Customer self-service. |
+| `/blog/` | Hugo-generated | Blog homepage (article listing + pagination). |
+| `/blog/artikel-slug/` | Hugo-generated | Individual blog article. |
+| `/blog/kategori/xxx/` | Hugo-generated | Category archive pages. |
+| `/blog/tag/xxx/` | Hugo-generated | Tag archive pages. |
+| `/blog/admin/` | Decap CMS | Blog editor (owner-only, GitHub OAuth). |
 | `/editor` | `editor.html` | LOCKED to sales page only. |
 | shared | `theme.css`, `favicon.svg`, `sw.js`, `manifest.json` | |
 Root `admin.html`, `staff.html`, `login.html` = redirect stubs. `login/` removed.
@@ -224,3 +241,72 @@ Root `admin.html`, `staff.html`, `login.html` = redirect stubs. `login/` removed
 ### Deploy note
 Deploy Edge Functions + git ops from repo root (`Downloads/Jayaclean`). Management API for SQL:
 `POST https://api.supabase.com/v1/projects/thbscwlcyhcnqsppoyfn/database/query` with `SUPABASE_ACCESS_TOKEN` (read SQL via `[System.IO.File]::ReadAllText` to avoid PS note-property JSON bug; keep SQL ASCII — no em-dashes).
+
+---
+
+## 14. HUGO BLOG SYSTEM (added 2026-07-14)
+
+### Architecture
+- **Generator:** Hugo (Go-based static site generator, installed in Cloudflare Pages build env).
+- **Source:** `blog/` (config, content, layouts, static, assets).
+- **Build:** Cloudflare Pages runs `build.sh` → `cd blog && hugo --minify --destination ../public` → copies static files + app folders.
+- **Output:** Deployed from `public/` directory to Cloudflare Pages global CDN.
+- **Design:** Customer-facing — Poppins font, green theme (`#166534`), responsive, mobile-first. Custom templates in `blog/layouts/`.
+- **CMS:** Decap CMS (`/blog/admin/`) — owner login via GitHub OAuth → write articles in rich text editor → commit `.md` to repo → Cloudflare Pages auto-deploys.
+
+### URL structure
+| URL | Purpose |
+|-----|---------|
+| `/blog/` | Blog homepage (paginated article cards, 12/page) |
+| `/blog/artikel-slug/` | Single article (title, content, share buttons, related posts) |
+| `/blog/kategori/nama/` | Articles by category |
+| `/blog/tag/nama/` | Articles by tag |
+| `/blog/index.xml` | RSS feed |
+| `/blog/admin/` | Decap CMS editor |
+
+### Hugo config (`blog/config.toml`)
+- `baseURL`: `https://cuci.jayabina.com/`
+- `disableKinds: ["home"]` — prevents Hugo from generating root `/` (sales page handles root)
+- Custom taxonomies: `kategori`, `tag` (Bahasa Melayu)
+- Permalinks: categories at `/blog/kategori/:slug/`, tags at `/blog/tag/:slug/`
+- Pagination: 12 articles per page
+
+### Content structure
+```
+blog/content/
+├── blog/
+│   ├── _index.md              (blog section listing)
+│   ├── 2026-07-12-slug.md     (article)
+│   └── ...
+├── kategori/
+│   └── _index.md              (taxonomy list → /blog/kategori/)
+└── tag/
+    └── _index.md              (taxonomy list → /blog/tag/)
+```
+
+### AI autonomous publishing flow
+1. DeepSeek AI generates articles with `date` field set progressively (5/day → 6/day → ...).
+2. All articles committed to `blog/content/blog/` once.
+3. Hugo only publishes articles where `date <= today` — future-dated articles are hidden.
+4. Daily Cloudflare Pages cron build (or push trigger) → auto-publish next batch.
+5. Zero touch for 3 months until all 5000 articles are live.
+
+### Decap CMS (`blog/static/blog/admin/`)
+- `config.yml`: Backend=GitHub, repo=banktif/jayaclean-salespage, branch=master.
+- Collections: "blog" → folder `blog/content/blog`, fields: title, date, kategori, tag, description, image, body.
+- Media: Cloudinary (cloud_name `dkibczut`). Images uploaded via drag-drop in editor.
+
+### Build flow (`build.sh`)
+```bash
+#!/bin/bash
+rm -rf public; mkdir public
+cd blog && hugo --minify --destination ../public && cd ..
+cp index.html success.html test-pay.html favicon.svg sw.js manifest.json theme.css .nojekyll CNAME public/
+cp -r admin worker customer public/
+```
+
+### Important: NEVER
+- ❌ Edit files in `public/` directly (generated, overwritten on each build)
+- ❌ Put images in `blog/static/img/` for 5000 articles (use Cloudinary URLs in markdown)
+- ❌ Change `disableKinds: ["home"]` — will overwrite sales page `index.html`
+- ❌ Move Hugo source outside `blog/` — Cloudflare Pages expects Hugo config there
