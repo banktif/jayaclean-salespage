@@ -24,7 +24,16 @@ Admin/staff system + docs = English. WhatsApp templates = Malay. Customer pages 
 - Images: Cloudinary (dkibczut)
 - Payment: Bayarcash v3 (integrated via Supabase Edge Function `bayarcash` — solves CORS; PAT stored as Supabase secret)
 - Editor: GrapesJS 0.21.13 + preset-webpage 1.0.3 (CDN)
-- Fonts: Plus Jakarta Sans (admin) / Poppins (sales page)
+- Fonts: Plus Jakarta Sans (admin) / Bricolage Grotesque + Figtree + IBM Plex Mono (sales page v4)
+
+## Sales Page Versions
+| Version | Key Features | Status |
+|---------|-------------|--------|
+| **v1** | Basic 10-section sales page, Poppins, forest green `#166534`, yellow accent, mock data calendar | Archive |
+| **v2** | Wudhu headline added, casual BM tone, 10 image placeholders, mobile-native | Archive |
+| **v3** | Supabase booking connected, removed fake testimonials, booking form live | Archive |
+| **v4 KILLER** | Teal `#0E8C86` + rust `#C25E2E` theme, 3-font system (Bricolage+Figtree+IBM Plex Mono), 13 sections with dark→light narrative, glass-morphism cards, Transisi gradient bridge, Bukti before/after, Jaminan Kepuasan, sticky mobile CTA bar | **🔴 LIVE** |
+| **Full blueprint** | See `cuci-tangki/SALES-PAGE-COPY.md` — compiled from 4 expert audits (copy, layout, color, psychology) | Reference |
 
 ## Credentials Location
 All API keys, tokens, passwords are in the chat history. Ask user to re-provide or check dashboards:
