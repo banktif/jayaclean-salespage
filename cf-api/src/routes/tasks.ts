@@ -1,0 +1,179 @@
+import type { Env } from '../types';
+import { err, ok, uuid, nowISO } from '../utils/helpers';
+import { requireAuth, requireAdmin } from '../utils/middleware';
+
+export async function handleTasks(req: Request, env: Env, path: string): Promise<Response> {
+  const url = new URL(req.url);
+
+  // GET /api/tasks
+  if (path === '/api/tasks' && req.method === 'GET') {
+    try {
+      const payload = await requireAuth(req, env);
+      const statusFilter = url.searchParams.get('status');
+      const assignedTo = url.searchParams.get('assigned_to');
+
+      let q = `SELECT t.*, b.customer_name, b.customer_phone, b.customer_address, b.booking_date, b.booking_time,
+        p.full_name as staff_name FROM tasks t LEFT JOIN bookings b ON t.booking_id = b.id LEFT JOIN profiles p ON t.assigned_to = p.id`;
+      const conds: string[] = [];
+      const params: any[] = [];
+
+      if (payload.role === 'staff') {
+        conds.push('t.assigned_to = ?');
+        params.push(payload.sub);
+      }
+
+      if (statusFilter) { conds.push('t.status = ?'); params.push(statusFilter); }
+      if (assignedTo && payload.role === 'admin') { conds.push('t.assigned_to = ?'); params.push(assignedTo); }
+
+      if (conds.length) q += ' WHERE ' + conds.join(' AND ');
+      q += ' ORDER BY b.booking_date DESC, b.booking_time ASC';
+
+      const result = await env.DB.prepare(q).bind(...params).all();
+      return ok(result.results);
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  // PATCH /api/tasks/:id
+  const patchMatch = path.match(/^\/api\/tasks\/([a-f0-9-]+)$/);
+  if (patchMatch && req.method === 'PATCH') {
+    try {
+      const payload = await requireAuth(req, env);
+      const taskId = patchMatch[1];
+      const body = await req.json() as any;
+      const now = nowISO();
+
+      const task = await env.DB.prepare('SELECT * FROM tasks WHERE id = ?').bind(taskId).first<{assigned_to: string | null; status: string; booking_id: string}>();
+      if (!task) return err('Task not found', 404);
+
+      // Staff can only update own tasks
+      if (payload.role === 'staff' && task.assigned_to !== payload.sub) {
+        return err('Access denied', 403);
+      }
+
+      const sets: string[] = ['updated_at = ?'];
+      const params: any[] = [now];
+
+      if (body.assigned_to !== undefined && payload.role === 'admin') {
+        sets.push('assigned_to = ?'); params.push(body.assigned_to);
+        sets.push('status = ?'); params.push('assigned');
+      }
+
+      if (body.status !== undefined) {
+        switch (body.status) {
+          case 'in_progress':
+            sets.push('started_at = ?'); params.push(body.started_at || now);
+            break;
+          case 'awaiting_review':
+            sets.push('finished_at = ?'); params.push(body.finished_at || now);
+            // Auto-complete check
+            const autoComplete = await env.DB.prepare("SELECT value FROM app_settings WHERE key = 'auto_complete_task'").first<{value: string}>();
+            if (autoComplete?.value === 'true') {
+              sets.push('status = ?, completed_at = ?');
+              params.push('completed', now);
+              // Also complete booking
+              await env.DB.prepare("UPDATE bookings SET status = 'completed', updated_at = ? WHERE id = ?")
+                .bind(now, task.booking_id).run();
+              await env.DB.prepare('SELECT id FROM bookings WHERE id = ?').bind(task.booking_id).first<{customer_id: string | null}>().then(bk => {
+                if (bk?.customer_id) refreshCustomerStats(env.DB, bk.customer_id);
+              });
+            }
+            break;
+          case 'completed':
+            if (payload.role !== 'admin') return err('Admin only', 403);
+            sets.push('completed_at = ?'); params.push(now);
+            await env.DB.prepare("UPDATE bookings SET status = 'completed', updated_at = ? WHERE id = ?")
+              .bind(now, task.booking_id).run();
+            break;
+        }
+        if (body.status !== 'completed' || !(await env.DB.prepare("SELECT value FROM app_settings WHERE key = 'auto_complete_task'").first<{value: string}>())?.value) {
+          // Only set status explicitly if not auto-completed
+          const statusIdx = params.findIndex(p => p === 'completed' && sets.indexOf('status = ?') >= 0);
+          if (statusIdx < 0) {
+            sets.push('status = ?'); params.push(body.status);
+          }
+        }
+      }
+
+      if (sets.length > 1) {
+        params.push(taskId);
+        await env.DB.prepare(`UPDATE tasks SET ${sets.join(', ')} WHERE id = ?`).bind(...params).run();
+      }
+
+      const updated = await env.DB.prepare('SELECT * FROM tasks WHERE id = ?').bind(taskId).first();
+      return ok(updated);
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  return err('Not found', 404);
+}
+
+export async function handleTaskPhotos(req: Request, env: Env, path: string): Promise<Response> {
+  const url = new URL(req.url);
+
+  // GET /api/task-photos?task_id=
+  if (path === '/api/task-photos' && req.method === 'GET') {
+    try {
+      await requireAuth(req, env);
+      const taskId = url.searchParams.get('task_id');
+      if (!taskId) return err('Missing task_id');
+
+      const photos = await env.DB.prepare('SELECT * FROM task_photos WHERE task_id = ? ORDER BY created_at ASC')
+        .bind(taskId).all();
+      return ok(photos.results);
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  // POST /api/task-photos
+  if (path === '/api/task-photos' && req.method === 'POST') {
+    try {
+      const payload = await requireAuth(req, env);
+      const { task_id, type, url: photoUrl } = await req.json() as any;
+
+      if (!task_id || !type || !photoUrl) return err('Missing task_id, type, or url');
+      if (!['before', 'after'].includes(type)) return err('Type must be "before" or "after"');
+
+      // Verify staff owns this task (or admin)
+      if (payload.role === 'staff') {
+        const task = await env.DB.prepare('SELECT assigned_to FROM tasks WHERE id = ?').bind(task_id).first<{assigned_to: string}>();
+        if (!task || task.assigned_to !== payload.sub) return err('Access denied', 403);
+      }
+
+      const photoId = uuid();
+      await env.DB.prepare('INSERT INTO task_photos (id, task_id, type, url, uploaded_by) VALUES (?,?,?,?,?)')
+        .bind(photoId, task_id, type, photoUrl, payload.sub).run();
+
+      return ok({ id: photoId, task_id, type, url: photoUrl, uploaded_by: payload.sub });
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  return err('Not found', 404);
+}
+
+async function refreshCustomerStats(db: D1Database, customerId: string): Promise<void> {
+  const stats = await db.prepare(`
+    SELECT
+      COUNT(*) as total_bookings,
+      SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_bookings,
+      SUM(CASE WHEN status = 'completed' THEN amount ELSE 0 END) as total_spent,
+      MIN(booking_date) as first_booking_date,
+      MAX(booking_date) as last_booking_date
+    FROM bookings WHERE customer_id = ?
+  `).bind(customerId).first<{total_bookings: number; completed_bookings: number; total_spent: number; first_booking_date: string; last_booking_date: string}>();
+
+  if (stats) {
+    await db.prepare(`UPDATE customers SET
+      total_bookings = ?, completed_bookings = ?, total_spent = ?,
+      first_booking_date = ?, last_booking_date = ?, updated_at = ?
+      WHERE id = ?`)
+      .bind(stats.total_bookings, stats.completed_bookings, stats.total_spent || 0,
+        stats.first_booking_date, stats.last_booking_date, nowISO(), customerId).run();
+  }
+}

@@ -1,0 +1,126 @@
+import type { Env } from '../types';
+import { err, ok, uuid, nowISO, hashPassword } from '../utils/helpers';
+import { requireAuth, requireAdmin } from '../utils/middleware';
+
+export async function handleProfiles(req: Request, env: Env, path: string): Promise<Response> {
+  const url = new URL(req.url);
+
+  // GET /api/profiles
+  if (path === '/api/profiles' && req.method === 'GET') {
+    try {
+      const payload = await requireAuth(req, env);
+      if (payload.role !== 'admin') {
+        // Staff can only see their own profile
+        const profile = await env.DB.prepare('SELECT id, full_name, phone, role, is_active, email, address, avatar_url, service_area, created_at FROM profiles WHERE id = ?')
+          .bind(payload.sub).first();
+        return profile ? ok(profile) : err('Not found', 404);
+      }
+      const profiles = await env.DB.prepare('SELECT id, full_name, phone, role, is_active, email, address, avatar_url, service_area, created_at FROM profiles ORDER BY created_at DESC').all();
+      return ok(profiles.results);
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  // POST /api/profiles (admin: create staff)
+  if (path === '/api/profiles' && req.method === 'POST') {
+    try {
+      const payload = await requireAuth(req, env);
+      requireAdmin(payload);
+      const body = await req.json() as any;
+
+      if (!body.full_name || !body.phone) return err('full_name and phone required');
+
+      const phoneDigits = body.phone.replace(/\D/g, '');
+      const existing = await env.DB.prepare('SELECT id FROM profiles WHERE phone = ?').bind(phoneDigits).first();
+      if (existing) return err('Phone number already exists', 409);
+
+      const userId = uuid();
+      const password = body.password || 'jayaclean123';
+      const hashed = await hashPassword(password);
+
+      await env.DB.prepare(`INSERT INTO profiles (id, full_name, phone, role, is_active, email, address, avatar_url, service_area, password)
+        VALUES (?,?,?,?,?,?,?,?,?,?)`)
+        .bind(userId, body.full_name, phoneDigits, body.role || 'staff', body.is_active !== false ? 1 : 0,
+          body.email || `${phoneDigits}@staff.jayabina.local`, body.address || '', body.avatar_url || '', body.service_area || '', hashed).run();
+
+      return ok({ id: userId, phone: phoneDigits, full_name: body.full_name, role: body.role || 'staff' });
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  // PATCH /api/profiles/:id
+  const patchMatch = path.match(/^\/api\/profiles\/([a-f0-9-]+)$/);
+  if (patchMatch && req.method === 'PATCH') {
+    try {
+      const payload = await requireAuth(req, env);
+      const profileId = patchMatch[1];
+      const body = await req.json() as any;
+
+      // Staff can only update own profile (limited fields)
+      if (payload.role !== 'admin' && payload.sub !== profileId) {
+        return err('Access denied', 403);
+      }
+
+      const sets: string[] = [];
+      const params: any[] = [];
+
+      if (payload.role === 'admin') {
+        if (body.full_name !== undefined) { sets.push('full_name = ?'); params.push(body.full_name); }
+        if (body.phone !== undefined) { sets.push('phone = ?'); params.push(body.phone.replace(/\D/g, '')); }
+        if (body.is_active !== undefined) { sets.push('is_active = ?'); params.push(body.is_active ? 1 : 0); }
+        if (body.service_area !== undefined) { sets.push('service_area = ?'); params.push(body.service_area); }
+        if (body.role !== undefined && payload.sub !== profileId) { sets.push('role = ?'); params.push(body.role); }
+      }
+
+      // Fields anyone can update on their own profile
+      if (body.email !== undefined) { sets.push('email = ?'); params.push(body.email); }
+      if (body.address !== undefined) { sets.push('address = ?'); params.push(body.address); }
+      if (body.avatar_url !== undefined) { sets.push('avatar_url = ?'); params.push(body.avatar_url); }
+
+      if (sets.length === 0) return err('No fields to update');
+
+      params.push(profileId);
+      await env.DB.prepare(`UPDATE profiles SET ${sets.join(', ')} WHERE id = ?`).bind(...params).run();
+
+      const updated = await env.DB.prepare('SELECT id, full_name, phone, role, is_active, email, address, avatar_url, service_area, created_at FROM profiles WHERE id = ?')
+        .bind(profileId).first();
+      return ok(updated);
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  // POST /api/profiles/bulk (admin: bulk create staff)
+  if (path === '/api/profiles/bulk' && req.method === 'POST') {
+    try {
+      const payload = await requireAuth(req, env);
+      requireAdmin(payload);
+      const { staff } = await req.json() as { staff: any[] };
+      if (!staff || !staff.length) return err('No staff provided');
+
+      const results = [];
+      for (const s of staff) {
+        const phoneDigits = s.phone.replace(/\D/g, '');
+        const existing = await env.DB.prepare('SELECT id FROM profiles WHERE phone = ?').bind(phoneDigits).first();
+        if (existing) { results.push({ phone: s.phone, error: 'Already exists' }); continue; }
+
+        const userId = uuid();
+        const password = s.password || 'jayaclean123';
+        const hashed = await hashPassword(password);
+
+        await env.DB.prepare(`INSERT INTO profiles (id, full_name, phone, role, is_active, email, password)
+          VALUES (?,?,?,?,?,?,?)`)
+          .bind(userId, s.full_name, phoneDigits, 'staff', 1, `${phoneDigits}@staff.jayabina.local`, hashed).run();
+
+        results.push({ ok: true, phone: s.phone, id: userId, name: s.full_name });
+      }
+      return ok(results);
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  return err('Not found', 404);
+}

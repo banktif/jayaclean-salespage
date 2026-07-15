@@ -42,9 +42,10 @@
   <a href="https://wa.me/60139373275?text=Assalamualaikum%20Jaya%20Bina.%20Saya%20baru%20buat%20bayaran." class="wa" target="_blank">&#128172; WhatsApp Kami</a>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/jc-api.js"></script>
 <script>
-var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
+var API_URL=localStorage.getItem('jc_api_url')||'https://jayaclean-api.banktifweb.workers.dev';
+var SB=JCApi.create(API_URL);
 var params=new URLSearchParams(window.location.search);
 var orderId=params.get('order')||params.get('order_number');
 if(orderId)document.getElementById('ref').textContent=orderId.substring(0,8)+'...';
@@ -69,10 +70,11 @@ function render(state){
 async function poll(tries){
   if(!orderId){render('pending');return;}
   try{
-    var {data,error}=await SB.from('bookings').select('payment_status').eq('id',orderId).single();
-    if(!error&&data){
-      if(data.payment_status==='paid'){render('paid');return;}
-      if(data.payment_status==='failed'){render('failed');return;}
+    var resp=await SB.from('bookings').select('*').eq('id',orderId).single();
+    var booking=resp.data||resp;
+    if(booking){
+      if(booking.payment_status==='paid'){render('paid');return;}
+      if(booking.payment_status==='failed'){render('failed');return;}
     }
   }catch(e){}
   if(tries>0){setTimeout(function(){poll(tries-1)},2000);}

@@ -82,14 +82,15 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/jc-api.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
-var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
+var API_URL=localStorage.getItem('jc_api_url')||'https://jayaclean-api.banktifweb.workers.dev';
+var SB=JCApi.create(API_URL);
 var _lt;function relucide(){clearTimeout(_lt);_lt=setTimeout(function(){try{if(window.lucide)lucide.createIcons()}catch(e){}},30);}
 var _mo=new MutationObserver(relucide);_mo.observe(document.body,{childList:true,subtree:true});
 var myPhone='',myBookings=[],myTasks=[],filter='all',selId=null;
-var BC_BALANCE_FN='https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/bayarcash/create-balance-intent';
+var BC_BALANCE_FN=API_URL+'/api/payments/create-balance-intent';
 
 function esc(s){return(s||'').toString().replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
 function fd(d){if(!d)return'-';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
@@ -111,14 +112,13 @@ async function login(){
 
 async function loadMyBookings(){
   try{
-    var {data,error}=await SB.from('bookings').select('*').eq('customer_phone',myPhone).order('booking_date',{ascending:false}).order('booking_time',{ascending:false});
-    if(error)throw error;
-    myBookings=data||[];
+    var resp=await SB.from('bookings').select('*').order('booking_date',{ascending:false}).order('booking_time',{ascending:false});
+    var data=resp.data||[];
+    myBookings=data.filter(function(b){return b.customer_phone&&b.customer_phone.replace(/\D/g,'')===myPhone});
     var ids=myBookings.map(function(b){return b.id});
     myTasks={};
     if(ids.length){
-      var {data:tasks}=await SB.from('tasks').select('*').in('booking_id',ids);
-      (tasks||[]).forEach(function(t){myTasks[t.booking_id]=t});
+      for(var i=0;i<ids.length;i++){try{var tr=await SB.from('tasks').select('*').eq('booking_id',ids[i]);if(tr.data){var tsk=Array.isArray(tr.data)?tr.data[0]:tr.data;if(tsk)myTasks[tsk.booking_id]=tsk}}catch(e){}}
     }
   }catch(e){myBookings=[];myTasks={}}
 }

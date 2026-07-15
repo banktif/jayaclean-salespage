@@ -702,7 +702,7 @@
   <a class="desktop-wa js-whatsapp" data-message="Assalamualaikum JAYACLEAN. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____. Bilangan tangki: ____." href="https://wa.me/60000000000" target="_blank" rel="noopener">Tanya di WhatsApp</a>
   <div class="mobile-sticky" id="mobileSticky"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYACLEAN. Saya mahu semak slot dan harga servis cuci tangki. Poskod saya: ____. Jenis rumah: ____. Bilangan tangki: ____." href="https://wa.me/60000000000" target="_blank" rel="noopener">Semak Slot & Harga</a></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="/jc-api.js" defer></script>
   <script>
     window.addEventListener('DOMContentLoaded',function(){
       var WHATSAPP_NUMBER='60000000000'; // WAJIB GANTI dengan nombor WhatsApp Business sebenar, format 601xxxxxxxx.
@@ -751,9 +751,9 @@
         if(!open){this.setAttribute('aria-expanded','true');document.getElementById(this.getAttribute('aria-controls')).hidden=false}
       })});
 
-      var SB=null;
-      if(window.supabase){SB=window.supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR')}
-      async function fetchBookedSlots(date){if(!SB)throw new Error('BOOKING_UNAVAILABLE');var result=await SB.from('slots').select('time_slot').eq('date',date).eq('is_booked',true);if(result.error)throw result.error;if(!result.data)throw new Error('AVAILABILITY_UNAVAILABLE');return result.data.map(function(item){return item.time_slot})}
+      var API_URL=localStorage.getItem('jc_api_url')||'https://jayaclean-api.banktifweb.workers.dev';
+      var SB=JCApi.create(API_URL);
+      async function fetchBookedSlots(date){if(!SB)throw new Error('BOOKING_UNAVAILABLE');var res=await fetch(API_URL+'/api/slots/available?date='+date);var d=await res.json();if(!d||d.error)throw new Error('AVAILABILITY_UNAVAILABLE');return (d.data||[]).filter(function(s){return !s.available}).map(function(s){return s.time_slot})}
 
       var today=new Date();today.setHours(0,0,0,0);
       var currentMonth=today.getMonth();
@@ -819,11 +819,11 @@
         if(!SB){alert('Sistem tempahan belum bersambung. Sila gunakan WhatsApp.');submit.disabled=false;submit.textContent='Hantar Permintaan Slot';return}
         try{
           var existing=await fetchBookedSlots(selectedDate);if(existing.indexOf(selectedSlot)>-1)throw new Error('SLOT_TAKEN');
-          var bookingResult=await SB.from('bookings').insert({customer_name:name,customer_phone:phone,customer_address:address,booking_date:selectedDate,booking_time:selectedSlot,amount:300,deposit_amount:150,status:'pending_payment',payment_status:'pending'}).select();
-          if(bookingResult.error)throw bookingResult.error;
-          var bookingId=bookingResult.data[0].id;
-          var slotResult=await SB.from('slots').insert({date:selectedDate,time_slot:selectedSlot,is_booked:true,booking_id:bookingId});
-          if(slotResult.error)throw slotResult.error;
+          var bookingResult=await SB.from('bookings').insert({customer_name:name,customer_phone:phone,customer_address:address,booking_date:selectedDate,booking_time:selectedSlot,amount:300,deposit_amount:150,status:'pending_payment',payment_status:'pending'});
+          if(bookingResult.error)throw new Error(bookingResult.error);
+          var bk=Array.isArray(bookingResult.data)?bookingResult.data[0]:bookingResult.data;
+          if(!bk||!bk.id)throw new Error('Booking failed');
+          var bookingId=bk.id;
           this.hidden=true;
           var slotLabels={"9am":"9:00 pagi","11am":"11:00 pagi","2pm":"2:00 petang","4pm":"4:00 petang"};
           document.getElementById('confirmationText').innerHTML='Terima kasih, <strong>'+name.replace(/[<>&"']/g,function(char){return({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'})[char]})+'</strong>. Permintaan untuk <strong>'+formatDate(selectedDate)+', '+slotLabels[selectedSlot]+'</strong> telah direkodkan. Slot belum disahkan sehingga semakan skop dan deposit selesai. Rujukan: <strong>'+bookingId.substring(0,8)+'</strong>.';

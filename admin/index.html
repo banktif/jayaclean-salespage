@@ -497,19 +497,20 @@
   <p style="margin-top:14px;font-size:.68rem;color:var(--text3);text-align:center">Admin access only</p>
 </div></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/jc-api.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
-var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
+var API_URL=localStorage.getItem('jc_api_url')||'https://jayaclean-api.banktifweb.workers.dev';
+var SB=JCApi.create(API_URL);
 var _lt;function relucide(){clearTimeout(_lt);_lt=setTimeout(function(){try{if(window.lucide)lucide.createIcons()}catch(e){}},30);}
 var _mo=new MutationObserver(relucide);_mo.observe(document.body,{childList:true,subtree:true});
-var FN_STAFF_ADMIN='https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/staff-admin';
-var BC_BALANCE_FN='https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/bayarcash/create-balance-intent';
-var FN_WA_API='https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/wa-messenger/send';
+var FN_STAFF_ADMIN=API_URL;
+var BC_BALANCE_FN=API_URL+'/api/payments/create-balance-intent';
+var FN_WA_API=API_URL+'/api/whatsapp/send';
 var cf=null,all=[],cid=null,currentView='bookings';
 var taskList=[],staffList=[],settings={},scMonth=new Date().getMonth(),scYear=new Date().getFullYear(),selDate=null;
 var newStaffAvatar='',staffCache=[],editAvatar='';
-async function authToken(){var {data:{session}}=await SB.auth.getSession();return session?session.access_token:'';}
+async function authToken(){return SB.auth.getToken()||'';}
 
 // THEME
 var theme=localStorage.getItem('theme')||'system';applyTheme(theme);
@@ -726,7 +727,7 @@ async function saveCustomer(id){
 // ═══════════ BACKUP ═══════════
 async function callBackup(action){
   var token=await authToken();
-  var res=await fetch('https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/backup',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:action})});
+  var res=await fetch(API_URL+'/api/backup/'+action,{method:action==='status'||action==='list'?'GET':'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:action==='status'||action==='list'?undefined:JSON.stringify({force:true})});
   return {ok:res.ok,body:await res.json()};
 }
 function bkPanel(label,icon,at,status){
@@ -776,7 +777,7 @@ async function showBackup(){
 async function backupNow(kind){
   var msg=document.getElementById('bkMsg');msg.style.color='var(--text3)';msg.textContent=(kind==='db'?'Backing up database...':'Triggering code backup...');
   var token=await authToken();
-  var res=await fetch('https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/backup',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(kind==='db'?{action:'db',force:true}:{action:'code'})});
+  var res=await fetch(API_URL+'/api/backup/db',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({force:true})});
   var r={ok:res.ok,body:await res.json()};
   if(r.ok){msg.style.color='var(--accent)';msg.textContent=(kind==='db'?'Database backup done.':'Code backup triggered (GitHub Actions running).');setTimeout(showBackup,1400);}
   else{msg.style.color='var(--danger)';msg.textContent='Error: '+(r.body.error||'failed');}
@@ -1066,7 +1067,24 @@ async function saveEditStaff(id){
 
 async function callStaffAdmin(payload){
   var token=await authToken();
-  var res=await fetch(FN_STAFF_ADMIN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(payload)});
+  var url=API_URL+'/api/profiles',method='POST',body=payload;
+  if(payload.action==='update'){
+    url=API_URL+'/api/profiles/'+payload.user_id;method='PATCH';
+    body={full_name:payload.full_name,email:payload.email,address:payload.address,service_area:payload.service_area,avatar_url:payload.avatar_url};
+  }else if(payload.action==='set_active'){
+    url=API_URL+'/api/profiles/'+payload.user_id;method='PATCH';
+    body={is_active:payload.is_active};
+  }else if(payload.action==='reset_password'){
+    url=API_URL+'/api/auth/reset-password';method='POST';
+    body={user_id:payload.user_id,new_password:payload.password};
+  }else if(payload.action==='bulk_create'){
+    url=API_URL+'/api/profiles/bulk';method='POST';
+    body={staff:payload.staff};
+  }else{
+    // create
+    body={full_name:payload.full_name,phone:payload.phone,password:payload.password,email:payload.email,address:payload.address,service_area:payload.service_area,avatar_url:payload.avatar_url,role:'staff'};
+  }
+  var res=await fetch(url,{method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
   return {ok:res.ok,body:await res.json()};
 }
 async function addStaff(){
@@ -1144,7 +1162,7 @@ async function publishHome(){
   m.style.color='var(--text3)';m.textContent='Publishing...';
   try{
     var token=await authToken();
-    var res=await fetch('https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/backup',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'publish_home',version:v})});
+    var res=await fetch(API_URL+'/api/backup/publish-home',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({version:v})});
     var r=await res.json();
     if(res.ok){m.style.color='var(--accent)';m.textContent='Published '+v+'! Main domain deploying (~1 min).';var hl=document.getElementById('hpLive');if(hl)hl.textContent=v;}
     else{m.style.color='var(--danger)';m.textContent='Error: '+(r.error||'failed');}
@@ -1296,11 +1314,14 @@ function completeTask(taskId){
   if(autoWA){
     (async function(){
       try{
-        var payRes=await fetch(BC_BALANCE_FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({booking_id:b.id,origin:location.origin})});
+        var payRes=await fetch(BC_BALANCE_FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({booking_id:b.id})});
         var payData=await payRes.json();
         var payUrl=payData.url||'';
         if(useAPI){
-          var waRes=await fetch(FN_WA_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({booking_id:b.id,template:'wa_tmpl_balance_link',extra:{baki:settings.price_balance||'150',business:settings.business_name||'JAYACLEAN'},pay_url:payUrl})});
+          var waMsg=fillTemplate(settings.wa_tmpl_balance_link||settings.wa_tmpl_baki||'Salam {nama}, kerja cuci tangki air di {alamat} telah siap. Sila lengkapkan baki RM{baki} melalui pautan: {pay_url}. Terima kasih {business}.',{
+            nama:b.customer_name,alamat:b.customer_address,baki:settings.price_balance||'150',bank:settings.bank_name||'',akaun:settings.bank_account_no||'',pemegang:settings.bank_account_holder||'',qr_url:settings.qr_image_url||'',business:settings.business_name||'JAYACLEAN',pay_url:payUrl
+          });
+          var waRes=await fetch(FN_WA_API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+await authToken()},body:JSON.stringify({booking_id:b.id,message:waMsg})});
           var waData=await waRes.json();
           if(!waRes.ok||waData.error){alert('WhatsApp API error: '+(waData.error||'failed')+'\nFalling back to manual wa.me.');window.open('https://wa.me/'+waNum(b.customer_phone)+'?text='+encodeURIComponent(payUrl),'_blank')}
         }else{
@@ -1356,17 +1377,16 @@ async function doLogin(){
   if(!em||!pw){msg.style.display='block';msg.textContent='Enter email and password';return}
   msg.style.display='none';
   try{
-    var {error}=await SB.auth.signInWithPassword({email:em,password:pw});
-    if(error){msg.style.display='block';msg.textContent=error.message;return}
+    var {status,error,data}=await SB.auth.signInWithPassword({email:em,password:pw});
+    if(error||status!=='ok'){msg.style.display='block';msg.textContent=error||'Login failed';return}
     await checkAccess();
   }catch(e){msg.style.display='block';msg.textContent=e.message}
 }
 async function checkAccess(){
   try{
-    var {data:{user}}=await SB.auth.getUser();
+    var user=await SB.auth.getUser();
     if(!user){showLogin();return}
-    var {data:profile}=await SB.from('profiles').select('role,is_active,full_name').eq('id',user.id).single();
-    if(!profile||profile.role!=='admin'||!profile.is_active){await SB.auth.signOut();showLogin();return}
+    if(!user.role||user.role!=='admin'||!user.is_active){SB.auth.signOut();showLogin();return}
     document.getElementById('loginOverlay').classList.add('hidden');
     await loadSettings();
     var h=location.hash;
@@ -1381,7 +1401,7 @@ async function checkAccess(){
   }catch(e){showLogin()}
 }
 function showLogin(){document.getElementById('loginOverlay').classList.remove('hidden');document.getElementById('authErr').style.display='none'}
-async function logout(){try{await SB.auth.signOut()}catch(e){}location.reload()}
+async function logout(){SB.auth.signOut();location.reload()}
 checkAccess();relucide();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){})}
 

@@ -41,10 +41,11 @@
   <a class="back" href="/">&larr; Kembali ke Laman Utama</a>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/jc-api.js"></script>
 <script>
-var SB=supabase.createClient('https://thbscwlcyhcnqsppoyfn.supabase.co','sb_publishable_jFrl83f8l_tcWTulTL5lkQ_bLnCVpYR');
-var BC_FN='https://thbscwlcyhcnqsppoyfn.supabase.co/functions/v1/bayarcash/create-intent';
+var API_URL=localStorage.getItem('jc_api_url')||'https://jayaclean-api.banktifweb.workers.dev';
+var SB=JCApi.create(API_URL);
+var BC_FN=API_URL+'/api/payments/create-intent';
 
 document.getElementById('btnPay').addEventListener('click',async function(){
   var btn=this,st=document.getElementById('status'),refEl=document.getElementById('ref');
@@ -53,7 +54,7 @@ document.getElementById('btnPay').addEventListener('click',async function(){
   if(!amt||amt<1){st.className='status err';st.textContent='Amount tak sah.';return}
   btn.disabled=true;btn.textContent='Menyediakan bayaran...';
   try{
-    var {data:booking,error:berr}=await SB.from('bookings').insert({
+    var result=await SB.from('bookings').insert({
       customer_name:'TEST PAYMENT',
       customer_phone:'0139373275',
       customer_address:'TEST PAYMENT - halaman ujian, bukan booking sebenar',
@@ -64,12 +65,14 @@ document.getElementById('btnPay').addEventListener('click',async function(){
       status:'pending_payment',
       payment_status:'pending',
       notes:'TEST PAYMENT RM'+amt+' - dari test-pay.html'
-    }).select();
-    if(berr)throw new Error(berr.message);
-    var bookingId=booking[0].id;
+    });
+    if(result.error)throw new Error(result.error);
+    var bk=Array.isArray(result.data)?result.data[0]:result.data;
+    if(!bk||!bk.id)throw new Error('Booking failed');
+    var bookingId=bk.id;
     refEl.textContent='Booking test: '+bookingId;
     btn.textContent='Ke halaman bayaran...';
-    var res=await fetch(BC_FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({booking_id:bookingId,origin:location.origin})});
+    var res=await fetch(BC_FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({booking_id:bookingId})});
     var pay=await res.json();
     if(res.ok&&pay.url){location.href=pay.url;return;}
     throw new Error((pay&&pay.error?pay.error:'Gateway gagal')+(pay&&pay.detail?' — '+JSON.stringify(pay.detail):''));

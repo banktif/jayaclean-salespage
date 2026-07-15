@@ -1,0 +1,34 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "jayaclean-api",
+  "account_id": "9b9af0328258f9bd59c1c3b955ddb616",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-15",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "jayaclean-db",
+      "database_id": "3ceabfef-4c60-47cb-b853-3658d3fa69a7"
+    }
+  ],
+  "r2_buckets": [],
+  "vars": {
+    "BAYARCASH_PAT": "",
+    "BAYARCASH_API_SECRET": "",
+    "BAYARCASH_PORTAL_KEY": "",
+    "BAYARCASH_PAYMENT_CHANNEL": "5",
+    "WA_PHONE_NUMBER_ID": "",
+    "WA_ACCESS_TOKEN": "",
+    "GH_PAT": "",
+    "SITE_URL": "https://cuci.jayabina.com"
+  },
+  "routes": [],
+  "triggers": {
+    "crons": [
+      "0 * * * *"
+    ]
+  }
+}
