@@ -1,8 +1,12 @@
+import { eq } from 'drizzle-orm';
 import type { Env } from '../types';
 import { err, ok } from '../utils/helpers';
 import { requireAuth } from '../utils/middleware';
+import { createDb } from '../db/client';
+import { bookings } from '../db/schema';
 
 export async function handleWhatsapp(req: Request, env: Env, path: string): Promise<Response> {
+  const db = createDb(env);
   // POST /api/whatsapp/send
   if (path === '/api/whatsapp/send' && req.method === 'POST') {
     try {
@@ -13,7 +17,8 @@ export async function handleWhatsapp(req: Request, env: Env, path: string): Prom
       let finalPhone = phone;
 
       if (booking_id && !phone) {
-        const booking = await env.DB.prepare('SELECT customer_phone FROM bookings WHERE id = ?').bind(booking_id).first<{customer_phone: string}>();
+        const booking = await db.select({ customer_phone: bookings.customerPhone }).from(bookings)
+          .where(eq(bookings.id, booking_id)).get();
         if (booking) finalPhone = booking.customer_phone;
       }
 

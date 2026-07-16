@@ -61,6 +61,13 @@ const handleCustomersRoute = (req: Request, env: Env) => {
 app.all('/api/customers', (c) => handleCustomersRoute(c.req.raw, c.env));
 app.all('/api/customers/*', (c) => handleCustomersRoute(c.req.raw, c.env));
 
+const handleWhatsappRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleWhatsapp(req, env, path);
+};
+app.all('/api/whatsapp', (c) => handleWhatsappRoute(c.req.raw, c.env));
+app.all('/api/whatsapp/*', (c) => handleWhatsappRoute(c.req.raw, c.env));
+
 app.all('*', (c) => handleLegacyRequest(c.req.raw, c.env));
 
 async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
@@ -92,9 +99,6 @@ async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
       if (path.startsWith('/api/tasks/distribute')) return await handleDistributeUnassigned(req, env);
       if (path.startsWith('/api/tasks')) return await handleTasks(req, env, path);
       if (path.startsWith('/api/task-photos')) return await handleTaskPhotos(req, env, path);
-
-      // WhatsApp
-      if (path.startsWith('/api/whatsapp')) return await handleWhatsapp(req, env, path);
 
       // Backup
       if (path.startsWith('/api/backup')) return await handleBackup(req, env, path);
