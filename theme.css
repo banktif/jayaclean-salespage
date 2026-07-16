@@ -33,7 +33,15 @@
   --shadow-lg:0 12px 34px rgba(22,101,52,.10);
   --menu-bg:#e7f3ea;
   --menu-overlay:rgba(231,243,234,.86);
+  --surface-hover:#edf7f0;
+  --canvas-glow:rgba(22,101,52,.07);
+  --nav-glass:rgba(255,255,255,.94);
+  --header-fade:rgba(245,247,245,0);
+  --login-card:rgba(255,255,255,.97);
+  --login-card-border:rgba(255,255,255,.58);
 }
+
+html.light{color-scheme:light}
 
 /* ---------- DARK (forced via html.dark) ---------- */
 html.dark{
@@ -45,7 +53,7 @@ html.dark{
   --border-strong:rgba(255,255,255,.11);
   --text:#e9eef5;
   --text2:#9aa7b8;
-  --text3:#66748a;
+  --text3:#8997a8;
   --accent:#22c55e;
   --accent-hover:#16a34a;
   --accent-light:rgba(34,197,94,.14);
@@ -60,7 +68,15 @@ html.dark{
   --shadow-lg:0 14px 40px rgba(0,0,0,.5);
   --menu-bg:#0e2118;
   --menu-overlay:rgba(14,33,24,.9);
+  --surface-hover:#203626;
+  --canvas-glow:rgba(34,197,94,.09);
+  --nav-glass:rgba(14,33,24,.94);
+  --header-fade:rgba(10,15,10,0);
+  --login-card:rgba(19,31,24,.97);
+  --login-card-border:rgba(255,255,255,.11);
 }
+
+html.dark{color-scheme:dark}
 
 /* ---------- DARK (system pref, unless page forces light/dark) ---------- */
 @media (prefers-color-scheme: dark){
@@ -73,7 +89,7 @@ html.dark{
     --border-strong:rgba(255,255,255,.11);
     --text:#e9eef5;
     --text2:#9aa7b8;
-    --text3:#66748a;
+    --text3:#8997a8;
     --accent:#22c55e;
     --accent-hover:#16a34a;
     --accent-light:rgba(34,197,94,.14);
@@ -86,8 +102,15 @@ html.dark{
     --danger-light:rgba(240,89,94,.12);
     --shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35);
     --shadow-lg:0 14px 40px rgba(0,0,0,.5);
-  --menu-bg:#0e2118;
-  --menu-overlay:rgba(14,33,24,.9);
+    --menu-bg:#0e2118;
+    --menu-overlay:rgba(14,33,24,.9);
+    --surface-hover:#203626;
+    --canvas-glow:rgba(34,197,94,.09);
+    --nav-glass:rgba(14,33,24,.94);
+    --header-fade:rgba(10,15,10,0);
+    --login-card:rgba(19,31,24,.97);
+    --login-card-border:rgba(255,255,255,.11);
+    color-scheme:dark;
   }
 }
 
@@ -101,6 +124,8 @@ html.dark{
 
 /* ---------- Global polish ---------- */
 *{ -webkit-tap-highlight-color:transparent; }
+input,select,textarea{accent-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--text3);opacity:1}
 button{ transition:transform .12s ease, background .18s ease, color .18s ease, border-color .18s ease; }
 button:active{ transform:scale(.97); }
 a,button,input,select,textarea{ outline:none; }

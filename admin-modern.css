@@ -14,9 +14,9 @@
 
 body.admin-app{
   background:
-    radial-gradient(circle at 90% 0,rgba(20,108,67,.07),transparent 30rem),
-    var(--jb-canvas);
-  color:#111827;
+    radial-gradient(circle at 90% 0,var(--canvas-glow),transparent 30rem),
+    var(--bg);
+  color:var(--text);
   line-height:1.55;
 }
 
@@ -82,20 +82,20 @@ body.admin-app{
 .admin-app .sGrp,
 .admin-app .d-card,
 .admin-app .cal-wrap{
-  border-color:var(--jb-border);
-  box-shadow:0 1px 2px rgba(5,46,34,.03),0 8px 28px rgba(5,46,34,.055);
+  border-color:var(--border);
+  box-shadow:var(--shadow);
 }
 
 .admin-app .stat:hover,
 .admin-app .kpi:hover,
 .admin-app .panel:hover,
 .admin-app .bk-card:hover{
-  box-shadow:0 14px 34px rgba(5,46,34,.10);
+  box-shadow:var(--shadow-lg);
 }
 
 .admin-app .sec-title,
 .admin-app .sGrpH{
-  color:var(--jb-700);
+  color:var(--accent);
   font-size:12px;
   letter-spacing:.08em;
 }
@@ -137,9 +137,9 @@ body.admin-app{
 .admin-app .cust-stat{font-size:12px}
 .admin-app .cust-row{min-height:66px;padding:12px 14px}
 
-.admin-app thead th{font-size:11px;padding:14px 16px;background:#f8faf9}
+.admin-app thead th{font-size:11px;padding:14px 16px;background:var(--surface)}
 .admin-app tbody td{font-size:13px;padding:16px}
-.admin-app tbody tr:hover{background:var(--jb-50)}
+.admin-app tbody tr:hover{background:var(--surface-hover)}
 .admin-app .d-btn{min-height:40px;font-size:12px}
 
 .admin-app .m-sheet h3{font-size:17px}
@@ -170,33 +170,36 @@ body.admin-app{
   width:420px;
   max-width:calc(100vw - 32px);
   padding:40px;
-  border:1px solid rgba(255,255,255,.55);
+  border:1px solid var(--login-card-border);
   border-radius:28px;
-  background:rgba(255,255,255,.96);
+  background:var(--login-card);
   box-shadow:0 28px 80px rgba(0,0,0,.35);
   text-align:left;
 }
 
 .admin-app .login-avatar{margin:0 0 24px;width:64px;height:64px;border-radius:18px;font-size:20px}
-.admin-app .login-box h2{font-size:26px;color:#111827;letter-spacing:-.04em;margin-bottom:6px}
-.admin-app .login-box .sub{font-size:14px;color:#667085;margin-bottom:26px}
+.admin-app .login-box h2{font-size:26px;color:var(--text);letter-spacing:-.04em;margin-bottom:6px}
+.admin-app .login-box .sub{font-size:14px;color:var(--text2);margin-bottom:26px}
 .admin-app .login-box input{
   min-height:52px;
   padding:0 16px;
-  border-color:#d8e2dc;
+  border-color:var(--border-strong);
   border-radius:13px;
-  background:#fff;
-  color:#111827;
+  background:var(--elevated);
+  color:var(--text);
   font-size:16px;
   text-align:left;
   box-shadow:none;
 }
 .admin-app .login-box button{min-height:52px;font-size:14px;border-radius:13px;background:var(--jb-700)}
-.admin-app .login-note{margin-top:16px!important;font-size:12px!important;color:#667085!important;text-align:left!important;line-height:1.55}
-
-html.dark .admin-app .login-box{background:rgba(19,31,24,.97);border-color:rgba(255,255,255,.10)}
-html.dark .admin-app .login-box h2{color:var(--text)}
-html.dark .admin-app .login-box input{background:var(--elevated);border-color:var(--border-strong);color:var(--text)}
+.admin-app .login-note{margin-top:16px!important;font-size:12px!important;color:var(--text2)!important;text-align:left!important;line-height:1.55}
+.admin-app .login-theme{
+  position:absolute;top:20px;right:20px;width:42px!important;height:42px!important;min-height:42px!important;
+  padding:0!important;display:grid;place-items:center;border:1px solid var(--border)!important;
+  border-radius:12px!important;background:var(--surface)!important;color:var(--text2)!important;
+  box-shadow:var(--shadow)!important
+}
+.admin-app .login-theme:hover{color:var(--accent)!important;border-color:var(--accent)!important}
 
 @media(min-width:1024px){
   .admin-app .d-sidebar{
@@ -237,9 +240,8 @@ html.dark .admin-app .login-box input{background:var(--elevated);border-color:va
     z-index:35;
     min-height:92px;
     margin:0 0 24px;
-    background:linear-gradient(180deg,var(--jb-canvas) 76%,rgba(245,248,246,0));
+    background:linear-gradient(180deg,var(--bg) 76%,var(--header-fade));
   }
-  html.dark .admin-app .d-hdr{background:linear-gradient(180deg,var(--bg) 76%,rgba(10,15,10,0))}
   .admin-app .d-hdr h1{font-size:28px;letter-spacing:-.04em}
   .admin-app .d-hdr p{font-size:13px;margin-top:3px}
   .admin-app .stats-grid{gap:18px;margin-bottom:28px}
@@ -262,12 +264,11 @@ html.dark .admin-app .login-box input{background:var(--elevated);border-color:va
   .admin-app .hdr{
     height:calc(64px + env(safe-area-inset-top));
     padding:env(safe-area-inset-top) 16px 0;
-    background:rgba(247,250,248,.92)!important;
-    border-color:var(--jb-border);
+    background:var(--nav-glass)!important;
+    border-color:var(--border);
     backdrop-filter:blur(18px)!important;
     -webkit-backdrop-filter:blur(18px)!important;
   }
-  html.dark .admin-app .hdr{background:rgba(10,15,10,.90)!important}
   .admin-app .hdr-logo{width:40px;height:40px;border-radius:12px}
   .admin-app .hdr-title h1{font-size:17px;line-height:1.15;letter-spacing:-.03em}
   .admin-app .hdr-title span{display:block;margin-top:3px;font-size:10px;color:var(--text3);letter-spacing:.08em}
@@ -280,13 +281,12 @@ html.dark .admin-app .login-box input{background:var(--elevated);border-color:va
   .admin-app .bnav{
     min-height:70px;
     padding:7px 8px calc(7px + env(safe-area-inset-bottom));
-    background:rgba(255,255,255,.94)!important;
-    border-color:var(--jb-border);
-    box-shadow:0 -8px 28px rgba(5,46,34,.08);
+    background:var(--nav-glass)!important;
+    border-color:var(--border);
+    box-shadow:var(--shadow-lg);
     backdrop-filter:blur(18px)!important;
     -webkit-backdrop-filter:blur(18px)!important;
   }
-  html.dark .admin-app .bnav{background:rgba(14,33,24,.94)!important}
   .admin-app .bnav-item{min-width:64px;min-height:52px;padding:6px 10px;border-radius:12px}
   .admin-app .bnav-item.active{background:var(--accent-light)}
   .admin-app .bnav-item.active::after{display:none}

@@ -10,10 +10,18 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#f5f7f5">
+  <script>
+    (function(){
+      var saved=localStorage.getItem('theme');
+      var mode=saved==='dark'||saved==='light'?saved:(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+      document.documentElement.className=mode;
+      document.querySelector('meta[name=theme-color]').content=mode==='dark'?'#0a0f0a':'#f5f7f5';
+    })();
+  </script>
   <link rel="manifest" href="/admin-manifest.json">
   <title>JAYABINA — Operations Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/theme.css">
+  <link rel="stylesheet" href="/theme.css?v=20260716-theme2">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none}
@@ -392,7 +400,7 @@
     .d-sidebar-footer button{color:rgba(255,255,255,.72)}
     .d-sidebar-footer button:hover{background:rgba(255,255,255,.09);color:#fff}
   </style>
-  <link rel="stylesheet" href="/admin-modern.css">
+  <link rel="stylesheet" href="/admin-modern.css?v=20260716-theme2">
 </head>
 <body class="admin-app">
 
@@ -491,6 +499,7 @@
 
 <!-- ═══════════ AUTH GATE ═══════════ -->
 <div class="login" id="loginOverlay"><div class="login-box">
+  <button type="button" class="login-theme" onclick="toggleTheme()" aria-label="Aktifkan tema gelap" title="Tukar tema"><i data-lucide="moon"></i></button>
   <div class="login-avatar">JB</div>
   <h2>JAYABINA</h2>
   <p class="sub">Log masuk ke Operations Portal</p>
@@ -521,16 +530,21 @@ var newStaffAvatar='',staffCache=[],editAvatar='';
 async function authToken(){return SB.auth.getToken()||'';}
 
 // THEME
-var theme=localStorage.getItem('theme')||'system';applyTheme(theme);
+var theme=document.documentElement.classList.contains('dark')?'dark':'light';applyTheme(theme);
 function applyTheme(t){
   var h=document.documentElement;h.classList.remove('light','dark');
-  if(t==='dark')h.classList.add('dark');else if(t==='light')h.classList.add('light');
-  var d=h.classList.contains('dark')||(!h.classList.contains('light')&&matchMedia('(prefers-color-scheme:dark)').matches);
+  h.classList.add(t==='dark'?'dark':'light');
+  var d=h.classList.contains('dark');
   document.querySelector('meta[name=theme-color]').content=d?'#0a0f0a':'#f5f8f6';
+  document.querySelectorAll('[onclick*="toggleTheme()"]').forEach(function(btn){
+    btn.setAttribute('aria-label',d?'Aktifkan tema cerah':'Aktifkan tema gelap');
+    if(btn.classList.contains('login-theme'))btn.innerHTML='<i data-lucide="'+(d?'sun':'moon')+'"></i>';
+  });
+  relucide();
 }
 function toggleTheme(){
   var h=document.documentElement;
-  theme=h.classList.contains('light')?'dark':h.classList.contains('dark')?'system':'light';
+  theme=h.classList.contains('dark')?'light':'dark';
   localStorage.setItem('theme',theme);applyTheme(theme);
 }
 
