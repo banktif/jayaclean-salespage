@@ -68,6 +68,21 @@ const handleWhatsappRoute = (req: Request, env: Env) => {
 app.all('/api/whatsapp', (c) => handleWhatsappRoute(c.req.raw, c.env));
 app.all('/api/whatsapp/*', (c) => handleWhatsappRoute(c.req.raw, c.env));
 
+app.all('/api/tasks/distribute', (c) => handleDistributeUnassigned(c.req.raw, c.env));
+const handleTasksRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleTasks(req, env, path);
+};
+app.all('/api/tasks', (c) => handleTasksRoute(c.req.raw, c.env));
+app.all('/api/tasks/*', (c) => handleTasksRoute(c.req.raw, c.env));
+
+const handleTaskPhotosRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleTaskPhotos(req, env, path);
+};
+app.all('/api/task-photos', (c) => handleTaskPhotosRoute(c.req.raw, c.env));
+app.all('/api/task-photos/*', (c) => handleTaskPhotosRoute(c.req.raw, c.env));
+
 app.all('*', (c) => handleLegacyRequest(c.req.raw, c.env));
 
 async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
@@ -94,11 +109,6 @@ async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
       if (path === '/api/payments/create-intent') return await handleCreateIntent(req, env);
       if (path === '/api/payments/create-balance-intent') return await handleCreateBalanceIntent(req, env);
       if (path === '/api/payments/bayarcash-callback') return await handleBayarcashCallback(req, env);
-
-      // Tasks
-      if (path.startsWith('/api/tasks/distribute')) return await handleDistributeUnassigned(req, env);
-      if (path.startsWith('/api/tasks')) return await handleTasks(req, env, path);
-      if (path.startsWith('/api/task-photos')) return await handleTaskPhotos(req, env, path);
 
       // Backup
       if (path.startsWith('/api/backup')) return await handleBackup(req, env, path);

@@ -1,9 +1,34 @@
+import { and, asc, count, desc, eq, min, max, sql, sum, type SQL } from 'drizzle-orm';
 import type { Env } from '../types';
 import { err, ok, uuid, nowISO } from '../utils/helpers';
-import { requireAuth, requireAdmin } from '../utils/middleware';
+import { requireAuth } from '../utils/middleware';
+import { createDb, type AppDb } from '../db/client';
+import { appSettings, bookings, customers, profiles, slots, taskPhotos, tasks } from '../db/schema';
+
+const taskFields = {
+  id: tasks.id,
+  booking_id: tasks.bookingId,
+  assigned_to: tasks.assignedTo,
+  status: tasks.status,
+  started_at: tasks.startedAt,
+  finished_at: tasks.finishedAt,
+  completed_at: tasks.completedAt,
+  created_at: tasks.createdAt,
+  updated_at: tasks.updatedAt
+};
+
+const photoFields = {
+  id: taskPhotos.id,
+  task_id: taskPhotos.taskId,
+  type: taskPhotos.type,
+  url: taskPhotos.url,
+  uploaded_by: taskPhotos.uploadedBy,
+  created_at: taskPhotos.createdAt
+};
 
 export async function handleTasks(req: Request, env: Env, path: string): Promise<Response> {
   const url = new URL(req.url);
+  const db = createDb(env);
 
   // GET /api/tasks
   if (path === '/api/tasks' && req.method === 'GET') {
@@ -13,25 +38,30 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
       const assignedTo = url.searchParams.get('assigned_to');
       const bookingId = url.searchParams.get('booking_id');
 
-      let q = `SELECT t.*, b.customer_name, b.customer_phone, b.customer_address, b.booking_date, b.booking_time,
-        p.full_name as staff_name FROM tasks t LEFT JOIN bookings b ON t.booking_id = b.id LEFT JOIN profiles p ON t.assigned_to = p.id`;
-      const conds: string[] = [];
-      const params: any[] = [];
+      const conditions: SQL[] = [];
 
       if (payload.role === 'staff') {
-        conds.push('t.assigned_to = ?');
-        params.push(payload.sub);
+        conditions.push(eq(tasks.assignedTo, payload.sub));
       }
 
-      if (statusFilter) { conds.push('t.status = ?'); params.push(statusFilter); }
-      if (assignedTo && payload.role === 'admin') { conds.push('t.assigned_to = ?'); params.push(assignedTo); }
-      if (bookingId && payload.role === 'admin') { conds.push('t.booking_id = ?'); params.push(bookingId); }
+      if (statusFilter) conditions.push(eq(tasks.status, statusFilter as any));
+      if (assignedTo && payload.role === 'admin') conditions.push(eq(tasks.assignedTo, assignedTo));
+      if (bookingId && payload.role === 'admin') conditions.push(eq(tasks.bookingId, bookingId));
 
-      if (conds.length) q += ' WHERE ' + conds.join(' AND ');
-      q += ' ORDER BY b.booking_date DESC, b.booking_time ASC';
-
-      const result = await env.DB.prepare(q).bind(...params).all();
-      return ok(result.results);
+      const rows = await db.select({
+        ...taskFields,
+        customer_name: bookings.customerName,
+        customer_phone: bookings.customerPhone,
+        customer_address: bookings.customerAddress,
+        booking_date: bookings.bookingDate,
+        booking_time: bookings.bookingTime,
+        staff_name: profiles.fullName
+      }).from(tasks)
+        .leftJoin(bookings, eq(tasks.bookingId, bookings.id))
+        .leftJoin(profiles, eq(tasks.assignedTo, profiles.id))
+        .where(conditions.length ? and(...conditions) : undefined)
+        .orderBy(desc(bookings.bookingDate), asc(bookings.bookingTime));
+      return ok(rows);
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);
     }
@@ -46,7 +76,11 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
       const body = await req.json() as any;
       const now = nowISO();
 
-      const task = await env.DB.prepare('SELECT * FROM tasks WHERE id = ?').bind(taskId).first<{assigned_to: string | null; status: string; booking_id: string}>();
+      const task = await db.select({
+        assigned_to: tasks.assignedTo,
+        status: tasks.status,
+        booking_id: tasks.bookingId
+      }).from(tasks).where(eq(tasks.id, taskId)).get();
       if (!task) return err('Task not found', 404);
 
       // Staff can only update own tasks
@@ -54,19 +88,20 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
         return err('Access denied', 403);
       }
 
-      const sets: string[] = ['updated_at = ?'];
-      const params: any[] = [now];
-      let nextStatus: string | null = null;
+      const updates: Partial<typeof tasks.$inferInsert> = { updatedAt: now };
+      let hasUpdate = false;
+      let nextStatus: typeof tasks.$inferInsert.status | null = null;
 
       if (body.assigned_to !== undefined && payload.role === 'admin') {
         if (body.assigned_to) {
-          const assignee = await env.DB.prepare("SELECT id FROM profiles WHERE id = ? AND role = 'staff' AND is_active = 1")
-            .bind(body.assigned_to).first();
+          const assignee = await db.select({ id: profiles.id }).from(profiles)
+            .where(and(eq(profiles.id, body.assigned_to), eq(profiles.role, 'staff'), eq(profiles.isActive, 1))).get();
           if (!assignee) return err('Selected staff account is not active', 400);
         } else if (!['unassigned', 'assigned', 'cancelled'].includes(task.status)) {
           return err('A job already in progress cannot be unassigned', 409);
         }
-        sets.push('assigned_to = ?'); params.push(body.assigned_to);
+        updates.assignedTo = body.assigned_to;
+        hasUpdate = true;
         if (['unassigned', 'assigned', 'cancelled'].includes(task.status)) {
           nextStatus = body.assigned_to ? 'assigned' : 'unassigned';
         }
@@ -80,61 +115,60 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
         }
         if (payload.role === 'staff' && body.status === 'in_progress') {
           if (task.status !== 'assigned') return err('Only an assigned job can be started', 409);
-          const before = await env.DB.prepare("SELECT COUNT(*) AS cnt FROM task_photos WHERE task_id = ? AND type = 'before'")
-            .bind(taskId).first<{cnt: number}>();
+          const before = await db.select({ cnt: count() }).from(taskPhotos)
+            .where(and(eq(taskPhotos.taskId, taskId), eq(taskPhotos.type, 'before'))).get();
           if (!before?.cnt) return err('Upload at least one before photo before starting the job', 409);
         }
         if (payload.role === 'staff' && body.status === 'awaiting_review') {
           if (task.status !== 'in_progress') return err('Start the job before submitting it for review', 409);
-          const after = await env.DB.prepare("SELECT COUNT(*) AS cnt FROM task_photos WHERE task_id = ? AND type = 'after'")
-            .bind(taskId).first<{cnt: number}>();
+          const after = await db.select({ cnt: count() }).from(taskPhotos)
+            .where(and(eq(taskPhotos.taskId, taskId), eq(taskPhotos.type, 'after'))).get();
           if (!after?.cnt) return err('Upload at least one after photo before finishing the job', 409);
         }
         nextStatus = body.status;
+        hasUpdate = true;
         switch (body.status) {
           case 'in_progress':
-            sets.push('started_at = ?'); params.push(body.started_at || now);
+            updates.startedAt = body.started_at || now;
             break;
           case 'awaiting_review':
-            sets.push('finished_at = ?'); params.push(body.finished_at || now);
+            updates.finishedAt = body.finished_at || now;
             // Auto-complete check
-            const autoComplete = await env.DB.prepare("SELECT value FROM app_settings WHERE key = 'auto_complete_task'").first<{value: string}>();
+            const autoComplete = await db.select({ value: appSettings.value }).from(appSettings)
+              .where(eq(appSettings.key, 'auto_complete_task')).get();
             if (autoComplete?.value === 'true') {
               nextStatus = 'completed';
-              sets.push('completed_at = ?'); params.push(now);
-              await env.DB.prepare("UPDATE bookings SET status = 'completed', updated_at = ? WHERE id = ?")
-                .bind(now, task.booking_id).run();
-              const autoBooking = await env.DB.prepare('SELECT customer_id FROM bookings WHERE id = ?')
-                .bind(task.booking_id).first<{customer_id: string | null}>();
-              if (autoBooking?.customer_id) await refreshCustomerStats(env.DB, autoBooking.customer_id);
+              updates.completedAt = now;
+              await db.update(bookings).set({ status: 'completed', updatedAt: now })
+                .where(eq(bookings.id, task.booking_id));
+              const autoBooking = await db.select({ customer_id: bookings.customerId }).from(bookings)
+                .where(eq(bookings.id, task.booking_id)).get();
+              if (autoBooking?.customer_id) await refreshCustomerStats(db, autoBooking.customer_id);
             }
             break;
           case 'completed':
             if (payload.role !== 'admin') return err('Admin only', 403);
-            sets.push('completed_at = ?'); params.push(now);
-            await env.DB.prepare("UPDATE bookings SET status = 'completed', updated_at = ? WHERE id = ?")
-              .bind(now, task.booking_id).run();
-            const completedBooking = await env.DB.prepare('SELECT customer_id FROM bookings WHERE id = ?')
-              .bind(task.booking_id).first<{customer_id: string | null}>();
-            if (completedBooking?.customer_id) await refreshCustomerStats(env.DB, completedBooking.customer_id);
+            updates.completedAt = now;
+            await db.update(bookings).set({ status: 'completed', updatedAt: now })
+              .where(eq(bookings.id, task.booking_id));
+            const completedBooking = await db.select({ customer_id: bookings.customerId }).from(bookings)
+              .where(eq(bookings.id, task.booking_id)).get();
+            if (completedBooking?.customer_id) await refreshCustomerStats(db, completedBooking.customer_id);
             break;
           case 'cancelled':
             if (payload.role !== 'admin') return err('Admin only', 403);
-            await env.DB.prepare("UPDATE bookings SET status = 'cancelled', updated_at = ? WHERE id = ?")
-              .bind(now, task.booking_id).run();
-            await env.DB.prepare('UPDATE slots SET is_booked = 0 WHERE booking_id = ?').bind(task.booking_id).run();
+            await db.update(bookings).set({ status: 'cancelled', updatedAt: now })
+              .where(eq(bookings.id, task.booking_id));
+            await db.update(slots).set({ isBooked: 0 }).where(eq(slots.bookingId, task.booking_id));
             break;
         }
       }
 
-      if (nextStatus !== null) { sets.push('status = ?'); params.push(nextStatus); }
+      if (nextStatus !== null) updates.status = nextStatus;
 
-      if (sets.length > 1) {
-        params.push(taskId);
-        await env.DB.prepare(`UPDATE tasks SET ${sets.join(', ')} WHERE id = ?`).bind(...params).run();
-      }
+      if (hasUpdate) await db.update(tasks).set(updates).where(eq(tasks.id, taskId));
 
-      const updated = await env.DB.prepare('SELECT * FROM tasks WHERE id = ?').bind(taskId).first();
+      const updated = await db.select(taskFields).from(tasks).where(eq(tasks.id, taskId)).get();
       return ok(updated);
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);
@@ -146,6 +180,7 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
 
 export async function handleTaskPhotos(req: Request, env: Env, path: string): Promise<Response> {
   const url = new URL(req.url);
+  const db = createDb(env);
 
   // GET /api/task-photos?task_id=
   if (path === '/api/task-photos' && req.method === 'GET') {
@@ -155,14 +190,14 @@ export async function handleTaskPhotos(req: Request, env: Env, path: string): Pr
       if (!taskId) return err('Missing task_id');
 
       if (payload.role === 'staff') {
-        const task = await env.DB.prepare('SELECT assigned_to FROM tasks WHERE id = ?')
-          .bind(taskId).first<{assigned_to: string | null}>();
+        const task = await db.select({ assigned_to: tasks.assignedTo }).from(tasks)
+          .where(eq(tasks.id, taskId)).get();
         if (!task || task.assigned_to !== payload.sub) return err('Access denied', 403);
       }
 
-      const photos = await env.DB.prepare('SELECT * FROM task_photos WHERE task_id = ? ORDER BY created_at ASC')
-        .bind(taskId).all();
-      return ok(photos.results);
+      const photos = await db.select(photoFields).from(taskPhotos)
+        .where(eq(taskPhotos.taskId, taskId)).orderBy(asc(taskPhotos.createdAt));
+      return ok(photos);
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);
     }
@@ -183,13 +218,13 @@ export async function handleTaskPhotos(req: Request, env: Env, path: string): Pr
 
       // Verify staff owns this task (or admin)
       if (payload.role === 'staff') {
-        const task = await env.DB.prepare('SELECT assigned_to FROM tasks WHERE id = ?').bind(task_id).first<{assigned_to: string}>();
+        const task = await db.select({ assigned_to: tasks.assignedTo }).from(tasks)
+          .where(eq(tasks.id, task_id)).get();
         if (!task || task.assigned_to !== payload.sub) return err('Access denied', 403);
       }
 
       const photoId = uuid();
-      await env.DB.prepare('INSERT INTO task_photos (id, task_id, type, url, uploaded_by) VALUES (?,?,?,?,?)')
-        .bind(photoId, task_id, type, photoUrl, payload.sub).run();
+      await db.insert(taskPhotos).values({ id: photoId, taskId: task_id, type, url: photoUrl, uploadedBy: payload.sub });
 
       return ok({ id: photoId, task_id, type, url: photoUrl, uploaded_by: payload.sub });
     } catch (e: any) {
@@ -200,23 +235,23 @@ export async function handleTaskPhotos(req: Request, env: Env, path: string): Pr
   return err('Not found', 404);
 }
 
-async function refreshCustomerStats(db: D1Database, customerId: string): Promise<void> {
-  const stats = await db.prepare(`
-    SELECT
-      COUNT(*) as total_bookings,
-      SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_bookings,
-      SUM(CASE WHEN status = 'completed' THEN amount ELSE 0 END) as total_spent,
-      MIN(booking_date) as first_booking_date,
-      MAX(booking_date) as last_booking_date
-    FROM bookings WHERE customer_id = ?
-  `).bind(customerId).first<{total_bookings: number; completed_bookings: number; total_spent: number; first_booking_date: string; last_booking_date: string}>();
+async function refreshCustomerStats(db: AppDb, customerId: string): Promise<void> {
+  const stats = await db.select({
+    total_bookings: count(),
+    completed_bookings: sum(sql`CASE WHEN ${bookings.status} = 'completed' THEN 1 ELSE 0 END`),
+    total_spent: sum(sql`CASE WHEN ${bookings.status} = 'completed' THEN ${bookings.amount} ELSE 0 END`),
+    first_booking_date: min(bookings.bookingDate),
+    last_booking_date: max(bookings.bookingDate)
+  }).from(bookings).where(eq(bookings.customerId, customerId)).get();
 
   if (stats) {
-    await db.prepare(`UPDATE customers SET
-      total_bookings = ?, completed_bookings = ?, total_spent = ?,
-      first_booking_date = ?, last_booking_date = ?, updated_at = ?
-      WHERE id = ?`)
-      .bind(stats.total_bookings, stats.completed_bookings, stats.total_spent || 0,
-        stats.first_booking_date, stats.last_booking_date, nowISO(), customerId).run();
+    await db.update(customers).set({
+      totalBookings: stats.total_bookings,
+      completedBookings: Number(stats.completed_bookings || 0),
+      totalSpent: Number(stats.total_spent || 0),
+      firstBookingDate: stats.first_booking_date,
+      lastBookingDate: stats.last_booking_date,
+      updatedAt: nowISO()
+    }).where(eq(customers.id, customerId));
   }
 }
