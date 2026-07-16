@@ -66,7 +66,7 @@ Current entry point: `cf-api/src/index.ts`. It manually normalizes the URL, hand
 
 ## Failures and skipped steps
 
-None.
+- **Step 4 attempt A — SKIPPED:** the first Cloudflare Vitest configuration used top-level `await` to load D1 migrations. On Windows the config loader emitted CommonJS and failed before test execution with `Top-level await is currently not supported with the 'cjs' output format`. All files from that attempt were reverted. No Worker code, production binding or data was changed. The next attempt must use an async config factory or a non-TLA harness.
 
 ## Backup evidence
 
