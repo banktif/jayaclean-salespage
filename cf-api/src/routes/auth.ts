@@ -1,9 +1,12 @@
+import { and, eq, sql } from 'drizzle-orm';
 import type { Env } from '../types';
 import { signJWT, verifyPassword, hashPassword, err, ok } from '../utils/helpers';
 import { requireAuth, requireAdmin } from '../utils/middleware';
+import { createDb } from '../db/client';
+import { profiles } from '../db/schema';
 
 export async function handleAuth(req: Request, env: Env, path: string): Promise<Response> {
-  const url = new URL(req.url);
+  const db = createDb(env);
 
   // POST /api/auth/login
   if (path === '/api/auth/login' && req.method === 'POST') {
@@ -11,37 +14,50 @@ export async function handleAuth(req: Request, env: Env, path: string): Promise<
     let user;
 
     if (email) {
-      user = await env.DB.prepare('SELECT * FROM profiles WHERE lower(email) = lower(?) AND is_active = 1')
-        .bind(String(email).trim()).first();
+      user = await db.select({
+        id: profiles.id, full_name: profiles.fullName, phone: profiles.phone,
+        role: profiles.role, is_active: profiles.isActive, email: profiles.email,
+        address: profiles.address, avatar_url: profiles.avatarUrl,
+        service_area: profiles.serviceArea, password: profiles.password,
+        created_at: profiles.createdAt
+      }).from(profiles).where(and(
+        sql`lower(${profiles.email}) = lower(${String(email).trim()})`,
+        eq(profiles.isActive, 1)
+      )).get();
     } else if (phone) {
       const digits = phone.replace(/\D/g, '');
-      user = await env.DB.prepare('SELECT * FROM profiles WHERE phone = ? AND is_active = 1')
-        .bind(digits).first();
+      user = await db.select({
+        id: profiles.id, full_name: profiles.fullName, phone: profiles.phone,
+        role: profiles.role, is_active: profiles.isActive, email: profiles.email,
+        address: profiles.address, avatar_url: profiles.avatarUrl,
+        service_area: profiles.serviceArea, password: profiles.password,
+        created_at: profiles.createdAt
+      }).from(profiles).where(and(eq(profiles.phone, digits), eq(profiles.isActive, 1))).get();
     }
 
     if (!user) return err('Invalid credentials', 401);
 
     // Password hashes cannot be exported from Supabase Auth. Migrated staff
     // accounts must be reset by an admin instead of allowing first-use claims.
-    if (!(user as any).password) {
+    if (!user.password) {
       return err('Password reset required. Contact the administrator.', 403);
     }
 
-    const valid = await verifyPassword(password, (user as any).password);
+    const valid = await verifyPassword(password, user.password);
     if (!valid) return err('Invalid credentials', 401);
 
-    const token = await signJWT({ sub: (user as any).id, role: (user as any).role, name: (user as any).full_name }, env.JWT_SECRET);
+    const token = await signJWT({ sub: user.id, role: user.role, name: user.full_name }, env.JWT_SECRET);
 
     return ok({
       token,
       user: {
-        id: (user as any).id,
-        full_name: (user as any).full_name,
-        phone: (user as any).phone,
-        email: (user as any).email,
-        role: (user as any).role,
-        avatar_url: (user as any).avatar_url,
-        service_area: (user as any).service_area
+        id: user.id,
+        full_name: user.full_name,
+        phone: user.phone,
+        email: user.email,
+        role: user.role,
+        avatar_url: user.avatar_url,
+        service_area: user.service_area
       }
     });
   }
@@ -50,8 +66,12 @@ export async function handleAuth(req: Request, env: Env, path: string): Promise<
   if (path === '/api/auth/me' && req.method === 'GET') {
     try {
       const payload = await requireAuth(req, env);
-      const user = await env.DB.prepare('SELECT id, full_name, phone, email, role, is_active, avatar_url, service_area, address, created_at FROM profiles WHERE id = ?')
-        .bind(payload.sub).first();
+      const user = await db.select({
+        id: profiles.id, full_name: profiles.fullName, phone: profiles.phone,
+        email: profiles.email, role: profiles.role, is_active: profiles.isActive,
+        avatar_url: profiles.avatarUrl, service_area: profiles.serviceArea,
+        address: profiles.address, created_at: profiles.createdAt
+      }).from(profiles).where(eq(profiles.id, payload.sub)).get();
       if (!user) return err('User not found', 404);
       return ok(user);
     } catch (e: any) {
@@ -66,13 +86,14 @@ export async function handleAuth(req: Request, env: Env, path: string): Promise<
       const { current_password, new_password } = await req.json() as any;
       if (!new_password || (new_password as string).length < 8) return err('Password must be at least 8 characters');
 
-      const user = await env.DB.prepare('SELECT password FROM profiles WHERE id = ?').bind(payload.sub).first<{password: string}>();
+      const user = await db.select({ password: profiles.password }).from(profiles)
+        .where(eq(profiles.id, payload.sub)).get();
       if (!user || !(await verifyPassword(current_password || '', user.password))) {
         return err('Current password is incorrect', 403);
       }
 
       const hashed = await hashPassword(new_password);
-      await env.DB.prepare('UPDATE profiles SET password = ? WHERE id = ?').bind(hashed, payload.sub).run();
+      await db.update(profiles).set({ password: hashed }).where(eq(profiles.id, payload.sub));
       return ok({ message: 'Password changed' });
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);
@@ -88,7 +109,7 @@ export async function handleAuth(req: Request, env: Env, path: string): Promise<
       if (!new_password || (new_password as string).length < 8) return err('Password must be at least 8 characters');
 
       const hashed = await hashPassword(new_password);
-      await env.DB.prepare('UPDATE profiles SET password = ? WHERE id = ?').bind(hashed, user_id).run();
+      await db.update(profiles).set({ password: hashed }).where(eq(profiles.id, user_id));
       return ok({ message: 'Password reset' });
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);

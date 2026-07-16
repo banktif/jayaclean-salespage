@@ -40,6 +40,13 @@ const handleSlotsRoute = (req: Request, env: Env) => {
 };
 app.all('/api/slots/*', (c) => handleSlotsRoute(c.req.raw, c.env));
 
+const handleAuthRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleAuth(req, env, path);
+};
+app.all('/api/auth', (c) => handleAuthRoute(c.req.raw, c.env));
+app.all('/api/auth/*', (c) => handleAuthRoute(c.req.raw, c.env));
+
 app.all('*', (c) => handleLegacyRequest(c.req.raw, c.env));
 
 async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
@@ -56,8 +63,6 @@ async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
       return ok({ service: 'jayaclean-api', database: 'ok' });
     }
 
-      // Auth
-      if (path.startsWith('/api/auth')) return await handleAuth(req, env, path);
       // Public endpoints
       if (path === '/api/bookings/public') return await handleBookings(req, env, path);
 

@@ -1,5 +1,8 @@
+import { eq } from 'drizzle-orm';
 import type { JWTPayload, Env } from '../types';
 import { verifyJWT, err } from './helpers';
+import { createDb } from '../db/client';
+import { profiles } from '../db/schema';
 
 export async function requireAuth(req: Request, env: Env): Promise<JWTPayload> {
   const auth = req.headers.get('Authorization');
@@ -8,9 +11,11 @@ export async function requireAuth(req: Request, env: Env): Promise<JWTPayload> {
   }
   try {
     const payload = await verifyJWT(auth.slice(7), env.JWT_SECRET);
-    const profile = await env.DB.prepare(
-      'SELECT full_name, role, is_active FROM profiles WHERE id = ?'
-    ).bind(payload.sub).first<{full_name: string; role: 'admin' | 'staff'; is_active: number}>();
+    const profile = await createDb(env).select({
+      full_name: profiles.fullName,
+      role: profiles.role,
+      is_active: profiles.isActive
+    }).from(profiles).where(eq(profiles.id, payload.sub)).get();
     if (!profile || !profile.is_active) throw new Error('Account disabled or not found');
     return { ...payload, role: profile.role, name: profile.full_name };
   } catch (e: any) {
