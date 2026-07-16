@@ -22,7 +22,7 @@ Object storage: Cloudflare R2 `jayaclean-backups`
 |---|---|---|---|---|
 | 1. Audit routes and bindings | PASS | Route inventory + Worker dry-run | `9efc7ac` | 41 HTTP contracts plus hourly scheduled backup identified. |
 | 2. Backup production D1 | PASS | Full export restored into isolated local D1; sanitized R2 archive downloaded and parsed | pending | No production business rows were changed. |
-| 3. Install Hono + Drizzle and introspect schema | PENDING | Typecheck + schema parity test + Worker dry-run | pending | Runtime bindings remain `DB` and `BACKUP_R2`. |
+| 3. Install Hono + Drizzle and introspect schema | PASS | Typecheck + 2 schema parity tests + Drizzle SQL export + Worker dry-run | pending | Runtime bindings remain `DB` and `BACKUP_R2`. |
 | 4. Baseline snapshot tests | PENDING | Legacy handler contract snapshots | pending | Snapshots must cover success, auth failure, validation and not-found behavior. |
 | 5. Refactor route groups | PENDING | Snapshot equality after every route-group commit | pending | One route group per commit where practical. |
 | 6. Full regression and final summary | PENDING | All tests + dry-run + production smoke checks | pending | Deploy only after all checks pass. |
@@ -54,6 +54,15 @@ Current entry point: `cf-api/src/index.ts`. It manually normalizes the URL, hand
 - External side effects are isolated to Bayarcash, WhatsApp Cloud API, Google Drive, GitHub Actions and R2.
 - Existing response helpers enforce JSON content type, CORS, `Cache-Control: no-store`, `X-Content-Type-Options: nosniff` and `Referrer-Policy: no-referrer`.
 - No automated Worker contract suite existed at audit start; this is the main regression risk that Step 4 must close.
+
+## Framework and schema foundation
+
+- Runtime dependencies: Hono 4.12.30 and Drizzle ORM 0.45.2.
+- Tooling: Drizzle Kit, Vitest, Cloudflare Vitest Pool and TypeScript.
+- `cf-api/src/db/schema.ts` maps all 9 production tables, all production columns, named indexes, foreign keys and checks.
+- `cf-api/src/db/client.ts` creates a typed Drizzle D1 client without changing the `DB` binding.
+- Automated schema parity compares the Drizzle mapping with the read-only production introspection captured on 2026-07-16.
+- Production dependency audit (`npm audit --omit=dev`) reports 0 vulnerabilities. Drizzle Kit currently carries development-only moderate advisories through its legacy esbuild loader; it is not bundled into the Worker runtime.
 
 ## Failures and skipped steps
 
