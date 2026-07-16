@@ -67,6 +67,7 @@ Current entry point: `cf-api/src/index.ts`. It manually normalizes the URL, hand
 ## Failures and skipped steps
 
 - **Step 4 attempt A — SKIPPED:** the first Cloudflare Vitest configuration used top-level `await` to load D1 migrations. On Windows the config loader emitted CommonJS and failed before test execution with `Top-level await is currently not supported with the 'cjs' output format`. All files from that attempt were reverted. No Worker code, production binding or data was changed. The next attempt must use an async config factory or a non-TLA harness.
+- **Step 4 attempt B — SKIPPED:** the async config factory removed top-level `await`, but the same CommonJS config loader then attempted to `require()` the ESM-only Cloudflare Vitest package. It failed before test execution. The attempt was fully reverted; production remained untouched. A future attempt must make the package itself explicitly ESM or use a separate Node/Miniflare harness.
 
 ## Backup evidence
 
