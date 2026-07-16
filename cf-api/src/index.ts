@@ -94,6 +94,13 @@ app.all('/api/payments/create-intent', (c) => handleCreateIntent(c.req.raw, c.en
 app.all('/api/payments/create-balance-intent', (c) => handleCreateBalanceIntent(c.req.raw, c.env));
 app.all('/api/payments/bayarcash-callback', (c) => handleBayarcashCallback(c.req.raw, c.env));
 
+const handleBackupRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleBackup(req, env, path);
+};
+app.all('/api/backup', (c) => handleBackupRoute(c.req.raw, c.env));
+app.all('/api/backup/*', (c) => handleBackupRoute(c.req.raw, c.env));
+
 app.all('*', (c) => handleLegacyRequest(c.req.raw, c.env));
 
 async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
@@ -109,9 +116,6 @@ async function handleLegacyRequest(req: Request, env: Env): Promise<Response> {
       await env.DB.prepare('SELECT 1').first();
       return ok({ service: 'jayaclean-api', database: 'ok' });
     }
-
-      // Backup
-      if (path.startsWith('/api/backup')) return await handleBackup(req, env, path);
 
     return err('Not found', 404);
   } catch (e: any) {

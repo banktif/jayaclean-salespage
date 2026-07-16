@@ -1,9 +1,13 @@
+import { eq, inArray, sql } from 'drizzle-orm';
 import type { Env } from '../types';
 import { err, ok, uuid, nowISO } from '../utils/helpers';
-import { requireAuth, requireAdmin, getPrivateSetting, getSetting } from '../utils/middleware';
+import { requireAuth, requireAdmin } from '../utils/middleware';
+import { createDb, type AppDb } from '../db/client';
+import { appSettings, backupLog, privateSettings } from '../db/schema';
 
 export async function handleBackup(req: Request, env: Env, path: string): Promise<Response> {
   const url = new URL(req.url);
+  const db = createDb(env);
 
   // POST /api/backup/db
   if (path === '/api/backup/db' && req.method === 'POST') {
@@ -11,12 +15,12 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
       await checkBackupAuth(req, env);
       const body = await req.json().catch(() => ({})) as any;
       const force = body.force === true;
-      const drive = await loadDriveConfig(env.DB);
+      const drive = await loadDriveConfig(db);
       const r2Configured = !!env.BACKUP_R2;
       const driveConfigured = !!(drive.email && drive.privateKey);
       if (!r2Configured && !driveConfigured) return err('No backup destination is configured', 503);
-      const doR2 = r2Configured && (force || await isBackupDue(env.DB, 'r2'));
-      const doDrive = driveConfigured && (force || await isBackupDue(env.DB, 'drive'));
+      const doR2 = r2Configured && (force || await isBackupDue(db, 'r2'));
+      const doDrive = driveConfigured && (force || await isBackupDue(db, 'drive'));
       if (!doR2 && !doDrive) {
         return ok({ skipped: true, reason: 'not due' });
       }
@@ -33,9 +37,9 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
         const rows: any[] = [];
         while (true) {
           const query = tableQueries[table] || `SELECT * FROM ${table}`;
-          const batch = await env.DB.prepare(`${query} LIMIT 1000 OFFSET ?`).bind(offset).all();
-          rows.push(...batch.results as any[]);
-          if (batch.results.length < 1000) break;
+          const batch = await db.all<any>(sql.raw(`${query} LIMIT 1000 OFFSET ${offset}`));
+          rows.push(...batch);
+          if (batch.length < 1000) break;
           offset += 1000;
         }
         dump[table] = rows;
@@ -53,14 +57,14 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
         const r2Key = `db/${filename}`;
         try {
           await env.BACKUP_R2.put(r2Key, compressed, { httpMetadata: { contentType: 'application/gzip' } });
-          await recordBackupLog(env.DB, 'r2', filename, 'ok', compressed.byteLength);
-          await updateBackupStatus(env.DB, 'r2', now, `ok (${Math.round(compressed.byteLength / 1024)} KB)`);
+          await recordBackupLog(db, 'r2', filename, 'ok', compressed.byteLength);
+          await updateBackupStatus(db, 'r2', now, `ok (${Math.round(compressed.byteLength / 1024)} KB)`);
           await pruneBackups(env, 'r2', 48);
           result.r2 = 'ok'; succeeded++;
         } catch (e: any) {
           const message = e.message || 'Upload failed';
-          await recordBackupLog(env.DB, 'r2', filename, 'error', 0, message);
-          await updateBackupStatus(env.DB, 'r2', now, `error: ${message}`);
+          await recordBackupLog(db, 'r2', filename, 'error', 0, message);
+          await updateBackupStatus(db, 'r2', now, `error: ${message}`);
           result.r2 = `error: ${message}`; failures.push('R2');
         }
       }
@@ -71,21 +75,19 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
           await driveUpload(token, drive.folderId, filename, compressed);
           const files = (await driveList(token, drive.folderId)).filter(f => f.name.startsWith('db-backup-'));
           for (const file of files.slice(48)) await driveDelete(token, file.id);
-          await recordBackupLog(env.DB, 'drive', filename, 'ok', compressed.byteLength);
-          await updateBackupStatus(env.DB, 'drive', now, `ok (${Math.round(compressed.byteLength / 1024)} KB)`);
+          await recordBackupLog(db, 'drive', filename, 'ok', compressed.byteLength);
+          await updateBackupStatus(db, 'drive', now, `ok (${Math.round(compressed.byteLength / 1024)} KB)`);
           result.drive = 'ok'; succeeded++;
         } catch (e: any) {
           const message = e.message || 'Upload failed';
-          await recordBackupLog(env.DB, 'drive', filename, 'error', 0, message);
-          await updateBackupStatus(env.DB, 'drive', now, `error: ${message}`);
+          await recordBackupLog(db, 'drive', filename, 'error', 0, message);
+          await updateBackupStatus(db, 'drive', now, `error: ${message}`);
           result.drive = `error: ${message}`; failures.push('Google Drive');
         }
       }
 
-      await env.DB.prepare(`INSERT INTO app_settings (key, value, updated_at) VALUES ('backup_last_db_at', ?, ?) ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = ?`)
-        .bind(now, now, now, now).run();
-      await env.DB.prepare(`INSERT INTO app_settings (key, value, updated_at) VALUES ('backup_last_db_status', ?, ?) ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = ?`)
-        .bind('ok', now, 'ok', now).run();
+      await setSetting(db, 'backup_last_db_at', now);
+      await setSetting(db, 'backup_last_db_status', 'ok');
 
       if (!succeeded) return err(`${failures.join(' and ')} backup failed`, 502);
       return ok(result);
@@ -127,13 +129,13 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
       const statusKeys = ['backup_last_db_at', 'backup_last_db_status', 'backup_last_drive_at', 'backup_last_drive_status',
         'backup_last_r2_at', 'backup_last_r2_status', 'backup_last_code_at', 'backup_last_code_status',
         'backup_freq_drive', 'backup_freq_r2'];
-      const rows = await env.DB.prepare(`SELECT key, value FROM app_settings WHERE key IN (${statusKeys.map(() => '?').join(',')})`)
-        .bind(...statusKeys).all();
+      const rows = await db.select({ key: appSettings.key, value: appSettings.value }).from(appSettings)
+        .where(inArray(appSettings.key, statusKeys));
       const status: Record<string, string> = {};
-      for (const r of rows.results as any[]) status[r.key] = r.value;
+      for (const row of rows) status[row.key] = row.value || '';
 
       const r2Configured = !!env.BACKUP_R2;
-      const drive = await loadDriveConfig(env.DB);
+      const drive = await loadDriveConfig(db);
       const driveConfigured = !!(drive.email && drive.privateKey);
 
       return ok({ ...status, r2_configured: r2Configured, drive_configured: driveConfigured });
@@ -159,7 +161,7 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
   if (path === '/api/backup/test_drive' && req.method === 'POST') {
     try {
       await checkBackupAuth(req, env);
-      const drive = await loadDriveConfig(env.DB);
+      const drive = await loadDriveConfig(db);
       if (!drive.email || !drive.privateKey) return err('Google Drive service account is not configured', 503);
       const token = await googleTokenFromSA(drive.email, drive.privateKey);
       await driveList(token, drive.folderId);
@@ -200,8 +202,8 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
         body: JSON.stringify({ ref: 'master' })
       });
       const now = nowISO();
-      await setSetting(env.DB, 'backup_last_code_at', now);
-      await setSetting(env.DB, 'backup_last_code_status', response.status === 204 ? 'triggered' : `error ${response.status}`);
+      await setSetting(db, 'backup_last_code_at', now);
+      await setSetting(db, 'backup_last_code_status', response.status === 204 ? 'triggered' : `error ${response.status}`);
       if (response.status !== 204) return err('GitHub backup workflow could not be triggered', 502);
       return ok({ triggered: true });
     } catch (e: any) {
@@ -234,7 +236,7 @@ export async function handleBackup(req: Request, env: Env, path: string): Promis
         })
       });
       if (!publish.ok) return err('Homepage publish failed', 502);
-      await setSetting(env.DB, 'active_homepage', clean);
+      await setSetting(db, 'active_homepage', clean);
       return ok({ published: clean });
     } catch (e: any) {
       return err(e.msg || e.message || 'Homepage publish failed', e.status || 500);
@@ -253,25 +255,26 @@ async function checkBackupAuth(req: Request, env: Env): Promise<void> {
   requireAdmin(payload);
 }
 
-async function recordBackupLog(db: D1Database, destination: string, filename: string, status: string, sizeBytes = 0, errorMsg: string | null = null): Promise<void> {
-  await db.prepare('INSERT INTO backup_log (id, destination, filename, status, size_bytes, error_msg) VALUES (?,?,?,?,?,?)')
-    .bind(uuid(), destination, filename, status, sizeBytes, errorMsg).run();
+async function recordBackupLog(db: AppDb, destination: string, filename: string, status: string, sizeBytes = 0, errorMsg: string | null = null): Promise<void> {
+  await db.insert(backupLog).values({
+    id: uuid(), destination, filename, status, sizeBytes, errorMsg
+  });
 }
 
-async function updateBackupStatus(db: D1Database, dest: string, ts: string, status: string): Promise<void> {
+async function updateBackupStatus(db: AppDb, dest: string, ts: string, status: string): Promise<void> {
   const now = nowISO();
   const atKey = `backup_last_${dest}_at`;
   const stKey = `backup_last_${dest}_status`;
   for (const key of [atKey, stKey]) {
     const val = key === atKey ? ts : status;
-    await db.prepare(`INSERT INTO app_settings (key, value, updated_at) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET value=?, updated_at=?`)
-      .bind(key, val, now, val, now).run();
+    await db.insert(appSettings).values({ key, value: val, updatedAt: now })
+      .onConflictDoUpdate({ target: appSettings.key, set: { value: val, updatedAt: now } });
   }
 }
 
 type DriveConfig = { email: string; privateKey: string; folderId: string };
 
-async function loadDriveConfig(db: D1Database): Promise<DriveConfig> {
+async function loadDriveConfig(db: AppDb): Promise<DriveConfig> {
   return {
     email: await getPrivateSetting(db, 'gdrive_client_email'),
     privateKey: await getPrivateSetting(db, 'gdrive_private_key'),
@@ -359,7 +362,7 @@ async function pruneBackups(env: Env, prefix: string, keep: number): Promise<voi
   }
 }
 
-async function isBackupDue(db: D1Database, destination: 'r2' | 'drive'): Promise<boolean> {
+async function isBackupDue(db: AppDb, destination: 'r2' | 'drive'): Promise<boolean> {
   const frequency = await getSetting(db, `backup_freq_${destination}`) || 'daily';
   const last = await getSetting(db, `backup_last_${destination}_at`);
   if (!last) return true;
@@ -368,10 +371,22 @@ async function isBackupDue(db: D1Database, destination: 'r2' | 'drive'): Promise
   return Date.now() - new Date(last).getTime() >= dueMs;
 }
 
-async function setSetting(db: D1Database, key: string, value: string): Promise<void> {
+async function getSetting(db: AppDb, key: string): Promise<string> {
+  const row = await db.select({ value: appSettings.value }).from(appSettings)
+    .where(eq(appSettings.key, key)).get();
+  return row?.value || '';
+}
+
+async function getPrivateSetting(db: AppDb, key: string): Promise<string> {
+  const row = await db.select({ value: privateSettings.value }).from(privateSettings)
+    .where(eq(privateSettings.key, key)).get();
+  return row?.value || '';
+}
+
+async function setSetting(db: AppDb, key: string, value: string): Promise<void> {
   const now = nowISO();
-  await db.prepare('INSERT INTO app_settings (key, value, updated_at) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at')
-    .bind(key, value, now).run();
+  await db.insert(appSettings).values({ key, value, updatedAt: now })
+    .onConflictDoUpdate({ target: appSettings.key, set: { value, updatedAt: now } });
 }
 
 function githubHeaders(token: string): Record<string, string> {
