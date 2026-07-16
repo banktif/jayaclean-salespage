@@ -17,7 +17,7 @@ cd ..
 
 # 2. Copy root static files
 echo "-> Copying root static files..."
-for f in index.html success.html test-pay.html favicon.svg sw.js manifest.json theme.css admin-modern.css admin-favicon.svg admin-manifest.json .nojekyll CNAME jc-api.js; do
+for f in index.html success.html test-pay.html favicon.svg sw.js manifest.json theme.css admin-modern.css admin-favicon.svg admin-manifest.json _redirects .nojekyll CNAME jc-api.js; do
   if [ -f "$f" ]; then
     cp "$f" "$OUT_DIR/"
     echo "   $f -> $OUT_DIR/"
@@ -32,5 +32,10 @@ for dir in admin worker customer assets home; do
     echo "   $dir/ -> $OUT_DIR/$dir/"
   fi
 done
+
+# The customer project keeps only a safe hand-off to the dedicated admin host.
+if [ -f "admin-redirect.html" ]; then
+  cp "admin-redirect.html" "$OUT_DIR/admin/index.html"
+fi
 
 echo "=== Build complete. Deploy folder: $OUT_DIR ==="
