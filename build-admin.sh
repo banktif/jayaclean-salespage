@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -e
 
 OUT_DIR="admin-public"
 rm -rf "$OUT_DIR"
