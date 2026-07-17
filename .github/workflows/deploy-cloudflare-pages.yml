@@ -32,6 +32,7 @@ jobs:
 
       - name: Deploy JAYABINA to www.jayabina.com
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
+        run: npx --yes wrangler@4 pages deploy site-public --project-name jayabina --branch master
 
       - name: Deploy Admin to admin.jayabina.com
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
