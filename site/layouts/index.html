@@ -67,9 +67,22 @@
     img{display:block;max-width:100%}
     [hidden]{display:none!important}
     .container{width:min(calc(100% - 48px),var(--container));margin-inline:auto}
-    .section{padding-block:clamp(64px,7vw,104px);scroll-margin-top:84px}
+    .section{padding-block:clamp(64px,7vw,104px);scroll-margin-top:84px;position:relative}
+    .section>.container{position:relative;z-index:1}
     .section-grey{background:var(--grey-50)}
     .section-mint{background:var(--green-50)}
+    .sec-services{overflow:hidden;background:linear-gradient(180deg,var(--white) 0%,#f4faf6 100%)}
+    .sec-services::before{content:'';position:absolute;width:560px;height:560px;right:-220px;top:-240px;border-radius:50%;border:1px solid rgba(20,108,67,.1);box-shadow:0 0 0 80px rgba(20,108,67,.035),0 0 0 160px rgba(20,108,67,.02)}
+    .sec-services::after{content:'';position:absolute;width:460px;height:460px;left:-230px;bottom:-260px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,199,142,.14),transparent 72%)}
+    .sec-why{overflow:hidden;background:linear-gradient(180deg,#f8faf9 0%,#eef7f1 100%)}
+    .sec-why::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(20,108,67,.07) 1px,transparent 1.6px);background-size:24px 24px}
+    .sec-why::after{content:'';position:absolute;width:420px;height:420px;right:-180px;bottom:-220px;border-radius:50%;background:radial-gradient(closest-side,rgba(157,227,186,.3),transparent 70%)}
+    .sec-steps{overflow:hidden;background:linear-gradient(135deg,#f1fbf5 0%,var(--white) 45%,#f4faf6 100%)}
+    .sec-steps::before{content:'';position:absolute;width:520px;height:520px;left:-240px;top:-260px;border-radius:50%;border:1px solid rgba(20,108,67,.1);box-shadow:0 0 0 70px rgba(20,108,67,.035),0 0 0 140px rgba(20,108,67,.02)}
+    .sec-steps::after{content:'';position:absolute;width:380px;height:380px;right:-170px;bottom:-200px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,199,142,.12),transparent 72%)}
+    .sec-faq{overflow:hidden;background:linear-gradient(180deg,var(--white) 0%,#f6f9f7 55%,#eef7f1 100%)}
+    .sec-faq::before{content:'';position:absolute;width:480px;height:480px;right:-220px;top:-200px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,199,142,.12),transparent 72%)}
+    .sec-faq::after{content:'';position:absolute;width:300px;height:300px;left:-140px;bottom:-160px;border-radius:50%;border:1px solid rgba(20,108,67,.09);box-shadow:0 0 0 55px rgba(20,108,67,.03)}
     .section-kicker{display:inline-flex;align-items:center;gap:9px;margin-bottom:16px;color:var(--green-700);font-size:.875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
     .section-kicker::before{content:'';width:24px;height:2px;background:currentColor;border-radius:99px}
     .section-head{display:flex;align-items:end;justify-content:space-between;gap:32px;margin-bottom:44px}
@@ -322,7 +335,7 @@
       </div>
     </section>
 
-    <section class="section" id="servis">
+    <section class="section sec-services" id="servis">
       <div class="container">
         <div class="section-head reveal">
           <div><span class="section-kicker">Servis kami</span><h2>Satu team. Tiga cara kami baiki rumah anda.</h2></div>
@@ -360,7 +373,7 @@
       </div>
     </section>
 
-    <section class="section section-grey" id="kenapa">
+    <section class="section sec-why" id="kenapa">
       <div class="container">
         <div class="section-head reveal">
           <div><span class="section-kicker">Kenapa JAYABINA</span><h2>Kami tak minta anda percaya. Kami minta anda semak.</h2></div>
@@ -375,7 +388,7 @@
       </div>
     </section>
 
-    <section class="section" id="proses">
+    <section class="section sec-steps" id="proses">
       <div class="container">
         <div class="section-head reveal">
           <div><span class="section-kicker">Cara nak mula</span><h2>Tiga langkah. Satu WhatsApp. Kerja siap.</h2></div>
@@ -389,7 +402,7 @@
       </div>
     </section>
 
-    <section class="section section-grey" id="faq">
+    <section class="section sec-faq" id="faq">
       <div class="container faq-layout">
         <div class="reveal"><span class="section-kicker">Soalan lazim</span><h2>Jawapan jujur. Sebelum anda tanya.</h2><p class="muted">Kalau dah jelas — terus WhatsApp. Kalau belum, baca dulu.</p></div>
         <div class="faq-list reveal">
