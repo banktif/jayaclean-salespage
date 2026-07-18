@@ -111,12 +111,13 @@
     .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
     .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
     .menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-    .mobile-menu{display:none;position:fixed;z-index:99;top:64px;left:0;right:0;max-height:calc(100dvh - 64px);overflow-y:auto;padding:20px 24px 26px;background:var(--white);border-bottom:1px solid var(--grey-200);box-shadow:var(--shadow)}
+    .mobile-menu{display:none;position:fixed;z-index:99;top:72px;right:max(16px,calc((100vw - var(--container)) / 2));width:min(340px,calc(100vw - 32px));max-height:calc(100dvh - 92px);overflow-y:auto;padding:16px 18px 20px;background:var(--white);border:1px solid var(--grey-200);border-radius:18px;box-shadow:var(--shadow)}
     .mobile-menu.open{display:grid;gap:6px}
-    .mobile-menu a{min-height:46px;display:flex;align-items:center;padding:8px 4px;color:var(--grey-700);font-weight:600}
+    .mobile-menu a{min-height:44px;display:flex;align-items:center;padding:6px 8px;border-radius:10px;color:var(--grey-700);font-weight:600}
+    .mobile-menu a:hover{background:var(--green-50);color:var(--green-800)}
     .mobile-menu .btn{margin-top:10px;color:var(--white);padding-inline:18px}
-    .mm-label{font-size:.68rem;font-weight:800;letter-spacing:.08em;color:var(--grey-500);text-transform:uppercase;margin:10px 4px 2px}
-    @media(min-width:1024px){.mobile-menu{top:72px;max-height:calc(100dvh - 72px)}}
+    .mm-label{font-size:.68rem;font-weight:800;letter-spacing:.08em;color:var(--grey-500);text-transform:uppercase;margin:10px 8px 2px}
+    @media(min-width:1024px){.mobile-menu{top:80px}}
 
     .hero{min-height:760px;padding:144px 0 78px;background:linear-gradient(135deg,var(--green-950) 0%,var(--green-900) 58%,#126044 100%);color:var(--white);position:relative;overflow:hidden}
     .hero::before{content:'';position:absolute;width:620px;height:620px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-190px;top:-250px;box-shadow:0 0 0 90px rgba(255,255,255,.025),0 0 0 180px rgba(255,255,255,.018)}
@@ -129,30 +130,9 @@
     .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
     .hero-note{display:flex;align-items:center;gap:9px;margin:0;color:#c7d8d1;font-size:.92rem}
     .hero-note::before{content:'✓';width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:rgba(157,227,186,.13);color:#9de3ba;font-weight:700}
-    .hero-panel{position:relative;padding:28px;border:1px solid rgba(255,255,255,.15);border-radius:28px;background:rgba(255,255,255,.97);box-shadow:0 32px 80px rgba(0,0,0,.24);color:var(--grey-900)}
-    .hero-panel-top{display:flex;align-items:start;justify-content:space-between;gap:20px;padding-bottom:22px;border-bottom:1px solid var(--grey-200)}
-    .hero-panel-label{margin-bottom:5px;color:var(--grey-600);font-size:.88rem;font-weight:600}
-    .hero-price{font-family:'Bricolage Grotesque',sans-serif;font-size:3.25rem;line-height:1;font-weight:800;color:var(--green-900);letter-spacing:-.05em}
-    .hero-price small{font-family:'Figtree',sans-serif;font-size:.85rem;font-weight:600;color:var(--grey-600);letter-spacing:0}
-    .status-pill{padding:7px 11px;border-radius:999px;background:var(--green-100);color:var(--green-800);font-size:.875rem;font-weight:700;white-space:nowrap}
-    .service-list{display:grid;gap:0;margin:18px 0 22px}
-    .service-row{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--grey-100)}
-    .service-row:last-child{border-bottom:0}
-    .service-num{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:var(--green-50);color:var(--green-800);font-size:.78rem;font-weight:700}
-    .service-row strong{display:block;font-size:.98rem}
-    .service-row span:last-child{color:var(--green-700);font-size:.875rem;font-weight:700}
-    .hero-panel-foot{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .mini-stat{padding:14px;border-radius:13px;background:var(--grey-50);border:1px solid var(--grey-200)}
-    .mini-stat strong{display:block;color:var(--green-900);font-size:1.06rem}
-    .mini-stat span{display:block;color:var(--grey-600);font-size:.875rem}
-
-    .trust-strip{background:var(--white);border-bottom:1px solid var(--grey-200)}
-    .trust-grid{display:grid;grid-template-columns:repeat(4,1fr)}
-    .trust-item{padding:26px 24px;border-right:1px solid var(--grey-200)}
-    .trust-item:first-child{padding-left:0}
-    .trust-item:last-child{border-right:0;padding-right:0}
-    .trust-item strong{display:block;margin-bottom:3px;color:var(--green-900);font-size:1.02rem}
-    .trust-item span{display:block;color:var(--grey-600);font-size:.9rem;line-height:1.45}
+    .hero-visual{position:relative;margin:0;padding:10px;border:1px solid rgba(255,255,255,.18);border-radius:28px;background:rgba(255,255,255,.06);box-shadow:0 32px 80px rgba(0,0,0,.24)}
+    .hero-visual img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:20px}
+    .hero-visual-badge{position:absolute;left:24px;bottom:24px;padding:9px 14px;border-radius:999px;background:rgba(5,46,34,.9);border:1px solid rgba(255,255,255,.25);color:var(--white);font-size:.82rem;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 
     .emotion-section{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--white) 0%,#f4faf6 100%)}
     .emotion-section::before{content:'';position:absolute;width:440px;height:440px;left:-220px;bottom:-270px;border-radius:50%;background:rgba(72,199,142,.1)}
@@ -167,6 +147,7 @@
     .emotion-label{max-width:190px;padding:10px 13px;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(5,46,34,.88);color:var(--white);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:.82rem;font-weight:700;line-height:1.35}
     .emotion-label:last-child{text-align:right}
     .emotion-caption{margin:11px 6px 2px;color:var(--grey-600);font-size:.875rem;line-height:1.5}
+    .emotion-ph{aspect-ratio:3/2;border-radius:20px;background:var(--green-100);display:grid;place-items:center;color:var(--green-800);font-weight:700;font-size:.88rem;text-align:center;padding:18px;line-height:1.6}
 
     .signs-layout{display:grid;grid-template-columns:.9fr 1.1fr;gap:72px;align-items:start}
     .sign-intro{position:sticky;top:112px}
@@ -289,6 +270,10 @@
     .f-links{display:grid;gap:2px;padding:0 16px 12px}
     .f-links a{padding:8px 0;color:#c7d8d1;font-size:.9rem}
     .f-links a:hover{color:var(--white)}
+    .f-acc.static{border:0;background:transparent}
+    .f-acc.static summary{pointer-events:none;cursor:default;padding:0 0 10px;color:#9de3ba;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
+    .f-acc.static summary::after{display:none}
+    .f-acc.static .f-links{padding:0}
     .footer-bottom{margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:.82rem;color:#9fb8ae}
 
     .desktop-wa{position:fixed;right:22px;bottom:22px;z-index:50;min-height:50px;padding:13px 18px;border-radius:999px;background:var(--wa);color:var(--white);box-shadow:0 14px 32px rgba(0,0,0,.2);font-size:.92rem;font-weight:700;transition:opacity .2s ease,transform .2s ease}
@@ -305,11 +290,7 @@
       .hero{min-height:auto;padding:116px 0 72px}
       .hero-grid{grid-template-columns:1fr;gap:44px}
       .hero-copy{max-width:760px}
-      .hero-panel{max-width:680px}
-      .trust-grid{grid-template-columns:1fr 1fr}
-      .trust-item:nth-child(2){border-right:0}
-      .trust-item:nth-child(-n+2){border-bottom:1px solid var(--grey-200)}
-      .trust-item:nth-child(3){padding-left:0}
+      .hero-visual{max-width:680px}
       .signs-layout,.proof-layout,.price-layout,.booking-layout,.faq-layout,.emotion-grid{grid-template-columns:1fr;gap:44px}
       .sign-intro,.booking-copy{position:static}
       .proof-frame{max-width:760px}
@@ -342,18 +323,12 @@
       .hero-badge{font-size:.82rem}
       .hero-actions{display:grid}
       .hero-note{align-items:flex-start;font-size:.87rem}
-      .hero-panel{padding:22px;border-radius:22px}
-      .hero-panel-top{display:block}
-      .status-pill{display:inline-block;margin-top:14px}
-      .hero-price{font-size:2.9rem}
-      .hero-panel-foot{grid-template-columns:1fr}
+      .hero-visual{padding:8px;border-radius:22px}
+      .hero-visual-badge{left:16px;bottom:16px;font-size:.76rem}
       .emotion-visual img{aspect-ratio:auto;object-fit:contain}
       .emotion-labels{position:static;display:grid;grid-template-columns:1fr 1fr;margin:10px 2px 2px}
       .emotion-label{max-width:none;background:var(--green-900);font-size:.8rem}
       .emotion-label:last-child{text-align:left}
-      .trust-grid{grid-template-columns:1fr}
-      .trust-item{padding:18px 0;border-right:0;border-bottom:1px solid var(--grey-200)!important}
-      .trust-item:last-child{border-bottom:0!important}
       .signs-grid,.benefits-grid,.process-grid{grid-template-columns:1fr}
       .sign-card:last-child{grid-column:auto}
       .process-card::after{display:none}
@@ -376,9 +351,7 @@
 
     @media(max-width:380px){
       .container{width:min(calc(100% - 28px),var(--container))}
-      .hero-panel{padding:18px}
-      .service-row{grid-template-columns:34px 1fr}
-      .service-row span:last-child{grid-column:2}
+      .hero-visual{padding:6px}
       .emotion-labels{grid-template-columns:1fr}
       .emotion-label{font-size:.78rem}
     }
@@ -428,55 +401,34 @@
         <div class="hero-copy">
           <div class="hero-badge"><span class="pulse"></span>Servis mengecat rumah &amp; ofis · KL &amp; Selangor</div>
           <h1>Cat mengelupas, warna pudar? <span>Kami cat semula sampai segar.</span></h1>
-          <p class="lead">Dinding rumah dan ofis cerita banyak benda — cuma cerita tu dah makin pudar. Bagi kami peluang segarkan semula.</p>
+          <p class="lead">Dinding kusam dan cat mengelupas bukan je nampak buruk — ia ubah cara tetamu tengok rumah anda. Bagi kami peluang segarkan semula.</p>
           <div class="hero-actions">
             <a class="btn btn-light js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang: ____. Anggaran saiz: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Hantar Gambar — Semakan Percuma</a>
             <a class="btn btn-hero-ghost" href="tel:+60139373275">Call 013-937 3275</a>
           </div>
           <p class="hero-note">Hantar gambar dinding + poskod untuk semakan percuma — tak perlu bayar apa-apa dulu.</p>
         </div>
-        <aside class="hero-panel" aria-label="Apa anda dapat daripada JAYABINA">
-          <div class="hero-panel-top">
-            <div><div class="hero-panel-label">Apa anda dapat</div><div class="hero-price">Percuma <small>/ semakan WhatsApp</small></div></div>
-            <span class="status-pill">Tiada kerja tambahan tanpa setuju</span>
-          </div>
-          <div class="service-list">
-            <div class="service-row"><span class="service-num">01</span><strong>Hantar gambar &amp; poskod</strong><span>PERCUMA</span></div>
-            <div class="service-row"><span class="service-num">02</span><strong>Skop &amp; anggaran awal di WhatsApp</strong><span>JELAS</span></div>
-            <div class="service-row"><span class="service-num">03</span><strong>Lawatan tapak, harga muktamad</strong><span>TELUS</span></div>
-            <div class="service-row"><span class="service-num">04</span><strong>Kerja cat + rekod foto penuh</strong><span>BUKTI</span></div>
-          </div>
-          <div class="hero-panel-foot">
-            <div class="mini-stat"><strong>Percuma</strong><span>Semakan WhatsApp awal</span></div>
-            <div class="mini-stat"><strong>KL &amp; Selangor</strong><span>Liputan disemak ikut poskod</span></div>
-          </div>
-        </aside>
+        <figure class="hero-visual reveal" aria-label="Gambaran ruang selepas dicat semula">
+          <img src="/images/paint/paint-hero-1200.webp" width="1200" height="800" loading="eager" decoding="async" alt="Ruang rumah yang kelihatan segar dan terang selepas dinding dicat semula">
+          <span class="hero-visual-badge">Semakan WhatsApp percuma · Harga setuju dulu</span>
+        </figure>
       </div>
     </section>
-
-    <div class="trust-strip" aria-label="Ringkasan kelebihan servis">
-      <div class="container trust-grid">
-        <div class="trust-item"><strong>Semak percuma</strong><span>Hantar gambar, kami reply terus</span></div>
-        <div class="trust-item"><strong>Harga sebelum mula</strong><span>Setuju dulu, baru sentuh berus</span></div>
-        <div class="trust-item"><strong>Perlindungan ruang</strong><span>Perabot &amp; lantai ditutup rapi</span></div>
-        <div class="trust-item"><strong>Rekod foto</strong><span>Sebelum, semasa &amp; selepas kerja</span></div>
-      </div>
-    </div>
 
     <section class="section emotion-section" id="kisah">
       <div class="container emotion-grid">
         <div class="emotion-copy reveal">
-          <span class="section-kicker">Yang penting ialah rasa bila masuk rumah</span>
+          <span class="section-kicker">Bukan pasal cantik. Pasal rasa.</span>
           <h2>Bila kali terakhir anda masuk rumah dan tarik nafas lega?</h2>
-          <p class="lead">Bukan sebab rumah bersepah. Tapi sebab dinding dah lama cerita cerita lama.</p>
+          <p class="lead">Bukan sebab rumah bersepah. Tapi sebab setiap tompok kusam tu ingatkan anda — dah bertahun tak segarkan.</p>
           <p>Cat yang bertahun tak disegarkan bukan sekadar nampak kusam. Ia mula longgar, mengelupas, dan tak lagi lindungi dinding daripada lembap. Bila cat baru melekat sempurna — dinding dapat perlindungan sebenar, dan suasana terus berubah.</p>
           <div class="emotion-quote">"Rumah yang sama. Cuma kali ni rasa ringan je bila pandang dinding."</div>
           <a class="btn btn-primary js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang: ____. Anggaran saiz: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Hantar Gambar Dinding — Percuma</a>
         </div>
         <figure class="emotion-visual reveal">
-          <img src="/images/paint/paint-hero-1200.webp" width="1200" height="800" loading="lazy" decoding="async" alt="Ruang rumah yang kelihatan segar selepas dinding dicat semula">
+          <div class="emotion-ph">[GAMBAR: dinding kusam &amp; cat mengelupas vs ruang segar selepas dicat —<br>foto sebenar akan dimuat naik]</div>
           <div class="emotion-labels" aria-hidden="true"><span class="emotion-label">Sebelum: warna pudar, cat mengelupas</span><span class="emotion-label">Selepas: segar, sekata, terlindung</span></div>
-          <figcaption class="emotion-caption">Ilustrasi dijana AI untuk menerangkan konsep perbandingan. Bukan foto pelanggan atau bukti servis.</figcaption>
+          <figcaption class="emotion-caption">Ruang gambar disediakan — foto sebenar akan dimuat naik kemudian.</figcaption>
         </figure>
       </div>
     </section>
@@ -488,7 +440,7 @@
           <h2>5 tanda dinding dah minta dicat semula.</h2>
           <p class="lead">Tak semua dinding nampak teruk dari jauh. Tapi bila dekat — lain ceritanya.</p>
           <p>Dinding yang dibiarkan bukan je nampak kusam. Lembap masuk, kulat merebak, dan kos baiki jadi lebih mahal nanti.</p>
-          <div class="check-callout">Kalau dua atau lebih tanda ni ada — elok dapatkan semakan dulu sebelum masalah merebak.</div>
+          <div class="check-callout">Kalau dua atau lebih tanda ni ada — semakin lama anda tunggu, semakin mahal nak baiki nanti.</div>
         </div>
         <div class="signs-grid reveal">
           <article class="sign-card"><span class="card-index">01</span><h3>Warna pudar &amp; kusam</h3><p>Cat dah hilang seri, ruang nampak suram walaupun lampu terang.</p></article>
@@ -513,7 +465,7 @@
         <div class="proof-copy reveal">
           <span class="ai-disclosure">Bukti, bukan janji</span>
           <span class="section-kicker">Apa yang anda akan terima</span>
-          <h2>Setiap peringkat kerja direkod dan ditunjukkan terus kepada anda.</h2>
+          <h2>Anda boleh lihat sendiri — dari dinding kosong sampai kemasan akhir.</h2>
           <p class="lead">Bila kerja selesai, anda boleh bandingkan sendiri — bukan bergantung pada cakap-cakap.</p>
           <ul class="deliverables">
             <li>Foto permukaan sebelum sebarang kerja dimulakan</li>
@@ -615,7 +567,7 @@
         <div class="reveal"><span class="section-kicker">Soalan lazim</span><h2>Jawapan ringkas sebelum anda hubungi kami.</h2><p class="muted">Masih was-was? Baca dulu. Dah jelas? Terus WhatsApp.</p></div>
         <div class="faq-list reveal">
           <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq1"><span>Perabot &amp; lantai saya macam mana?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq1" hidden><p>Kami tutup perabot, lantai dan lekapan dengan pelindung sebelum kerja. Lepas siap, kami kemas semula — ruang balik macam asal, cuma dinding dah baru.</p></div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq2"><span>Bau cat kuat tak? Ada anak kecil.</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq2" hidden><p>Jenis cat dibincang dengan anda semasa sebut harga — termasuk pilihan yang kurang bau. Kami tetap sarankan ruang berudara baik dan anak-anak di ruang lain semasa kerja.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq2"><span>Bau cat kuat tak? Ada anak kecil.</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq2" hidden><p>Kami guna cat pilihan anda — ada jenis kurang bau yang lebih mesra keluarga. Ruang berudara baik, anak di ruang lain semasa kerja, dan bau hilang tak lama selepas siap.</p></div></div>
           <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq3"><span>Berapa lama nak siap?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq3" hidden><p>Ikut saiz ruang dan bilangan lapisan. Anggaran tempoh diberikan sekali dengan sebut harga — dan kami ikut jadual yang dipersetujui.</p></div></div>
           <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq4"><span>Tak reti pilih warna. Macam mana?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq4" hidden><p>Hantar gambar ruang anda dan ceritakan gaya yang anda suka — cerah, tenang, moden. Kami cadangkan pilihan warna yang padan dengan pencahayaan dan saiz ruang.</p></div></div>
           <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq5"><span>Dalam rumah je ke? Luar pun boleh?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq5" hidden><p>Dua-dua. Dinding dalam, luar, siling — semua kami semak permukaannya dulu, lepas tu beri sebut harga ikut keperluan. Ceritakan je apa yang anda nak.</p></div></div>
@@ -715,6 +667,9 @@
         document.querySelectorAll('.faq-question').forEach(function(other){other.setAttribute('aria-expanded','false');document.getElementById(other.getAttribute('aria-controls')).hidden=true});
         if(!open){this.setAttribute('aria-expanded','true');document.getElementById(this.getAttribute('aria-controls')).hidden=false}
       })});
+
+      function footerAcc(){var isDesktop=window.matchMedia('(min-width:768px)').matches;document.querySelectorAll('.f-acc').forEach(function(acc){acc.open=isDesktop;acc.classList.toggle('static',isDesktop)})}
+      footerAcc();window.addEventListener('resize',footerAcc);
     });
   </script>
 </body>
