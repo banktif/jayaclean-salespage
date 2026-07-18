@@ -1,6 +1,6 @@
 // JAYACLEAN API Client — replaces Supabase SDK on the frontend
 // Drop-in replacement that calls the JAYACLEAN Worker API instead of Supabase.
-// Usage: var JC = JCApi.create('https://jayaclean-api.banktifweb.workers.dev');
+// Usage: var JC = JCApi.create('https://api.jayabina.com');
 // Then use like Supabase: JC.from('bookings').select('*').eq('id',x) etc.
 // Auth works same way: JC.auth.signInWithPassword({email,pwd}) → token in localStorage
 

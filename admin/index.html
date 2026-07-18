@@ -519,7 +519,7 @@
 <script src="/jc-api.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
-var DEFAULT_API_URL='https://jayaclean-api.banktifweb.workers.dev';
+var DEFAULT_API_URL='https://api.jayabina.com';
 var DEV_API_URL=localStorage.getItem('jc_api_url')||'';
 var API_URL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)&&/^https?:\/\//.test(DEV_API_URL)?DEV_API_URL:DEFAULT_API_URL;
 var SB=JCApi.create(API_URL);

@@ -24,7 +24,12 @@
     "BAYARCASH_PAYMENT_CHANNEL": "5",
     "SITE_URL": "https://cuci.jayabina.com"
   },
-  "routes": [],
+  "routes": [
+    {
+      "pattern": "api.jayabina.com",
+      "custom_domain": true
+    }
+  ],
   "triggers": {
     "crons": [
       "0 * * * *"
