@@ -335,9 +335,14 @@
       .site-nav{height:64px}
       .nav-links,.nav-actions{display:none}
       .hero{min-height:auto;padding:116px 0 72px}
-      .hero-grid{grid-template-columns:1fr;gap:44px}
-      .hero-copy{max-width:760px}
-      .hero-visual{max-width:680px}
+      .hero-grid{grid-template-columns:1fr;gap:0}
+      .hero-copy{display:contents}
+      .hero-badge{order:1;justify-self:start}
+      .hero-copy h1{order:2}
+      .hero-copy .lead{order:3;margin-bottom:26px}
+      .hero-visual{order:4;margin:0 0 28px;max-width:680px}
+      .hero-actions{order:5}
+      .hero-note{order:6}
       .trust-grid{grid-template-columns:1fr 1fr}
       .trust-item:nth-child(2){border-right:0}
       .trust-item:nth-child(-n+2){border-bottom:1px solid var(--grey-200)}
@@ -370,7 +375,6 @@
       .btn{width:100%;min-height:52px;padding-inline:18px}
       .hero{padding:102px 0 58px}
       .hero::before{width:430px;height:430px;right:-240px;top:-180px}
-      .hero-grid{gap:34px}
       .hero-badge{font-size:.82rem}
       .hero-actions{display:grid}
       .hero-note{align-items:flex-start;font-size:.87rem}
