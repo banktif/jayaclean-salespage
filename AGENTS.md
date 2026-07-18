@@ -11,7 +11,8 @@
 This section supersedes older Supabase architecture and deploy notes below.
 
 - ⛔ **ADMIN SYSTEM LOCKED (owner order, 2026-07-18):** `admin.jayabina.com` (Pages project `jayabina-admin`, `admin/index.html`, `admin/editor.html`, `admin/vendor/`) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session.
-- Frontend: Cloudflare Pages project `jayaclean`, custom domain `cuci.jayabina.com`.
+- Frontend: Cloudflare Pages project `jayaclean`, custom domain `cuci.jayabina.com` (revived 2026-07-18: served via Worker `jayabina-cuci-router` in `cf-cuci-router/`, custom-domain proxy to `jayaclean-29f.pages.dev`, same pattern as `jayabina-www-router`). Booking + Bayarcash deposit flow on `index.html` now uses the JC API (D1) — Supabase fully removed from the booking path.
+- CI: `.github/workflows/deploy-cloudflare-pages.yml` deploys ALL THREE on push to master: `jayabina` (www, `--branch main`), `jayabina-admin` (`--branch master`), `jayaclean` (cuci booking site, `bash build.sh` then `--branch master`).
 - API: Cloudflare Worker `jayaclean-api` (`cf-api/`). **Canonical public URL: `https://api.jayabina.com`** (Worker custom domain, added 2026-07-18). The legacy `https://jayaclean-api.banktifweb.workers.dev` hostname still works but must not be referenced in frontend code. Do NOT redeploy the Worker under a new name — secrets (Bayarcash, backup, GH_PAT) cannot be copied and payments would break.
 - Database/Auth: Cloudflare D1 `jayaclean-db` plus custom PBKDF2/JWT auth. Supabase is legacy source data only and is no longer called by the production frontend.
 - Frontend client: `/jc-api.js`; served apps are `admin/index.html`, `worker/index.html`, and `customer/index.html`.
