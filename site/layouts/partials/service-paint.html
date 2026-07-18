@@ -1,103 +1,721 @@
-{{ $b := hugo.Data.business }}
-{{ $wa := "Assalamualaikum JAYABINA. Saya mahu sebut harga mengecat. Jenis ruang: rumah/ofis. Bahagian: dalaman/luaran. Lokasi/poskod: ____." }}
-<section class="service-hero" data-hero>
-  <div class="container hero-grid">
-    <div class="hero-copy">
-      <span class="hero-badge">SERVIS MENGECAT RUMAH &amp; OFIS</span>
-      <h1>Dinding kusam, bertompok atau mengelupas?</h1>
-      <p class="lead">Segarkan semula rumah atau ruang kerja dengan skop yang melihat lebih daripada warna — termasuk keadaan permukaan, persediaan dan perlindungan kawasan kerja.</p>
-      <div class="hero-actions"><a class="btn btn-primary" href="#hubungi">Minta Semakan &amp; Sebut Harga</a><a class="btn btn-outline" href="#proses">Lihat Cara Kami Bekerja</a></div>
-      <p class="hero-note">Kongsi gambar ruang, bahagian dalaman atau luaran, anggaran keluasan dan lokasi untuk semakan awal.</p>
+<!DOCTYPE html>
+<html lang="ms" class="js">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d3b2e">
+  <meta name="description" content="Dinding kusam, cat mengelupas? Kami cat semula sampai segar — perabot dilindungi, harga dipersetujui dulu, rekod foto penuh. Semakan WhatsApp percuma. KL & Selangor.">
+  <meta property="og:title" content="Servis Mengecat Rumah &amp; Ofis KL &amp; Selangor | JAYABINA">
+  <meta property="og:description" content="Cat mengelupas, warna pudar? Kami cat semula sampai segar. Semakan WhatsApp percuma.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.jayabina.com/servis-mengecat/">
+  <meta property="og:image" content="https://www.jayabina.com/images/paint/paint-hero-1200.webp">
+  <link rel="canonical" href="https://www.jayabina.com/servis-mengecat/">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Servis Mengecat Rumah &amp; Ofis KL &amp; Selangor | JAYABINA</title>
+  <script>document.documentElement.className='js';window.setTimeout(function(){document.documentElement.classList.add('js-fallback')},2500);</script>
+  <style>
+    :root{
+      --green-950:#052e22;
+      --green-900:#0d3b2e;
+      --green-800:#145c3d;
+      --green-700:#146c43;
+      --green-600:#158957;
+      --green-100:#dff5e8;
+      --green-50:#f1fbf5;
+      --white:#fff;
+      --grey-50:#f8faf9;
+      --grey-100:#f3f4f6;
+      --grey-200:#e5e7eb;
+      --grey-300:#d1d5db;
+      --grey-500:#6b7280;
+      --grey-600:#4b5563;
+      --grey-700:#374151;
+      --grey-900:#111827;
+      --error:#b42318;
+      --wa:#0f766e;
+      --shadow-sm:0 1px 2px rgba(17,24,39,.05);
+      --shadow:0 14px 36px rgba(17,24,39,.08);
+      --shadow-green:0 18px 42px rgba(13,59,46,.2);
+      --radius:20px;
+      --radius-sm:14px;
+      --container:1200px;
+      --font-body:clamp(1rem,.96rem + .18vw,1.125rem);
+      --font-small:clamp(.9rem,.87rem + .1vw,1rem);
+      --font-h1:clamp(2.35rem,1.65rem + 3.15vw,4.35rem);
+      --font-h2:clamp(2rem,1.56rem + 2vw,3.1rem);
+      --font-h3:clamp(1.4rem,1.22rem + .75vw,1.9rem);
+    }
+
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--white);color:var(--grey-900);font-family:'Figtree',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:var(--font-body);line-height:1.67;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body.menu-open{overflow:hidden}
+    h1,h2,h3,h4,p,ul,ol,figure{margin-top:0}
+    h1,h2,h3,h4{font-family:'Bricolage Grotesque','Figtree',sans-serif;color:var(--grey-900);letter-spacing:-.025em}
+    h1{font-size:var(--font-h1);line-height:1.05;margin-bottom:24px;max-width:15ch}
+    h2{font-size:var(--font-h2);line-height:1.12;margin-bottom:20px;max-width:20ch}
+    h3{font-size:var(--font-h3);line-height:1.2;margin-bottom:14px}
+    h4{font-size:clamp(1.1rem,1.04rem + .25vw,1.28rem);line-height:1.32;margin-bottom:8px}
+    p{max-width:65ch}
+    a{color:inherit;text-decoration:none}
+    button,input,textarea{font:inherit}
+    button,a{touch-action:manipulation}
+    img{display:block;max-width:100%}
+    [hidden]{display:none!important}
+    .container{width:min(calc(100% - 48px),var(--container));margin-inline:auto}
+    .section{padding-block:clamp(64px,7vw,104px);scroll-margin-top:84px}
+    .section-grey{background:var(--grey-50)}
+    .section-mint{background:var(--green-50)}
+    .section-dark{background:var(--green-950);color:var(--white)}
+    .section-dark h2,.section-dark h3{color:var(--white)}
+    .section-kicker{display:inline-flex;align-items:center;gap:9px;margin-bottom:16px;color:var(--green-700);font-size:.875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+    .section-kicker::before{content:'';width:24px;height:2px;background:currentColor;border-radius:99px}
+    .section-dark .section-kicker{color:#9de3ba}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:32px;margin-bottom:44px}
+    .section-head h2{margin-bottom:0}
+    .section-head p{margin:0;color:var(--grey-600);max-width:46ch}
+    .lead{font-size:clamp(1.08rem,1rem + .3vw,1.3rem);line-height:1.55}
+    .muted{color:var(--grey-600)}
+    .fine-print{font-size:.9rem;line-height:1.55;color:var(--grey-600)}
+    .fine-print-light{font-size:.9rem;line-height:1.55;color:#c7d8d1}
+    .btn{min-height:54px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid transparent;border-radius:13px;padding:14px 24px;font-weight:700;font-size:1rem;line-height:1.25;cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{background:var(--green-700);color:var(--white);box-shadow:0 10px 24px rgba(20,108,67,.2)}
+    .btn-primary:hover{background:var(--green-800)}
+    .btn-light{background:var(--white);color:var(--green-900);box-shadow:var(--shadow-sm)}
+    .btn-light:hover{background:var(--green-50)}
+    .btn-outline{background:transparent;color:var(--green-800);border-color:#8dc9a7}
+    .btn-outline:hover{background:var(--green-50);border-color:var(--green-700)}
+    .btn-hero-ghost{background:transparent;color:var(--white);border-color:rgba(255,255,255,.42)}
+    .btn-hero-ghost:hover{background:rgba(255,255,255,.1);border-color:var(--white)}
+    .btn-wa{background:var(--wa);color:var(--white);box-shadow:0 10px 24px rgba(18,140,126,.2)}
+    .btn-wa:hover{background:#0b5f59}
+    :focus-visible{outline:3px solid var(--white);outline-offset:2px;box-shadow:0 0 0 5px #16a36a}
+
+    .site-nav{position:fixed;inset:0 0 auto;z-index:100;height:72px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--grey-200);box-shadow:var(--shadow-sm)}
+    .nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .brand{display:flex;align-items:center;gap:11px;font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:800;color:var(--green-950);letter-spacing:-.02em}
+    .brand-mark{width:38px;height:38px;display:block;border-radius:11px;box-shadow:0 5px 14px rgba(13,59,46,.16)}
+    .nav-links{display:flex;align-items:center;gap:28px;list-style:none;margin:0;padding:0}
+    .nav-links a{color:var(--grey-700);font-size:.94rem;font-weight:600}
+    .nav-links a:hover,.nav-links a.active{color:var(--green-700)}
+    .nav-actions{display:flex;align-items:center;gap:12px}
+    .nav-actions .btn{min-height:44px;padding:10px 18px;font-size:.93rem}
+    .menu-toggle{display:block;width:46px;height:46px;padding:0;border:1px solid var(--grey-200);border-radius:12px;background:var(--white);cursor:pointer}
+    .menu-toggle span{display:block;width:21px;height:2px;margin:4px auto;background:var(--green-950);border-radius:99px;transition:transform .2s ease,opacity .2s ease}
+    .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+    .menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+    .mobile-menu{display:none;position:fixed;z-index:99;top:64px;left:0;right:0;max-height:calc(100dvh - 64px);overflow-y:auto;padding:20px 24px 26px;background:var(--white);border-bottom:1px solid var(--grey-200);box-shadow:var(--shadow)}
+    .mobile-menu.open{display:grid;gap:6px}
+    .mobile-menu a{min-height:46px;display:flex;align-items:center;padding:8px 4px;color:var(--grey-700);font-weight:600}
+    .mobile-menu .btn{margin-top:10px;color:var(--white);padding-inline:18px}
+    .mm-label{font-size:.68rem;font-weight:800;letter-spacing:.08em;color:var(--grey-500);text-transform:uppercase;margin:10px 4px 2px}
+    @media(min-width:1024px){.mobile-menu{top:72px;max-height:calc(100dvh - 72px)}}
+
+    .hero{min-height:760px;padding:144px 0 78px;background:linear-gradient(135deg,var(--green-950) 0%,var(--green-900) 58%,#126044 100%);color:var(--white);position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;width:620px;height:620px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-190px;top:-250px;box-shadow:0 0 0 90px rgba(255,255,255,.025),0 0 0 180px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(390px,.88fr);gap:72px;align-items:center}
+    .hero h1{color:var(--white)}
+    .hero h1 span{color:#9de3ba}
+    .hero-copy>.lead{color:#d7e8e1;max-width:58ch;margin-bottom:30px}
+    .hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;padding:8px 13px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);color:#e9f7ef;font-size:.875rem;font-weight:700;letter-spacing:.04em}
+    .pulse{width:8px;height:8px;background:#4ade80;border-radius:50%;box-shadow:0 0 0 5px rgba(74,222,128,.13)}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .hero-note{display:flex;align-items:center;gap:9px;margin:0;color:#c7d8d1;font-size:.92rem}
+    .hero-note::before{content:'✓';width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:rgba(157,227,186,.13);color:#9de3ba;font-weight:700}
+    .hero-panel{position:relative;padding:28px;border:1px solid rgba(255,255,255,.15);border-radius:28px;background:rgba(255,255,255,.97);box-shadow:0 32px 80px rgba(0,0,0,.24);color:var(--grey-900)}
+    .hero-panel-top{display:flex;align-items:start;justify-content:space-between;gap:20px;padding-bottom:22px;border-bottom:1px solid var(--grey-200)}
+    .hero-panel-label{margin-bottom:5px;color:var(--grey-600);font-size:.88rem;font-weight:600}
+    .hero-price{font-family:'Bricolage Grotesque',sans-serif;font-size:3.25rem;line-height:1;font-weight:800;color:var(--green-900);letter-spacing:-.05em}
+    .hero-price small{font-family:'Figtree',sans-serif;font-size:.85rem;font-weight:600;color:var(--grey-600);letter-spacing:0}
+    .status-pill{padding:7px 11px;border-radius:999px;background:var(--green-100);color:var(--green-800);font-size:.875rem;font-weight:700;white-space:nowrap}
+    .service-list{display:grid;gap:0;margin:18px 0 22px}
+    .service-row{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--grey-100)}
+    .service-row:last-child{border-bottom:0}
+    .service-num{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:var(--green-50);color:var(--green-800);font-size:.78rem;font-weight:700}
+    .service-row strong{display:block;font-size:.98rem}
+    .service-row span:last-child{color:var(--green-700);font-size:.875rem;font-weight:700}
+    .hero-panel-foot{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .mini-stat{padding:14px;border-radius:13px;background:var(--grey-50);border:1px solid var(--grey-200)}
+    .mini-stat strong{display:block;color:var(--green-900);font-size:1.06rem}
+    .mini-stat span{display:block;color:var(--grey-600);font-size:.875rem}
+
+    .trust-strip{background:var(--white);border-bottom:1px solid var(--grey-200)}
+    .trust-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+    .trust-item{padding:26px 24px;border-right:1px solid var(--grey-200)}
+    .trust-item:first-child{padding-left:0}
+    .trust-item:last-child{border-right:0;padding-right:0}
+    .trust-item strong{display:block;margin-bottom:3px;color:var(--green-900);font-size:1.02rem}
+    .trust-item span{display:block;color:var(--grey-600);font-size:.9rem;line-height:1.45}
+
+    .emotion-section{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--white) 0%,#f4faf6 100%)}
+    .emotion-section::before{content:'';position:absolute;width:440px;height:440px;left:-220px;bottom:-270px;border-radius:50%;background:rgba(72,199,142,.1)}
+    .emotion-grid{position:relative;display:grid;grid-template-columns:.78fr 1.22fr;gap:58px;align-items:center}
+    .emotion-copy h2{max-width:13ch}
+    .emotion-copy .lead{color:var(--green-950)}
+    .emotion-copy p:not(.lead){color:var(--grey-600)}
+    .emotion-quote{margin:26px 0;padding:20px 22px;border-left:4px solid var(--green-700);border-radius:0 var(--radius-sm) var(--radius-sm) 0;background:var(--white);box-shadow:var(--shadow-sm);color:var(--green-950);font-weight:700}
+    .emotion-visual{position:relative;margin:0;padding:10px;border:1px solid #bfddca;border-radius:28px;background:var(--white);box-shadow:var(--shadow)}
+    .emotion-visual img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:20px}
+    .emotion-labels{position:absolute;left:26px;right:26px;bottom:26px;display:flex;justify-content:space-between;gap:16px;pointer-events:none}
+    .emotion-label{max-width:190px;padding:10px 13px;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(5,46,34,.88);color:var(--white);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:.82rem;font-weight:700;line-height:1.35}
+    .emotion-label:last-child{text-align:right}
+    .emotion-caption{margin:11px 6px 2px;color:var(--grey-600);font-size:.875rem;line-height:1.5}
+
+    .signs-layout{display:grid;grid-template-columns:.9fr 1.1fr;gap:72px;align-items:start}
+    .sign-intro{position:sticky;top:112px}
+    .sign-intro p{color:var(--grey-600)}
+    .signs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .sign-card,.benefit-card,.process-card{background:var(--white);border:1px solid var(--grey-200);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+    .sign-card{padding:24px}
+    .sign-card:last-child{grid-column:1/-1}
+    .sign-card h3,.benefit-card h3{font-size:clamp(1.12rem,1.05rem + .24vw,1.32rem);margin-bottom:8px}
+    .card-index{width:38px;height:38px;display:grid;place-items:center;margin-bottom:18px;border-radius:11px;background:var(--green-100);color:var(--green-800);font-size:.8rem;font-weight:800}
+    .sign-card p,.benefit-card p,.process-card p{margin:0;color:var(--grey-600);font-size:var(--font-small);line-height:1.6}
+    .check-callout{margin-top:28px;padding:20px 22px;border-left:4px solid var(--green-600);border-radius:0 var(--radius-sm) var(--radius-sm) 0;background:var(--green-50);color:var(--green-950);font-weight:600}
+
+    .proof-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:52px;align-items:center}
+    .proof-frame{overflow:hidden;border:1px solid var(--grey-200);border-radius:26px;background:var(--white);box-shadow:var(--shadow)}
+    .proof-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 20px;border-bottom:1px solid var(--grey-200);background:var(--grey-50)}
+    .proof-toolbar strong{font-size:.95rem;color:var(--green-950)}
+    .proof-toolbar span{font-size:.875rem;color:var(--grey-600)}
+    .proof-panels{display:grid;grid-template-columns:1fr 1fr;min-height:320px}
+    .proof-panel{position:relative;display:grid;place-items:center;padding:28px;text-align:center;overflow:hidden}
+    .proof-panel.before{background:linear-gradient(145deg,#e5e7eb,#cbd5d1)}
+    .proof-panel.after{background:linear-gradient(145deg,#e7f8ed,#c7efd6)}
+    .proof-panel::before,.proof-panel::after{content:'';position:absolute;border-radius:50%;opacity:.3}
+    .proof-panel::before{width:180px;height:180px;right:-52px;bottom:-62px;background:var(--green-700)}
+    .proof-panel::after{width:90px;height:90px;left:-30px;top:-24px;border:18px solid var(--white)}
+    .proof-label{position:absolute;top:16px;left:16px;padding:6px 10px;border-radius:999px;background:rgba(17,24,39,.78);color:var(--white);font-size:.8rem;font-weight:700;letter-spacing:.08em}
+    .proof-slot{position:relative;z-index:1}
+    .proof-slot strong{display:block;margin-bottom:6px;font-family:'Bricolage Grotesque',sans-serif;font-size:1.2rem;color:var(--green-950)}
+    .proof-slot span{display:block;max-width:18ch;color:var(--grey-700);font-size:.875rem;line-height:1.45}
+    .proof-media{position:relative;background:var(--grey-100);overflow:hidden}
+    .proof-media img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+    .proof-media-labels{position:absolute;inset:16px 16px auto;display:flex;justify-content:space-between;gap:12px;pointer-events:none}
+    .proof-media-label{padding:7px 11px;border:1px solid rgba(255,255,255,.28);border-radius:999px;background:rgba(5,46,34,.9);color:var(--white);font-size:.76rem;font-weight:800;letter-spacing:.09em}
+    .proof-caption{padding:15px 20px;margin:0;color:var(--grey-600);font-size:.875rem;line-height:1.5}
+    .ai-disclosure{display:inline-flex;align-items:center;gap:8px;margin:0 0 18px;padding:8px 11px;border-radius:999px;background:#eef2f0;color:var(--green-900);font-size:.78rem;font-weight:800;letter-spacing:.055em;text-transform:uppercase}
+    .proof-copy h2{max-width:13ch}
+    .proof-copy>p{color:var(--grey-600)}
+    .deliverables{display:grid;gap:12px;margin:26px 0 30px;padding:0;list-style:none}
+    .deliverables li{display:flex;align-items:flex-start;gap:12px;color:var(--grey-700);font-size:var(--font-small)}
+    .deliverables li::before{content:'✓';flex:0 0 26px;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;background:var(--green-100);color:var(--green-800);font-size:.78rem;font-weight:800}
+
+    .process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+    .process-card{padding:10px 10px 24px;position:relative;overflow:visible}
+    .process-card::after{content:'→';position:absolute;top:76px;right:-14px;z-index:2;width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--grey-200);border-radius:50%;background:var(--white);color:var(--green-700);font-weight:700}
+    .process-card:last-child::after{display:none}
+    .process-photo{aspect-ratio:16/9;display:block;margin-bottom:20px;border-radius:14px;background:var(--green-100);overflow:hidden;position:relative}
+    .process-photo img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+    .process-card:hover .process-photo img{transform:scale(1.025)}
+    .process-photo span{position:absolute;left:10px;bottom:10px;z-index:1;display:block;padding:6px 9px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(5,46,34,.88);color:var(--white);font-size:.68rem;font-weight:800;letter-spacing:.075em;text-transform:uppercase}
+    .photo-placeholder{display:grid;place-items:center;width:100%;height:100%;color:var(--green-800);font-size:.78rem;font-weight:700;text-align:center;padding:12px}
+    .process-number{font-family:'Bricolage Grotesque',sans-serif;font-size:2rem;line-height:1;color:#83c8a0;font-weight:800;margin:0 14px 16px}
+    .process-card h3,.process-card p{margin-left:14px;margin-right:14px}
+    .process-card h3{font-size:clamp(1.12rem,1.06rem + .2vw,1.3rem);margin-bottom:8px}
+
+    .benefits-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    .benefit-card{padding:28px;display:grid;grid-template-columns:48px 1fr;gap:18px;align-items:start}
+    .benefit-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:var(--green-100);color:var(--green-800);font-weight:800}
+
+    .price-layout{display:grid;grid-template-columns:.9fr 1.1fr;gap:72px;align-items:center;margin-top:52px}
+    .price-copy p{color:var(--grey-600)}
+    .price-card{padding:38px;border:1px solid #a9d7bb;border-radius:26px;background:var(--white);box-shadow:var(--shadow-green)}
+    .price-card-head{display:flex;align-items:start;justify-content:space-between;gap:20px;padding-bottom:26px;border-bottom:1px solid var(--grey-200)}
+    .price-eyebrow{margin-bottom:5px;color:var(--grey-600);font-size:.9rem;font-weight:600}
+    .price-main{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(2.2rem,4vw,3.2rem);line-height:.98;color:var(--green-900);font-weight:800;letter-spacing:-.045em}
+    .price-main small{font-family:'Figtree',sans-serif;font-size:.92rem;color:var(--grey-600);font-weight:600;letter-spacing:0}
+    .price-chip{padding:8px 12px;border-radius:999px;background:var(--green-100);color:var(--green-800);font-size:.875rem;font-weight:700;white-space:nowrap}
+    .scope-list{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;margin:22px 0;padding:0;list-style:none}
+    .scope-list li{display:flex;gap:10px;padding:10px 0;color:var(--grey-700);font-size:.93rem}
+    .scope-list li::before{content:'✓';color:var(--green-700);font-weight:800}
+    .payment-split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+    .payment-box{padding:16px;border-radius:14px;background:var(--grey-50);border:1px solid var(--grey-200)}
+    .payment-box span{display:block;color:var(--grey-600);font-size:.875rem}
+    .payment-box strong{display:block;color:var(--green-950);font-size:1.14rem}
+    .price-card .btn{width:100%}
+    .price-note{margin:14px 0 0;text-align:center;color:var(--grey-600);font-size:.875rem;line-height:1.45}
+
+    .booking-layout{display:grid;grid-template-columns:.75fr 1.25fr;gap:58px;align-items:start}
+    .booking-layout>*{min-width:0}
+    .booking-copy{position:sticky;top:110px}
+    .booking-copy p{color:#c7d8d1}
+    .booking-points{display:grid;gap:12px;margin:26px 0 0;padding:0;list-style:none}
+    .booking-points li{display:flex;gap:12px;color:#e4f0eb;font-size:.95rem}
+    .booking-points li::before{content:'✓';color:#9de3ba;font-weight:800}
+    .booking-card{padding:34px;border-radius:26px;background:var(--white);color:var(--grey-900);box-shadow:0 28px 70px rgba(0,0,0,.25)}
+    .booking-card h3{margin-bottom:6px;color:var(--grey-900)}
+    .booking-sub{margin-bottom:28px;color:var(--grey-600);font-size:.95rem}
+    .form-step{display:flex;align-items:center;gap:10px;margin:26px 0 12px;color:var(--green-900);font-size:.88rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+    .form-step:first-of-type{margin-top:0}
+    .form-step span{width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:var(--green-100);color:var(--green-800);font-size:.76rem}
+    .wa-step-desc{margin:0 0 4px 38px;color:var(--grey-600);font-size:.9rem;line-height:1.55}
+    .booking-card .btn{width:100%;margin-top:22px}
+    .form-note{margin:12px auto 0;color:var(--grey-600);font-size:.875rem;text-align:center;line-height:1.5}
+
+    .faq-layout{display:grid;grid-template-columns:.65fr 1.35fr;gap:70px;align-items:start}
+    .faq-list{border-top:1px solid var(--grey-200)}
+    .faq-item{border-bottom:1px solid var(--grey-200)}
+    .faq-question{width:100%;min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border:0;background:transparent;color:var(--grey-900);font-family:'Bricolage Grotesque',sans-serif;font-size:1.08rem;font-weight:700;text-align:left;cursor:pointer}
+    .faq-plus{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:var(--green-100);color:var(--green-800);font-family:'Figtree',sans-serif;font-size:1.2rem;transition:transform .2s ease,background .2s ease}
+    .faq-question[aria-expanded="true"] .faq-plus{transform:rotate(45deg);background:var(--green-700);color:var(--white)}
+    .faq-answer{padding:0 52px 20px 0;color:var(--grey-600);font-size:var(--font-small)}
+    .faq-answer p{margin-bottom:0}
+
+    .final-cta{padding-block:clamp(68px,7vw,92px);background:linear-gradient(135deg,var(--green-900),var(--green-700));color:var(--white)}
+    .final-inner{display:flex;align-items:center;justify-content:space-between;gap:50px}
+    .final-cta h2{color:var(--white);margin-bottom:14px}
+    .final-cta p{margin-bottom:0;color:#d7e8e1}
+    .final-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+
+    .site-footer{padding:42px 0 30px;background:var(--green-950);color:#c7d8d1;font-size:.9rem}
+    .footer-brand{margin-bottom:22px}
+    .footer-brand strong{display:block;color:var(--white);font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem}
+    .footer-brand span{display:block}
+    .footer-acc{display:grid;gap:10px}
+    @media(min-width:768px){.footer-acc{grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}}
+    .f-acc{border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.04)}
+    .f-acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;color:var(--white);font-weight:700;font-size:.95rem}
+    .f-acc summary::-webkit-details-marker{display:none}
+    .f-acc summary::after{content:'+';font-size:1.15rem;color:#9de3ba;transition:transform .2s ease}
+    .f-acc[open] summary::after{transform:rotate(45deg)}
+    .f-links{display:grid;gap:2px;padding:0 16px 12px}
+    .f-links a{padding:8px 0;color:#c7d8d1;font-size:.9rem}
+    .f-links a:hover{color:var(--white)}
+    .footer-bottom{margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:.82rem;color:#9fb8ae}
+
+    .desktop-wa{position:fixed;right:22px;bottom:22px;z-index:50;min-height:50px;padding:13px 18px;border-radius:999px;background:var(--wa);color:var(--white);box-shadow:0 14px 32px rgba(0,0,0,.2);font-size:.92rem;font-weight:700;transition:opacity .2s ease,transform .2s ease}
+    .desktop-wa.is-hidden{opacity:0;transform:translateY(14px);pointer-events:none}
+    .mobile-sticky{display:none}
+
+    .js .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+    .js .reveal.visible,.js.js-fallback .reveal{opacity:1;transform:none}
+
+    @media(max-width:1023px){
+      .container{width:min(calc(100% - 40px),var(--container))}
+      .site-nav{height:64px}
+      .nav-links,.nav-actions{display:none}
+      .hero{min-height:auto;padding:116px 0 72px}
+      .hero-grid{grid-template-columns:1fr;gap:44px}
+      .hero-copy{max-width:760px}
+      .hero-panel{max-width:680px}
+      .trust-grid{grid-template-columns:1fr 1fr}
+      .trust-item:nth-child(2){border-right:0}
+      .trust-item:nth-child(-n+2){border-bottom:1px solid var(--grey-200)}
+      .trust-item:nth-child(3){padding-left:0}
+      .signs-layout,.proof-layout,.price-layout,.booking-layout,.faq-layout,.emotion-grid{grid-template-columns:1fr;gap:44px}
+      .sign-intro,.booking-copy{position:static}
+      .proof-frame{max-width:760px}
+      .emotion-copy{max-width:760px}
+      .emotion-visual{max-width:900px}
+      .process-grid{grid-template-columns:1fr 1fr}
+      .process-card:nth-child(2)::after{display:none}
+      .booking-copy{max-width:680px}
+      .booking-card{max-width:760px}
+      .final-inner{align-items:flex-start;flex-direction:column;gap:28px}
+      .final-actions{justify-content:flex-start}
+      .desktop-wa{display:none}
+      body{padding-bottom:78px}
+      .mobile-sticky{position:fixed;left:0;right:0;bottom:0;z-index:90;display:block;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);border-top:1px solid var(--grey-200);box-shadow:0 -8px 24px rgba(17,24,39,.08)}
+      .mobile-sticky .btn{width:100%;min-height:52px}
+      .mobile-sticky.is-hidden{display:none}
+    }
+
+    @media(max-width:767px){
+      .container{width:min(calc(100% - 32px),var(--container))}
+      .section{padding-block:64px;scroll-margin-top:72px}
+      h1{font-size:clamp(2.3rem,10.3vw,3.1rem);line-height:1.08}
+      h2{font-size:clamp(2rem,8.2vw,2.55rem);line-height:1.14}
+      .section-head{display:block;margin-bottom:32px}
+      .section-head h2{margin-bottom:14px}
+      .btn{width:100%;min-height:52px;padding-inline:18px}
+      .hero{padding:102px 0 58px}
+      .hero::before{width:430px;height:430px;right:-240px;top:-180px}
+      .hero-grid{gap:34px}
+      .hero-badge{font-size:.82rem}
+      .hero-actions{display:grid}
+      .hero-note{align-items:flex-start;font-size:.87rem}
+      .hero-panel{padding:22px;border-radius:22px}
+      .hero-panel-top{display:block}
+      .status-pill{display:inline-block;margin-top:14px}
+      .hero-price{font-size:2.9rem}
+      .hero-panel-foot{grid-template-columns:1fr}
+      .emotion-visual img{aspect-ratio:auto;object-fit:contain}
+      .emotion-labels{position:static;display:grid;grid-template-columns:1fr 1fr;margin:10px 2px 2px}
+      .emotion-label{max-width:none;background:var(--green-900);font-size:.8rem}
+      .emotion-label:last-child{text-align:left}
+      .trust-grid{grid-template-columns:1fr}
+      .trust-item{padding:18px 0;border-right:0;border-bottom:1px solid var(--grey-200)!important}
+      .trust-item:last-child{border-bottom:0!important}
+      .signs-grid,.benefits-grid,.process-grid{grid-template-columns:1fr}
+      .sign-card:last-child{grid-column:auto}
+      .process-card::after{display:none}
+      .proof-layout{gap:32px}
+      .proof-media-labels{inset:12px 12px auto}
+      .proof-panel{padding:20px}
+      .proof-slot strong{font-size:1.05rem}
+      .proof-slot span{font-size:.84rem}
+      .benefit-card{grid-template-columns:42px 1fr;padding:22px;gap:14px}
+      .benefit-icon{width:42px;height:42px}
+      .price-card{padding:26px 22px;border-radius:22px}
+      .price-card-head{display:block}
+      .price-chip{display:inline-block;margin-top:14px}
+      .scope-list{grid-template-columns:1fr}
+      .payment-split{grid-template-columns:1fr}
+      .booking-card{padding:24px 18px;border-radius:20px}
+      .faq-answer{padding-right:0}
+      .footer-bottom{flex-direction:column;gap:6px}
+    }
+
+    @media(max-width:380px){
+      .container{width:min(calc(100% - 28px),var(--container))}
+      .hero-panel{padding:18px}
+      .service-row{grid-template-columns:34px 1fr}
+      .service-row span:last-child{grid-column:2}
+      .emotion-labels{grid-template-columns:1fr}
+      .emotion-label{font-size:.78rem}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+      .js .reveal{opacity:1;transform:none}
+    }
+  </style>
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
+</head>
+<body>
+  <nav class="site-nav" aria-label="Navigasi utama">
+    <div class="container nav-inner">
+      <a class="brand" href="#hero" aria-label="JAYABINA - kembali ke atas"><img class="brand-mark" src="/favicon.png" width="38" height="38" alt=""><span>JAYABINA</span></a>
+      <ul class="nav-links">
+        <li><a href="#tanda">Tanda</a></li>
+        <li><a href="#bukti">Bukti</a></li>
+        <li><a href="#proses">Proses</a></li>
+        <li><a href="#harga">Harga</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-actions"><a class="btn btn-primary" href="#hubungi">Semakan Percuma</a></div>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Buka menu" aria-controls="mobileMenu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
-    <div class="hero-visual">{{ partial "responsive-image.html" (dict "base" "/images/paint/paint-hero" "alt" "Petugas mengecat tepi dinding dalam ruang rumah yang telah dilindungi" "loading" "eager" "sizes" "(max-width: 1023px) calc(100vw - 40px), 45vw") }}<p class="image-disclosure">Imej konsep AI untuk menggambarkan persediaan kawasan mengecat.</p></div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <div class="mm-label">Seksyen page ini</div>
+    <a href="#tanda">Tanda dinding perlu dicat semula</a>
+    <a href="#bukti">Bukti &amp; rekod kerja</a>
+    <a href="#proses">Cara kami bekerja</a>
+    <a href="#harga">Harga &amp; skop</a>
+    <a href="#faq">Soalan lazim</a>
+    <div class="mm-label">Halaman utama</div>
+    <a href="/">Utama</a>
+    <a href="/servis/">Semua Servis</a>
+    <a href="/tentang-kami/">Tentang Kami</a>
+    <a href="/blog/">Blog</a>
+    <a href="/hubungi-kami/">Hubungi</a>
+    <a class="btn btn-primary" href="#hubungi">Semakan Percuma di WhatsApp</a>
   </div>
-</section>
 
-<section class="section">
-  <div class="container assessment-panel">
-    <div><span class="section-kicker">HASIL BERMULA SEBELUM ROLLER MENYENTUH DINDING</span><h2>Persediaan itu sebahagian kerja.</h2></div>
-    <ul class="assessment-list"><li>Keadaan cat dan permukaan sedia ada</li><li>Bahagian yang perlu dikikis atau ditampal</li><li>Perabot, lantai dan kemasan yang perlu dilindungi</li><li>Jenis ruang: dalaman atau luaran</li><li>Pilihan warna dan kesesuaian sistem cat</li><li>Punca lembapan aktif yang perlu ditangani dahulu</li></ul>
-  </div>
-</section>
+  <main>
+    <section class="hero" id="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="hero-badge"><span class="pulse"></span>Servis mengecat rumah &amp; ofis · KL &amp; Selangor</div>
+          <h1>Cat mengelupas, warna pudar? <span>Kami cat semula sampai segar.</span></h1>
+          <p class="lead">Dinding rumah dan ofis cerita banyak benda — cuma cerita tu dah makin pudar. Bagi kami peluang segarkan semula.</p>
+          <div class="hero-actions">
+            <a class="btn btn-light js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang: ____. Anggaran saiz: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Hantar Gambar — Semakan Percuma</a>
+            <a class="btn btn-hero-ghost" href="tel:+60139373275">Call 013-937 3275</a>
+          </div>
+          <p class="hero-note">Hantar gambar dinding + poskod untuk semakan percuma — tak perlu bayar apa-apa dulu.</p>
+        </div>
+        <aside class="hero-panel" aria-label="Apa anda dapat daripada JAYABINA">
+          <div class="hero-panel-top">
+            <div><div class="hero-panel-label">Apa anda dapat</div><div class="hero-price">Percuma <small>/ semakan WhatsApp</small></div></div>
+            <span class="status-pill">Tiada kerja tambahan tanpa setuju</span>
+          </div>
+          <div class="service-list">
+            <div class="service-row"><span class="service-num">01</span><strong>Hantar gambar &amp; poskod</strong><span>PERCUMA</span></div>
+            <div class="service-row"><span class="service-num">02</span><strong>Skop &amp; anggaran awal di WhatsApp</strong><span>JELAS</span></div>
+            <div class="service-row"><span class="service-num">03</span><strong>Lawatan tapak, harga muktamad</strong><span>TELUS</span></div>
+            <div class="service-row"><span class="service-num">04</span><strong>Kerja cat + rekod foto penuh</strong><span>BUKTI</span></div>
+          </div>
+          <div class="hero-panel-foot">
+            <div class="mini-stat"><strong>Percuma</strong><span>Semakan WhatsApp awal</span></div>
+            <div class="mini-stat"><strong>KL &amp; Selangor</strong><span>Liputan disemak ikut poskod</span></div>
+          </div>
+        </aside>
+      </div>
+    </section>
 
-<section class="section section-grey">
-  <div class="container emotion-layout">
-    <div>{{ partial "responsive-image.html" (dict "base" "/images/paint/paint-finished" "alt" "Pemilik rumah menikmati ruang tamu yang kelihatan segar selepas dicat" "sizes" "(max-width: 767px) calc(100vw - 32px), 46vw") }}<p class="image-disclosure">Imej konsep AI untuk menggambarkan suasana ruang yang diperbaharui.</p></div>
-    <div><span class="section-kicker">RUANG YANG ANDA LIHAT SETIAP HARI</span><h2>Bila dinding berubah, seluruh suasana ikut berubah.</h2><p class="lead">Rumah terasa lebih terurus. Ofis kelihatan lebih bersedia menerima pelanggan. Ruang lama mendapat nafas baharu tanpa perlu rombakan besar.</p><p>Tetapi hasil yang kemas bukan sekadar menyapu warna baharu. Permukaan perlu dinilai, kawasan sekitar dilindungi dan skop dipersetujui supaya jangkaan anda lebih selari dengan kerja yang dibuat.</p><div class="quote-callout">Warna memberi kesan pertama. Persediaan membantu menentukan bagaimana hasil itu kelihatan selepas kerja selesai.</div></div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container">
-    <div class="section-head"><span class="section-kicker">UNTUK RUMAH DAN TEMPAT KERJA</span><h2>Servis disusun mengikut jenis ruang dan keadaan.</h2><p>Kami menilai permukaan dan keperluan tapak sebelum mencadangkan skop yang sesuai.</p></div>
-    <div class="feature-grid">
-      <article class="feature-card"><h3>Dalaman rumah</h3><p>Ruang tamu, bilik, dapur dan kawasan dalaman lain yang memerlukan suasana lebih segar.</p></article>
-      <article class="feature-card"><h3>Luaran rumah</h3><p>Dinding luar dan bahagian berkaitan yang terdedah kepada cuaca serta keadaan persekitaran.</p></article>
-      <article class="feature-card"><h3>Ofis &amp; ruang komersial</h3><p>Ruang kerja, bilik mesyuarat atau premis yang mahu kelihatan lebih kemas dan profesional.</p></article>
-      <article class="feature-card"><h3>Cat pudar atau bertompok</h3><p>Semakan warna lama, keadaan permukaan dan liputan yang diperlukan.</p></article>
-      <article class="feature-card"><h3>Cat mengelupas</h3><p>Bahagian longgar diperhatikan supaya persediaan tidak terhad kepada lapisan atas sahaja.</p></article>
-      <article class="feature-card"><h3>Pertukaran suasana</h3><p>Bantu menyusun pilihan warna mengikut fungsi ruang dan gaya yang anda mahu capai.</p></article>
+    <div class="trust-strip" aria-label="Ringkasan kelebihan servis">
+      <div class="container trust-grid">
+        <div class="trust-item"><strong>Semak percuma</strong><span>Hantar gambar, kami reply terus</span></div>
+        <div class="trust-item"><strong>Harga sebelum mula</strong><span>Setuju dulu, baru sentuh berus</span></div>
+        <div class="trust-item"><strong>Perlindungan ruang</strong><span>Perabot &amp; lantai ditutup rapi</span></div>
+        <div class="trust-item"><strong>Rekod foto</strong><span>Sebelum, semasa &amp; selepas kerja</span></div>
+      </div>
     </div>
-  </div>
-</section>
 
-<section class="section section-dark">
-  <div class="container">
-    <div class="section-head"><span class="section-kicker">TIGA PERINGKAT UTAMA</span><h2>Persediaan. Aplikasi. Semakan.</h2><p>Visual konsep ini menerangkan aliran umum. Keadaan sebenar permukaan akan menentukan kerja yang diperlukan.</p></div>
-    <div class="visual-gallery">
-      <figure class="visual-card">{{ partial "responsive-image.html" (dict "base" "/images/paint/paint-preparation" "alt" "Petugas memakai perlindungan diri ketika mengikis cat yang mengelupas" "sizes" "(max-width: 767px) calc(100vw - 32px), 31vw") }}<figcaption>1. Permukaan diperiksa dan bahagian yang perlu disediakan dikenal pasti.</figcaption></figure>
-      <figure class="visual-card">{{ partial "responsive-image.html" (dict "base" "/images/paint/paint-application" "alt" "Cat baharu disapu pada dinding dengan lantai dan perabot dilindungi" "sizes" "(max-width: 767px) calc(100vw - 32px), 31vw") }}<figcaption>2. Cat diaplikasi mengikut sistem dan skop yang dipersetujui.</figcaption></figure>
-      <figure class="visual-card">{{ partial "responsive-image.html" (dict "base" "/images/paint/paint-finished" "alt" "Ruang dalaman yang kelihatan bersih dan segar selepas proses mengecat" "sizes" "(max-width: 767px) calc(100vw - 32px), 31vw") }}<figcaption>3. Ruang disemak dan hasil akhir dinilai sebelum serahan.</figcaption></figure>
+    <section class="section emotion-section" id="kisah">
+      <div class="container emotion-grid">
+        <div class="emotion-copy reveal">
+          <span class="section-kicker">Yang penting ialah rasa bila masuk rumah</span>
+          <h2>Bila kali terakhir anda masuk rumah dan tarik nafas lega?</h2>
+          <p class="lead">Bukan sebab rumah bersepah. Tapi sebab dinding dah lama cerita cerita lama.</p>
+          <p>Cat yang bertahun tak disegarkan bukan sekadar nampak kusam. Ia mula longgar, mengelupas, dan tak lagi lindungi dinding daripada lembap. Bila cat baru melekat sempurna — dinding dapat perlindungan sebenar, dan suasana terus berubah.</p>
+          <div class="emotion-quote">"Rumah yang sama. Cuma kali ni rasa ringan je bila pandang dinding."</div>
+          <a class="btn btn-primary js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang: ____. Anggaran saiz: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Hantar Gambar Dinding — Percuma</a>
+        </div>
+        <figure class="emotion-visual reveal">
+          <img src="/images/paint/paint-hero-1200.webp" width="1200" height="800" loading="lazy" decoding="async" alt="Ruang rumah yang kelihatan segar selepas dinding dicat semula">
+          <div class="emotion-labels" aria-hidden="true"><span class="emotion-label">Sebelum: warna pudar, cat mengelupas</span><span class="emotion-label">Selepas: segar, sekata, terlindung</span></div>
+          <figcaption class="emotion-caption">Ilustrasi dijana AI untuk menerangkan konsep perbandingan. Bukan foto pelanggan atau bukti servis.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section section-grey" id="tanda">
+      <div class="container signs-layout">
+        <div class="sign-intro reveal">
+          <span class="section-kicker">Periksa dahulu</span>
+          <h2>5 tanda dinding dah minta dicat semula.</h2>
+          <p class="lead">Tak semua dinding nampak teruk dari jauh. Tapi bila dekat — lain ceritanya.</p>
+          <p>Dinding yang dibiarkan bukan je nampak kusam. Lembap masuk, kulat merebak, dan kos baiki jadi lebih mahal nanti.</p>
+          <div class="check-callout">Kalau dua atau lebih tanda ni ada — elok dapatkan semakan dulu sebelum masalah merebak.</div>
+        </div>
+        <div class="signs-grid reveal">
+          <article class="sign-card"><span class="card-index">01</span><h3>Warna pudar &amp; kusam</h3><p>Cat dah hilang seri, ruang nampak suram walaupun lampu terang.</p></article>
+          <article class="sign-card"><span class="card-index">02</span><h3>Mengelupas atau gelembung</h3><p>Ada tompok cat tertanggal, permukaan naik buih — lapisan dah longgar.</p></article>
+          <article class="sign-card"><span class="card-index">03</span><h3>Kesan kulat &amp; tompok hitam</h3><p>Lembap dah serap masuk, bintik hitam makin merebak di sudut dinding.</p></article>
+          <article class="sign-card"><span class="card-index">04</span><h3>Contengan &amp; calar</h3><p>Krayon, pen dan kesan tangan kecil yang degil — lap macam mana pun tak hilang.</p></article>
+          <article class="sign-card"><span class="card-index">05</span><h3>Nak jual, sewa atau buka ofis</h3><p>Ruang nak diserahkan atau dibuka — cat baru terus naikkan kesan pertama.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="bukti">
+      <div class="container proof-layout">
+        <figure class="proof-frame reveal" style="margin:0">
+          <div class="proof-toolbar"><strong>Rekod kerja JAYABINA</strong><span>Apa yang anda akan lihat &amp; terima</span></div>
+          <div class="proof-panels">
+            <div class="proof-panel before"><span class="proof-label">DIBIARKAN</span><div class="proof-slot"><strong>Kusam &amp; terdedah</strong><span>Cat longgar, lembap masuk, ruang makin hilang seri dari tahun ke tahun.</span></div></div>
+            <div class="proof-panel after"><span class="proof-label">DICAT SEMULA</span><div class="proof-slot"><strong>Segar &amp; terlindung</strong><span>Lapisan baru melekat sempurna — dinding dilindungi, suasana terus berubah.</span></div></div>
+          </div>
+          <figcaption class="proof-caption">Perbandingan konsep — foto kerja sebenar direkod untuk setiap projek yang dijalankan.</figcaption>
+        </figure>
+        <div class="proof-copy reveal">
+          <span class="ai-disclosure">Bukti, bukan janji</span>
+          <span class="section-kicker">Apa yang anda akan terima</span>
+          <h2>Setiap peringkat kerja direkod dan ditunjukkan terus kepada anda.</h2>
+          <p class="lead">Bila kerja selesai, anda boleh bandingkan sendiri — bukan bergantung pada cakap-cakap.</p>
+          <ul class="deliverables">
+            <li>Foto permukaan sebelum sebarang kerja dimulakan</li>
+            <li>Rekod proses — perlindungan ruang &amp; perabot semasa kerja</li>
+            <li>Foto akhir selepas setiap lapisan siap</li>
+            <li>Semakan akhir bersama — anda puas hati, baru kami kemas</li>
+          </ul>
+          <a class="btn btn-primary js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang: ____. Anggaran saiz: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Dapatkan Semakan Percuma</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-mint" id="proses">
+      <div class="container">
+        <div class="section-head reveal">
+          <div><span class="section-kicker">Cara kami bekerja</span><h2>Empat langkah. Dari semakan sampai serahan.</h2></div>
+          <p>Setiap langkah anda tahu, anda setuju, anda boleh periksa.</p>
+        </div>
+        <div class="process-grid reveal">
+          <article class="process-card"><div class="process-photo"><img src="/images/paint/paint-preparation-1200.webp" width="1200" height="800" loading="lazy" decoding="async" alt="Pemeriksaan dan persediaan permukaan dinding sebelum kerja cat"><span>Ilustrasi proses</span></div><div class="process-number">01</div><h3>Semak Permukaan</h3><p>Periksa jenis dinding, warna sedia ada dan masalah macam kulat, retak atau lembap.</p></article>
+          <article class="process-card"><div class="process-photo"><div class="photo-placeholder">[Gambar sebut harga<br>akan datang]</div><span>Placeholder</span></div><div class="process-number">02</div><h3>Sebut Harga &amp; Skop</h3><p>Kami bentang kos, jenis cat dan tempoh — anda setuju dahulu, baru mula.</p></article>
+          <article class="process-card"><div class="process-photo"><img src="/images/paint/paint-application-1200.webp" width="1200" height="800" loading="lazy" decoding="async" alt="Kerja mengecat dinding dijalankan dengan ruang dilindungi"><span>Ilustrasi proses</span></div><div class="process-number">03</div><h3>Lindungi &amp; Cat</h3><p>Perabot dan lantai ditutup rapi. Kerja cat berperingkat, lapisan demi lapisan.</p></article>
+          <article class="process-card"><div class="process-photo"><img src="/images/paint/paint-finished-1200.webp" width="1200" height="800" loading="lazy" decoding="async" alt="Ruang siap dicat dengan kemasan bersih dan suasana segar"><span>Ilustrasi proses</span></div><div class="process-number">04</div><h3>Kemas &amp; Serah</h3><p>Sentuhan akhir, ruang dibersihkan, semak bersama dan rekod foto dihantar.</p></article>
+        </div>
+        <p class="proof-caption">Visual proses ialah ilustrasi AI untuk menerangkan aliran kerja umum, bukan foto pelanggan.</p>
+      </div>
+    </section>
+
+    <section class="section section-grey" id="harga">
+      <div class="container">
+        <div class="section-head reveal">
+          <div><span class="section-kicker">Kenapa JAYABINA</span><h2>Kerja mengecat yang telus dan terus terang.</h2></div>
+          <p>Anda tak perlu teka apa yang berlaku bila kami masuk rumah anda.</p>
+        </div>
+        <div class="benefits-grid reveal">
+          <article class="benefit-card"><span class="benefit-icon">01</span><div><h3>Harga sebelum kerja</h3><p>Skop dan kos dipersetujui dulu. Tiada kejutan lepas kerja siap.</p></div></article>
+          <article class="benefit-card"><span class="benefit-icon">02</span><div><h3>Perlindungan ruang</h3><p>Perabot, lantai dan barang ditutup sebelum berus cat disentuh.</p></div></article>
+          <article class="benefit-card"><span class="benefit-icon">03</span><div><h3>Rekod setiap langkah</h3><p>Foto sebelum, semasa dan selepas — anda boleh lihat sendiri.</p></div></article>
+          <article class="benefit-card"><span class="benefit-icon">04</span><div><h3>Semak &amp; setuju</h3><p>Kerja dikira siap hanya selepas anda semak hasil bersama kami.</p></div></article>
+        </div>
+        <div class="price-layout">
+        <div class="price-copy reveal">
+          <span class="section-kicker">Harga &amp; skop</span>
+          <h2>Setiap ruang berbeza. Harga ikut keadaan sebenar.</h2>
+          <p class="lead">Tak semua dinding sama luas, sama tinggi, sama masalah. Sebab tu kami tak letak harga pukal.</p>
+          <p>Anda hantar gambar dan ukuran kasar, kami beri anggaran awal. Bila anda okey, kami datang tapak — sahkan harga muktamad sebelum kerja bermula. Ada kerja tambahan patut dibuat? Kami maklum dulu. Tak setuju, kami teruskan skop asal je.</p>
+          <p class="fine-print"><strong>Tiada kerja tambahan dibuat tanpa persetujuan anda.</strong> Skop, jenis cat, bilangan lapisan dan akses disemak semasa lawatan — semuanya masuk dalam sebut harga bertulis.</p>
+        </div>
+        <div class="price-card reveal">
+          <div class="price-card-head">
+            <div><div class="price-eyebrow">Anggaran selepas semakan</div><div class="price-main">Sebut Harga Jelas <small>bertulis</small></div></div>
+            <span class="price-chip">Disahkan sebelum kerja mula</span>
+          </div>
+          <ul class="scope-list">
+            <li>Luas dinding &amp; siling diukur di tapak</li><li>Jenis permukaan diperiksa &amp; direkod</li>
+            <li>Warna dibincang bersama anda</li><li>Masalah dinding dikenal pasti</li>
+            <li>Jenis cat &amp; bilangan lapisan ditentukan</li><li>Perlindungan perabot termasuk skop</li>
+          </ul>
+          <div class="payment-split">
+            <div class="payment-box"><span>Semakan WhatsApp</span><strong>Percuma</strong></div>
+            <div class="payment-box"><span>Harga muktamad</span><strong>Selepas lawatan tapak</strong></div>
+          </div>
+          <a class="btn btn-primary js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang: ____. Anggaran saiz: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Hantar Gambar — Anggaran Percuma</a>
+          <p class="price-note">Semakan awal melalui WhatsApp adalah percuma. Tiada komitmen — anda tanya je dulu.</p>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="hubungi">
+      <div class="container booking-layout">
+        <div class="booking-copy reveal">
+          <span class="section-kicker">Mulakan sekarang</span>
+          <h2>Hantar gambar — kami semak. Percuma je.</h2>
+          <p class="lead">Cara paling pantas nak tahu skop dan anggaran untuk ruang anda. Tak perlu isi borang panjang.</p>
+          <ul class="booking-points">
+            <li>Satu mesej WhatsApp — terus kepada orang yang buat kerja</li>
+            <li>Gambar dinding + poskod = anggaran awal kami reply</li>
+            <li>Tak tahu nak tanya apa? Kami bantu tanya soalan yang patut</li>
+          </ul>
+        </div>
+        <div class="booking-card reveal">
+          <h3>WhatsApp Semakan Percuma</h3>
+          <p class="booking-sub">Hantar gambar ruang &amp; poskod. Kami balas dengan anggaran dan cadangan.</p>
+          <div class="form-step"><span>1</span>Snap gambar</div>
+          <p class="wa-step-desc">Ambil 1-3 gambar dinding atau ruang yang nak dicat.</p>
+          <div class="form-step"><span>2</span>Sertakan poskod</div>
+          <p class="wa-step-desc">Tambah ukuran kasar kalau ada — tak ada pun tak apa.</p>
+          <div class="form-step"><span>3</span>Kami semak &amp; balas</div>
+          <p class="wa-step-desc">Anggaran awal diberi, lawatan tapak diatur jika anda berkenan.</p>
+          <a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang (teres / kondo / apartment / ofis): ____. Anggaran saiz ruang (kecil / sederhana / besar): ____. Saya akan lampirkan gambar ruang." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp Sekarang — Percuma</a>
+          <p class="form-note">Semakan percuma. Tak komited apa-apa. Kami bagi maklumat — anda buat keputusan.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="container faq-layout">
+        <div class="reveal"><span class="section-kicker">Soalan lazim</span><h2>Jawapan ringkas sebelum anda hubungi kami.</h2><p class="muted">Masih was-was? Baca dulu. Dah jelas? Terus WhatsApp.</p></div>
+        <div class="faq-list reveal">
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq1"><span>Perabot &amp; lantai saya macam mana?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq1" hidden><p>Kami tutup perabot, lantai dan lekapan dengan pelindung sebelum kerja. Lepas siap, kami kemas semula — ruang balik macam asal, cuma dinding dah baru.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq2"><span>Bau cat kuat tak? Ada anak kecil.</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq2" hidden><p>Jenis cat dibincang dengan anda semasa sebut harga — termasuk pilihan yang kurang bau. Kami tetap sarankan ruang berudara baik dan anak-anak di ruang lain semasa kerja.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq3"><span>Berapa lama nak siap?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq3" hidden><p>Ikut saiz ruang dan bilangan lapisan. Anggaran tempoh diberikan sekali dengan sebut harga — dan kami ikut jadual yang dipersetujui.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq4"><span>Tak reti pilih warna. Macam mana?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq4" hidden><p>Hantar gambar ruang anda dan ceritakan gaya yang anda suka — cerah, tenang, moden. Kami cadangkan pilihan warna yang padan dengan pencahayaan dan saiz ruang.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq5"><span>Dalam rumah je ke? Luar pun boleh?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq5" hidden><p>Dua-dua. Dinding dalam, luar, siling — semua kami semak permukaannya dulu, lepas tu beri sebut harga ikut keperluan. Ceritakan je apa yang anda nak.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq6"><span>Macam mana nak tahu harga sebelum setuju?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq6" hidden><p>Hantar gambar dan ukuran kasar — kami beri anggaran awal percuma. Bila anda okey, kami datang ukur tepat dan sahkan harga muktamad. Tak ada istilah "lepas kerja baru tahu harga".</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="container final-inner reveal">
+        <div><h2>Rumah yang sama. Dinding yang baru. Rasa yang berbeza.</h2><p>Dari dinding kusam yang buat anda segan bila ada tetamu — kepada ruang segar yang buat anda tarik nafas lega setiap kali masuk pintu.</p></div>
+        <div class="final-actions"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang: ____. Anggaran saiz: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp — Semakan Percuma</a><a class="btn btn-light" href="tel:+60139373275">Call 013-937 3275</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-brand"><strong>JAYABINA</strong><span>Servis tukar atap, cuci tangki air &amp; mengecat · KL &amp; Selangor</span></div>
+      <div class="footer-acc">
+        <details class="f-acc">
+          <summary>Servis</summary>
+          <div class="f-links">
+            <a href="/servis-tukar-atap/">Tukar Atap Baharu</a>
+            <a href="/servis-cuci-tangki-air/">Cuci Tangki Air</a>
+            <a href="/servis-mengecat/">Mengecat Rumah &amp; Ofis</a>
+          </div>
+        </details>
+        <details class="f-acc">
+          <summary>Tentang</summary>
+          <div class="f-links">
+            <a href="/">Utama</a>
+            <a href="/tentang-kami/">Tentang Kami</a>
+            <a href="/hubungi-kami/">Hubungi Kami</a>
+          </div>
+        </details>
+        <details class="f-acc">
+          <summary>Informasi</summary>
+          <div class="f-links">
+            <a href="/terma-perkhidmatan/">Terma Perkhidmatan</a>
+            <a href="/dasar-privasi/">Dasar Privasi</a>
+            <a href="/blog/">Blog</a>
+          </div>
+        </details>
+      </div>
+      <div class="footer-bottom"><span>© 2026 Primex Jaya Bina Solutions. Hak cipta terpelihara.</span><span>www.jayabina.com</span></div>
     </div>
-    <p class="image-disclosure">Semua imej dalam galeri ini ialah visual konsep AI, bukan foto projek pelanggan.</p>
-  </div>
-</section>
+  </footer>
 
-<section class="section" id="proses">
-  <div class="container">
-    <div class="section-head"><span class="section-kicker">PROSES KERJA</span><h2>Lima langkah untuk skop yang lebih tersusun.</h2></div>
-    <div class="process-grid">
-      <article class="process-card"><span class="step-number">1</span><h3>Kongsi ruang</h3><p>Hantar gambar, lokasi, jenis ruang dan bahagian yang mahu dicat.</p></article>
-      <article class="process-card"><span class="step-number">2</span><h3>Semakan tapak</h3><p>Keadaan permukaan, akses, keluasan dan perlindungan yang diperlukan dinilai.</p></article>
-      <article class="process-card"><span class="step-number">3</span><h3>Sahkan skop</h3><p>Bahagian yang dicat, persediaan, pilihan sistem dan pengecualian diterangkan.</p></article>
-      <article class="process-card"><span class="step-number">4</span><h3>Persediaan &amp; cat</h3><p>Kawasan dilindungi, permukaan disediakan dan aplikasi dijalankan mengikut skop.</p></article>
-      <article class="process-card"><span class="step-number">5</span><h3>Semakan akhir</h3><p>Hasil kerja dan kawasan berkaitan diperiksa sebelum proses serahan.</p></article>
-    </div>
-  </div>
-</section>
+  <a class="desktop-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang: ____. Anggaran saiz: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Semakan Percuma di WhatsApp</a>
+  <div class="mobile-sticky" id="mobileSticky"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak semakan percuma untuk servis mengecat. Poskod saya: ____. Jenis ruang: ____. Anggaran saiz: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Semakan Percuma di WhatsApp</a></div>
 
-<section class="section section-mint">
-  <div class="container emotion-layout">
-    <div>{{ partial "responsive-image.html" (dict "base" "/images/paint/paint-preparation" "alt" "Permukaan cat mengelupas sedang disediakan sebelum dicat semula" "sizes" "(max-width: 767px) calc(100vw - 32px), 46vw") }}<p class="image-disclosure">Imej konsep AI.</p></div>
-    <div><span class="section-kicker">PENTING SEBELUM MENGECAT</span><h2>Cat tidak menyelesaikan punca air yang masih aktif.</h2><p class="lead">Jika dinding lembap kerana paip bocor, rembesan atau masalah atap, puncanya perlu dikenal pasti dan ditangani dahulu.</p><p>Mengecat terus di atas permukaan bermasalah boleh membuat kesan kembali. Beritahu kami jika tompok bertambah selepas hujan, berbau hapak atau permukaan sentiasa terasa lembap supaya keadaan itu boleh diambil kira dalam semakan.</p></div>
-  </div>
-</section>
+  <script>
+    window.addEventListener('DOMContentLoaded',function(){
+      var WHATSAPP_NUMBER='60139373275';
+      document.querySelectorAll('.js-whatsapp').forEach(function(link){
+        var message=link.getAttribute('data-message')||'';
+        link.href='https://wa.me/'+WHATSAPP_NUMBER+'?text='+encodeURIComponent(message);
+      });
 
-<section class="section section-grey">
-  <div class="container cost-layout">
-    <div><span class="section-kicker">APA YANG MEMPENGARUHI KOS?</span><h2>Sebut harga bergantung pada lebih daripada keluasan.</h2><p class="lead">Keadaan permukaan, ketinggian, akses, sistem cat dan tahap persediaan boleh mengubah skop dengan ketara.</p><p class="muted">Hantar gambar untuk semakan awal. Lawatan atau ukuran mungkin diperlukan sebelum harga yang lebih tepat dapat disediakan.</p></div>
-    <div class="cost-card"><h3>Antara faktor utama</h3><ul class="factor-list"><li>Keluasan dan bilangan ruang</li><li>Dalaman, luaran atau kedua-duanya</li><li>Keadaan cat dan permukaan sedia ada</li><li>Kerja mengikis, menampal atau menyediakan permukaan</li><li>Jenis sistem cat dan pilihan kemasan</li><li>Ketinggian, akses dan perlindungan kawasan</li></ul></div>
-  </div>
-</section>
+      var menuToggle=document.getElementById('menuToggle');
+      var mobileMenu=document.getElementById('mobileMenu');
+      function closeMenu(returnFocus){menuToggle.setAttribute('aria-expanded','false');menuToggle.setAttribute('aria-label','Buka menu');mobileMenu.classList.remove('open');mobileMenu.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');if(returnFocus)menuToggle.focus()}
+      function openMenu(){menuToggle.setAttribute('aria-expanded','true');menuToggle.setAttribute('aria-label','Tutup menu');mobileMenu.classList.add('open');mobileMenu.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');var first=mobileMenu.querySelector('a');if(first)first.focus()}
+      menuToggle.addEventListener('click',function(){this.getAttribute('aria-expanded')==='true'?closeMenu(false):openMenu()});
+      mobileMenu.querySelectorAll('a').forEach(function(link){link.addEventListener('click',function(){closeMenu(false)})});
+      document.addEventListener('keydown',function(event){if(event.key==='Escape'&&mobileMenu.classList.contains('open'))closeMenu(true);if(event.key==='Tab'&&mobileMenu.classList.contains('open')){var focusable=Array.from(mobileMenu.querySelectorAll('a[href]'));if(!focusable.length)return;var first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}});
+      document.addEventListener('click',function(event){if(!mobileMenu.contains(event.target)&&!menuToggle.contains(event.target)&&mobileMenu.classList.contains('open'))closeMenu()});
 
-<section class="section">
-  <div class="container faq-layout">
-    <div class="section-head"><span class="section-kicker">SOALAN LAZIM</span><h2>Sebelum ruang anda dicat.</h2></div>
-    <div class="faq-list">{{ $faqs := slice
-      (dict "q" "Boleh terus cat atas cat lama?" "a" "Ia bergantung pada keadaan permukaan. Cat yang longgar, mengelupas, berdebu atau bermasalah mungkin memerlukan persediaan terlebih dahulu.")
-      (dict "q" "Siapa perlu alihkan perabot?" "a" "Keperluan mengalih dan melindungi perabot perlu dijelaskan dalam skop. Beritahu keadaan ruang supaya persediaan boleh dirancang.")
-      (dict "q" "Boleh bantu pilih warna?" "a" "Kami boleh berbincang tentang suasana dan fungsi ruang. Pilihan akhir perlu disahkan oleh pemilik berdasarkan sampel atau rujukan warna yang berkaitan.")
-      (dict "q" "Berapa lapisan cat diperlukan?" "a" "Bilangan aplikasi bergantung pada warna asal, warna baharu, keadaan permukaan dan sistem produk. Ia tidak wajar dijanjikan tanpa menilai keadaan sebenar.")
-      (dict "q" "Berapa lama ruang boleh digunakan semula?" "a" "Ia bergantung pada jenis produk, pengudaraan, keluasan dan urutan kerja. Tempoh akan diterangkan berdasarkan skop yang dipilih.")
-    }}{{ range $i,$faq := $faqs }}<div class="faq-item"><button class="faq-question" type="button" data-faq-button aria-expanded="false" aria-controls="paint-faq-{{ $i }}"><span>{{ $faq.q }}</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="paint-faq-{{ $i }}" hidden>{{ $faq.a }}</div></div>{{ end }}</div>
-  </div>
-</section>
+      document.querySelectorAll('a[href^="#"]').forEach(function(link){link.addEventListener('click',function(event){var target=document.querySelector(this.getAttribute('href'));if(target){event.preventDefault();var distance=Math.abs(target.getBoundingClientRect().top);var instant=window.matchMedia('(prefers-reduced-motion: reduce)').matches||distance>2200;if(instant){var oldBehavior=document.documentElement.style.scrollBehavior;document.documentElement.style.scrollBehavior='auto';target.scrollIntoView({behavior:'auto',block:'start'});window.setTimeout(function(){document.documentElement.style.scrollBehavior=oldBehavior},0)}else{target.scrollIntoView({behavior:'smooth',block:'start'})}}})});
 
-<section class="section lead-section" id="hubungi" data-lead-section>
-  <div class="container lead-card">
-    <div><span class="section-kicker">MULA DENGAN GAMBAR RUANG</span><h2>Beritahu bahagian mana yang anda mahu segarkan.</h2><p class="lead">Hantar gambar, jenis ruang, bahagian dalaman atau luaran dan lokasi. Kami akan semak maklumat sebelum mencadangkan langkah seterusnya.</p><div class="lead-actions"><a class="btn btn-secondary" href="https://wa.me/{{ $b.whatsapp }}?text={{ $wa | urlquery }}" target="_blank" rel="noopener">Minta Semakan &amp; Sebut Harga</a><a class="btn btn-outline" style="color:white;border-color:white" href="tel:{{ $b.phone_tel }}">Telefon {{ $b.phone_display }}</a></div></div>
-    <div class="contact-options"><div><strong>Maklumat berguna</strong>Gambar semua dinding, keadaan cat, jenis ruang dan lokasi atau poskod.</div><div><strong>Ruang sasaran</strong>Rumah, ofis dan ruang berkaitan mengikut semakan.</div><div><strong>Kawasan fokus</strong>{{ $b.service_area }}</div></div>
-  </div>
-</section>
+      var navLinks=document.querySelectorAll('.nav-links a');
+      var sections=document.querySelectorAll('main section[id]');
+      var sectionObserver=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){navLinks.forEach(function(link){var active=link.getAttribute('href')==='#'+entry.target.id;link.classList.toggle('active',active);if(active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current')})}})},{rootMargin:'-30% 0px -60% 0px'});
+      sections.forEach(function(section){sectionObserver.observe(section)});
 
-<section class="section section-mint">{{ partial "other-services.html" "paint" }}</section>
+      if('IntersectionObserver' in window){
+        var revealObserver=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){entry.target.classList.add('visible');revealObserver.unobserve(entry.target)}})},{threshold:.08});
+        document.querySelectorAll('.reveal').forEach(function(element){revealObserver.observe(element)});
+      }else{document.querySelectorAll('.reveal').forEach(function(element){element.classList.add('visible')})}
+
+      var sticky=document.getElementById('mobileSticky');
+      var desktopWhatsApp=document.querySelector('.desktop-wa');
+      var contactSection=document.getElementById('hubungi');
+      var heroSection=document.getElementById('hero');
+      if(sticky&&contactSection&&heroSection&&'IntersectionObserver' in window){
+        var heroVisible=true;
+        var contactVisible=false;
+        function updateSticky(){sticky.classList.toggle('is-hidden',heroVisible||contactVisible);if(desktopWhatsApp)desktopWhatsApp.classList.toggle('is-hidden',contactVisible)}
+        new IntersectionObserver(function(entries){entries.forEach(function(entry){heroVisible=entry.isIntersecting;updateSticky()})},{threshold:.05}).observe(heroSection);
+        new IntersectionObserver(function(entries){entries.forEach(function(entry){contactVisible=entry.isIntersecting;updateSticky()})},{threshold:.01}).observe(contactSection);
+        updateSticky();
+      }
+
+      document.querySelectorAll('.faq-question').forEach(function(button){button.addEventListener('click',function(){
+        var open=this.getAttribute('aria-expanded')==='true';
+        document.querySelectorAll('.faq-question').forEach(function(other){other.setAttribute('aria-expanded','false');document.getElementById(other.getAttribute('aria-controls')).hidden=true});
+        if(!open){this.setAttribute('aria-expanded','true');document.getElementById(this.getAttribute('aria-controls')).hidden=false}
+      })});
+    });
+  </script>
+</body>
+</html>
