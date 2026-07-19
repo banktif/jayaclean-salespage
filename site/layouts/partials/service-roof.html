@@ -100,7 +100,7 @@
     .site-nav{position:fixed;inset:0 0 auto;z-index:100;height:72px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--grey-200);box-shadow:var(--shadow-sm)}
     .nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:24px}
     .brand{display:flex;align-items:center;gap:11px}
-    .brand-mark{height:32px;width:auto;display:block}
+    .brand-mark{height:24px;width:auto;display:block}
     .nav-links{display:flex;align-items:center;gap:28px;list-style:none;margin:0;padding:0}
     .nav-links a{color:var(--grey-700);font-size:.94rem;font-weight:600}
     .nav-links a:hover,.nav-links a.active{color:var(--green-700)}
@@ -367,11 +367,9 @@
     <div class="container nav-inner">
       <a class="brand" href="/" aria-label="JAYABINA - halaman utama"><img class="brand-mark" src="/logo.png" width="768" height="123" alt="JAYABINA"></a>
       <ul class="nav-links">
-        <li><a href="#tanda">Tanda</a></li>
-        <li><a href="#bukti">Bukti</a></li>
-        <li><a href="#proses">Proses</a></li>
-        <li><a href="#harga">Harga</a></li>
-        <li><a href="#faq">FAQ</a></li>
+        <li><a href="/servis/">Servis</a></li>
+        <li><a href="/tentang-kami/">Tentang Kami</a></li>
+        <li><a href="/blog/">Blog</a></li>
       </ul>
       <div class="nav-right">
         <div class="nav-actions"><a class="btn btn-primary" href="#hubungi">Semakan Percuma</a></div>
@@ -380,14 +378,6 @@
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <div class="mm-sections">
-      <div class="mm-label">Seksyen page ini</div>
-      <a href="#tanda">Tanda dah sampai masa tukar</a>
-      <a href="#bukti">Bukti &amp; rekod kerja</a>
-      <a href="#proses">Cara kami bekerja</a>
-      <a href="#harga">Harga &amp; skop</a>
-      <a href="#faq">Soalan lazim</a>
-    </div>
     <div class="mm-label">Halaman utama</div>
     <a href="/">Utama</a>
     <a href="/servis/">Semua Servis</a>
@@ -395,8 +385,8 @@
     <a href="/blog/">Blog</a>
     <a href="/hubungi-kami/">Hubungi</a>
     <div class="mm-label">Portal</div>
-    <a href="https://akaun.jayabina.com/">Akaun Pelanggan</a>
-    <a href="https://staff.jayabina.com/">Portal Staff</a>
+    <a class="btn btn-outline" href="https://akaun.jayabina.com/" style="margin:4px 0;justify-content:flex-start">👤 Akaun Pelanggan</a>
+    <a class="btn btn-outline" href="https://staff.jayabina.com/" style="margin:4px 0;justify-content:flex-start">🛠️ Portal Staff</a>
     <a class="btn btn-primary" href="#hubungi">Semakan Percuma di WhatsApp</a>
   </div>
 
