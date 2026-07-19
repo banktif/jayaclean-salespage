@@ -42,6 +42,20 @@ app.all('/api/health/github', async (c) => {
   } catch (e: any) { return ok({ connected: false, error: e?.message || String(e) }); }
 });
 
+app.all('/api/health/github', async (c) => {
+  if (c.req.raw.method !== 'GET') return err('Not found', 404);
+  const hasToken = !!c.env.GH_PAT;
+  const tokenPrefix = hasToken ? String(c.env.GH_PAT).substring(0, 8) + '...' : 'MISSING';
+  if (!hasToken) return ok({ gh_pat: 'MISSING', connected: false });
+  try {
+    const r = await fetch('https://api.github.com/repos/banktif/JAYABINA-WEBSITE/contents/site/content/blog?ref=master', {
+      headers: { Authorization: `Bearer ${c.env.GH_PAT}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'JAYABINA-Admin' }
+    });
+    const data: any = await r.json();
+    return ok({ gh_pat: tokenPrefix, connected: r.ok, status: r.status, message: data?.message || '', files: Array.isArray(data) ? data.length : 0 });
+  } catch (e: any) { return ok({ gh_pat: tokenPrefix, connected: false, error: e?.message || String(e) }); }
+});
+
 const handleSettingsRoute = (req: Request, env: Env) => {
   const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
   return handleSettings(req, env, path);

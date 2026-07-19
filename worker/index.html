@@ -61,6 +61,7 @@
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:12px 20px;border-radius:30px;font-size:.8rem;font-weight:600;z-index:100;opacity:0;transition:opacity .2s;pointer-events:none}
     .toast.show{opacity:1}
     .login{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+    .pf-input:focus{border-color:var(--accent)!important}
   </style>
 </head>
 <body>
@@ -73,7 +74,10 @@
 
 <header class="hdr" id="hdr" style="display:none">
   <div class="hdr-l"><div class="logo">JC</div><div><h1>My Jobs</h1><div class="who" id="who"></div></div></div>
-  <button class="hbtn" onclick="logout()">Logout</button>
+  <div style="display:flex;gap:6px">
+    <button class="hbtn" onclick="pfToggle()" style="color:var(--text2);border-color:var(--border-strong)"><i data-lucide="user-cog"></i></button>
+    <button class="hbtn" onclick="logout()">Logout</button>
+  </div>
 </header>
 
 <div class="wrap" id="wrap" style="display:none">
@@ -84,6 +88,22 @@
     <button class="fpill" data-f="completed" onclick="setFilter('completed')">Done</button>
   </div>
   <div id="jobs"></div>
+  <div class="card" id="profileCard" style="display:none;margin-top:10px">
+    <div style="font-size:.82rem;font-weight:700;margin-bottom:12px"><i data-lucide="user-cog"></i> Edit Profile</div>
+    <label style="display:block;font-size:.7rem;font-weight:600;color:var(--text3);margin-bottom:4px">Full Name</label>
+    <input type="text" id="pfName" style="padding:10px;border:2px solid var(--border-strong);border-radius:12px;font-family:var(--font);font-size:.82rem;width:100%;background:var(--elevated);color:var(--text);margin-bottom:10px;outline:none">
+    <label style="display:block;font-size:.7rem;font-weight:600;color:var(--text3);margin-bottom:4px">Phone</label>
+    <input type="text" id="pfPhone" style="padding:10px;border:2px solid var(--border-strong);border-radius:12px;font-family:var(--font);font-size:.82rem;width:100%;background:var(--elevated);color:var(--text);margin-bottom:10px;outline:none">
+    <label style="display:block;font-size:.7rem;font-weight:600;color:var(--text3);margin-bottom:4px">Email</label>
+    <input type="email" id="pfEmail" style="padding:10px;border:2px solid var(--border-strong);border-radius:12px;font-family:var(--font);font-size:.82rem;width:100%;background:var(--elevated);color:var(--text);margin-bottom:10px;outline:none">
+    <label style="display:block;font-size:.7rem;font-weight:600;color:var(--text3);margin-bottom:4px">Address</label>
+    <input type="text" id="pfAddr" style="padding:10px;border:2px solid var(--border-strong);border-radius:12px;font-family:var(--font);font-size:.82rem;width:100%;background:var(--elevated);color:var(--text);margin-bottom:14px;outline:none">
+    <div style="display:flex;gap:8px">
+      <button class="abtn primary" onclick="pfSave()" id="pfSaveBtn" style="flex:1;margin:0">Save Profile</button>
+      <button class="abtn ghost" onclick="pfToggle()" style="flex:1;margin:0">Cancel</button>
+    </div>
+    <div style="color:var(--danger);font-size:.72rem;text-align:center;margin-top:8px;display:none" id="pfErr"></div>
+  </div>
 </div>
 
 <!-- JOB DETAIL OVERLAY -->
@@ -144,6 +164,21 @@ async function checkAccess(){
   }catch(e){showLogin()}
 }
 function showLogin(){document.getElementById('loading').style.display='flex';document.getElementById('hdr').style.display='none';document.getElementById('wrap').style.display='none';document.getElementById('authErr').style.display='none'}
+function pfToggle(){var c=document.getElementById('profileCard');c.style.display=c.style.display==='none'?'block':'none';if(c.style.display==='block')pfLoad();relucide()}
+function pfLoad(){if(!me)return;document.getElementById('pfName').value=profile.full_name||'';document.getElementById('pfPhone').value=profile.phone||'';document.getElementById('pfEmail').value=profile.email||'';document.getElementById('pfAddr').value=profile.address||''}
+async function pfSave(){
+  var btn=document.getElementById('pfSaveBtn'),e=document.getElementById('pfErr');
+  btn.disabled=true;btn.textContent='Saving...';e.style.display='none';
+  try{
+    var body={full_name:document.getElementById('pfName').value.trim(),phone:document.getElementById('pfPhone').value.trim(),email:document.getElementById('pfEmail').value.trim(),address:document.getElementById('pfAddr').value.trim()};
+    var res=await fetch(API_URL+'/api/profiles/'+me.id,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB.auth.getToken()},body:JSON.stringify(body)});
+    var d=await res.json();
+    if(!res.ok)throw new Error(d.error||'Failed');
+    profile=d.data||d;
+    document.getElementById('who').textContent=(profile.full_name||'Worker')+(profile.service_area?' \u2022 '+profile.service_area:'');
+    pfToggle();toast('Profile saved');relucide();
+  }catch(ex){e.style.display='block';e.textContent=ex.message;btn.disabled=false;btn.textContent='Save Profile'}
+}
 async function logout(){SB.auth.signOut();location.reload()}
 checkAccess();relucide();
 

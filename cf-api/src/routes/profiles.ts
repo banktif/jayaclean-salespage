@@ -99,14 +99,14 @@ export async function handleProfiles(req: Request, env: Env, path: string): Prom
       const updates: Partial<typeof profilesTable.$inferInsert> = {};
 
       if (payload.role === 'admin') {
-        if (body.full_name !== undefined) updates.fullName = body.full_name;
-        if (body.phone !== undefined) updates.phone = body.phone.replace(/\D/g, '');
         if (body.is_active !== undefined) updates.isActive = body.is_active ? 1 : 0;
         if (body.service_area !== undefined) updates.serviceArea = body.service_area;
         if (body.role !== undefined && payload.sub !== profileId) updates.role = body.role;
       }
 
       // Fields anyone can update on their own profile
+      if (body.full_name !== undefined) updates.fullName = body.full_name;
+      if (body.phone !== undefined) updates.phone = body.phone.replace(/\D/g, '');
       if (body.email !== undefined) updates.email = String(body.email).trim().toLowerCase();
       if (body.address !== undefined) updates.address = body.address;
       if (body.avatar_url !== undefined) updates.avatarUrl = body.avatar_url;
