@@ -134,6 +134,18 @@ export const backupLog = sqliteTable('backup_log', {
   index('idx_backup_log_dest').on(table.destination, table.createdAt)
 ]);
 
+export const notifications = sqliteTable('notifications', {
+  id: text('id').primaryKey(),
+  type: text('type').notNull().default('info'),
+  message: text('message').notNull().default(''),
+  taskId: text('task_id'),
+  bookingId: text('booking_id'),
+  staffId: text('staff_id'),
+  createdAt: text('created_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_notifications_created').on(table.createdAt)
+]);
+
 export const schema = {
   profiles,
   appSettings,
@@ -143,6 +155,7 @@ export const schema = {
   slots,
   tasks,
   taskPhotos,
-  backupLog
+  backupLog,
+  notifications
 };
 

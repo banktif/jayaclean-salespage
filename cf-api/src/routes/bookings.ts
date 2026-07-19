@@ -3,7 +3,7 @@ import type { Env } from '../types';
 import { json, err, ok, uuid, nowISO, normPhone, todayStr } from '../utils/helpers';
 import { requireAuth } from '../utils/middleware';
 import { createDb, type AppDb } from '../db/client';
-import { appSettings, bookings, customers, profiles, slots, tasks } from '../db/schema';
+import { appSettings, bookings, customers, notifications, profiles, slots, tasks } from '../db/schema';
 
 // WhatsApp notification helper (mirrors tasks.ts logic for fire-and-forget)
 async function sendWa(env: Env, phone: string, message: string): Promise<void> {
@@ -257,6 +257,13 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
                   + `${b?.customer_name || 'Customer'} → ${s?.full_name || r.staffId}\n`
                   + `${b?.booking_date} ${b?.booking_time}`
                 ).catch(() => {});
+                try {
+                  await db.insert(notifications).values({
+                    id: uuid(), type: 'info',
+                    message: `Assigned to ${s?.full_name || r.staffId}: ${b?.customer_name || 'Customer'} — ${b?.booking_date} ${b?.booking_time}`,
+                    taskId: taskId, bookingId, staffId: r.staffId
+                  });
+                } catch {}
               }
             }
           } else if (existingTask.status === 'cancelled') {
@@ -444,10 +451,17 @@ export async function handleBayarcashCallback(req: Request, env: Env): Promise<R
               ).catch(() => {});
             }
             notifyAdmins(env, db,
-              `📋 New booking ASSIGNED\n`
+              `📋 New booking ASSIGNED (paid)\n`
               + `${b?.customer_name || 'Customer'} → ${s?.full_name || r.staffId}\n`
               + `${b?.booking_date} ${b?.booking_time}`
             ).catch(() => {});
+            try {
+              await db.insert(notifications).values({
+                id: uuid(), type: 'success',
+                message: `Paid & assigned to ${s?.full_name || r.staffId}: ${b?.customer_name || 'Customer'} — ${b?.booking_date} ${b?.booking_time}`,
+                taskId: taskId, bookingId: booking.id, staffId: r.staffId
+              });
+            } catch {}
           }
         }
       }

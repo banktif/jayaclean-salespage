@@ -85,6 +85,12 @@ const handleTaskPhotosRoute = (req: Request, env: Env) => {
 app.all('/api/task-photos', (c) => handleTaskPhotosRoute(c.req.raw, c.env));
 app.all('/api/task-photos/*', (c) => handleTaskPhotosRoute(c.req.raw, c.env));
 
+const handleNotificationsRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleTasks(req, env, path);
+};
+app.all('/api/notifications', (c) => handleNotificationsRoute(c.req.raw, c.env));
+
 const handleBookingsRoute = (req: Request, env: Env) => {
   const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
   return handleBookings(req, env, path);
