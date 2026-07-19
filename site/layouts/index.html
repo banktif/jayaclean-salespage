@@ -115,7 +115,7 @@
     .site-nav{position:fixed;inset:0 0 auto;z-index:100;height:72px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--grey-200);box-shadow:var(--shadow-sm)}
     .nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:24px}
     .brand{display:flex;align-items:center;gap:11px;font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:800;color:var(--green-950);letter-spacing:-.02em}
-    .brand-mark{height:32px;width:auto;display:block}
+    .brand-mark{height:28px;width:auto;display:block}
     .nav-links{display:flex;align-items:center;gap:28px;list-style:none;margin:0;padding:0}
     .nav-links a{color:var(--grey-700);font-size:.94rem;font-weight:600}
     .nav-links a:hover,.nav-links a.active{color:var(--green-700)}
@@ -139,10 +139,10 @@
     .hero{min-height:720px;padding:144px 0 78px;background:linear-gradient(135deg,var(--green-950) 0%,var(--green-900) 58%,#126044 100%);color:var(--white);position:relative;overflow:hidden}
     .hero::before{content:'';position:absolute;width:620px;height:620px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-190px;top:-250px;box-shadow:0 0 0 90px rgba(255,255,255,.025),0 0 0 180px rgba(255,255,255,.018)}
     .hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(390px,.88fr);gap:64px;align-items:center}
-    .hero h1{color:var(--white)}
+    .hero h1{color:var(--white);text-align:center;margin-left:auto;margin-right:auto}
     .hero h1 span{color:#9de3ba}
-    .hero-copy>.lead{color:#d7e8e1;max-width:58ch;margin-bottom:30px}
-    .hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;padding:8px 13px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);color:#e9f7ef;font-size:.875rem;font-weight:700;letter-spacing:.04em}
+    .hero-copy>.lead{color:#d7e8e1;max-width:58ch;margin-bottom:30px;text-align:center;margin-left:auto;margin-right:auto}
+    .hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;padding:8px 13px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);color:#e9f7ef;font-size:.875rem;font-weight:700;letter-spacing:.04em;margin-left:auto;margin-right:auto;width:fit-content}
     .pulse{width:8px;height:8px;background:#4ade80;border-radius:50%;box-shadow:0 0 0 5px rgba(74,222,128,.13)}
     .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
     .hero-note{display:flex;align-items:center;gap:9px;margin:0;color:#c7d8d1;font-size:.92rem}
@@ -299,8 +299,12 @@
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <div class="mm-label">Servis kami</div>
+    <a href="/servis-tukar-atap/">Tukar Atap Baharu</a>
+    <a href="/servis-cuci-tangki-air/">Cuci Tangki Air</a>
+    <a href="/servis-mengecat/">Cat Rumah &amp; Ofis</a>
     <div class="mm-label">Halaman utama</div>
-    <a href="/servis/">Semua Servis</a>
+    <a href="/">Utama</a>
     <a href="/tentang-kami/">Tentang Kami</a>
     <a href="/blog/">Blog</a>
     <a href="/hubungi-kami/">Hubungi</a>
@@ -320,7 +324,6 @@
             <a class="btn btn-light js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tanya pasal servis: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____. Cerita masalah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Dapatkan Sebut Harga Percuma</a>
             <a class="btn btn-hero-ghost" href="#servis">Lihat Tiga Servis Kami</a>
           </div>
-          <p class="hero-note">Hantar gambar &amp; poskod — kami semak dulu. Percuma, tak perlu komitmen apa-apa.</p>
         </div>
         <aside class="hero-panel reveal" aria-label="Tiga servis utama JAYABINA">
           <div class="hero-panel-title">Apa yang kami buat:</div>
@@ -345,7 +348,6 @@
               <div class="about-fact"><span>Hubungan</span><strong><a class="js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tahu lanjut pasal servis anda: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener" style="color:var(--green-700)">WhatsApp 60139373275</a></strong></div>
             </div>
           </div>
-          <div class="about-img reveal">[GAMBAR: Pasukan JAYABINA atau pejabat operasi —<br>foto sebenar akan dimuat naik]</div>
         </div>
       </div>
     </section>
@@ -446,6 +448,7 @@
           <div class="footer-info">
             <span>Primex Jaya Bina Solutions</span>
             <span>JR0188646-T</span>
+            <span>013-937 3275</span>
           </div>
         </div>
         <details class="f-acc">
