@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0d3b2e">
   <meta name="description" content="Atap bocor, tangki kotor, dinding kusam? JAYABINA uruskan — tukar atap, cuci tangki air (RM300) dan mengecat rumah & ofis. Semakan WhatsApp percuma. KL & Selangor.">
   <meta property="og:title" content="JAYABINA — Servis Tukar Atap, Cuci Tangki Air &amp; Mengecat | KL &amp; Selangor">
-  <meta property="og:description" content="Atap bocor, tangki kotor, dinding kusam — satu team uruskan semua. Semakan WhatsApp percuma.">
+  <meta property="og:description" content="Atap, tangki, dinding — satu pasukan uruskan semua. Sebut harga percuma di WhatsApp.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.jayabina.com/">
   <meta property="og:image" content="https://www.jayabina.com/images/og/jayabina-og.png">
@@ -83,6 +83,16 @@
     .sec-faq{overflow:hidden;background:linear-gradient(180deg,var(--white) 0%,#f6f9f7 55%,#eef7f1 100%)}
     .sec-faq::before{content:'';position:absolute;width:480px;height:480px;right:-220px;top:-200px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,199,142,.12),transparent 72%)}
     .sec-faq::after{content:'';position:absolute;width:300px;height:300px;left:-140px;bottom:-160px;border-radius:50%;border:1px solid rgba(20,108,67,.09);box-shadow:0 0 0 55px rgba(20,108,67,.03)}
+    .sec-about{overflow:hidden;background:linear-gradient(135deg,#f1fbf5 0%,#e8f5ee 50%,#f4faf6 100%)}
+    .sec-about::before{content:'';position:absolute;width:480px;height:480px;right:-200px;top:-220px;border-radius:50%;border:1px solid rgba(20,108,67,.1);box-shadow:0 0 0 70px rgba(20,108,67,.03)}
+    .about-layout{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+    .about-copy p{color:var(--grey-600)}
+    .about-facts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+    .about-fact{padding:16px;border-radius:14px;background:var(--white);border:1px solid var(--grey-200)}
+    .about-fact span{display:block;color:var(--grey-600);font-size:.78rem;margin-bottom:2px}
+    .about-fact strong{display:block;color:var(--grey-900);font-size:1rem}
+    .about-img{aspect-ratio:4/3;border-radius:22px;overflow:hidden;border:1px solid #bfddca;box-shadow:var(--shadow);background:var(--green-100);display:grid;place-items:center;color:var(--green-800);font-weight:700;font-size:.88rem;text-align:center;padding:18px;line-height:1.6}
+    @media(max-width:1023px){.about-layout{grid-template-columns:1fr;gap:36px}}
     .section-kicker{display:inline-flex;align-items:center;gap:9px;margin-bottom:16px;color:var(--green-700);font-size:.875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
     .section-kicker::before{content:'';width:24px;height:2px;background:currentColor;border-radius:99px}
     .section-head{display:flex;align-items:end;justify-content:space-between;gap:32px;margin-bottom:44px}
@@ -286,6 +296,7 @@
         <li><a href="#servis">Servis</a></li>
         <li><a href="#kenapa">Kenapa Kami</a></li>
         <li><a href="#proses">Proses</a></li>
+        <li><a href="#tentang">Tentang</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
       <div class="nav-right">
@@ -311,17 +322,17 @@
       <div class="container hero-grid">
         <div class="hero-copy">
           <div class="hero-badge"><span class="pulse"></span>Servis selenggara rumah · KL &amp; Selangor</div>
-          <h1>Atap bocor, tangki kotor, dinding kusam — <span>rumah anda dah tak rasa macam rumah.</span></h1>
-          <p class="lead">Atap yang bocor setiap hujan. Air tangki yang entah bila kali terakhir dicuci. Dinding yang dah bertahun kusam. Anda layak tinggal dalam rumah yang tenang — bukan rumah yang bagi masalah.</p>
+          <h1>[H]Atap, tangki, dinding — kami baiki, anda selesa.[/H]</h1>
+          <p class="lead">Satu pasukan uruskan tiga servis rumah anda — tukar atap, cuci tangki, dan cat dinding. Hantar gambar di WhatsApp, kami beri sebut harga percuma dulu.</p>
           <div class="hero-actions">
-            <a class="btn btn-light js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tanya pasal servis: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____. Cerita masalah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp — Semakan Percuma</a>
-            <a class="btn btn-hero-ghost" href="#servis">Lihat Servis Kami</a>
+            <a class="btn btn-light js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tanya pasal servis: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____. Cerita masalah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">Dapatkan Sebut Harga Percuma</a>
+            <a class="btn btn-hero-ghost" href="#servis">Lihat Tiga Servis Kami</a>
           </div>
           <p class="hero-note">Hantar gambar &amp; poskod — kami semak dulu. Percuma, tak perlu komitmen apa-apa.</p>
         </div>
         <aside class="hero-panel reveal" aria-label="Tiga servis utama JAYABINA">
           <div class="hero-panel-title">Apa yang kami buat:</div>
-          <a class="hp-row" href="/servis-tukar-atap/"><span class="hp-num">01</span><span><strong>Tukar Atap Baharu</strong><span class="hp-sub">Berhenti tampal — ganti terus.</span></span><span class="hp-tag">Sebut harga percuma</span></a>
+          <a class="hp-row" href="/servis-tukar-atap/"><span class="hp-num">01</span><span><strong>Tukar Atap Baharu</strong><span class="hp-sub">Ganti terus, bukan tampal lagi.</span></span><span class="hp-tag">Sebut harga percuma</span></a>
           <a class="hp-row" href="/servis-cuci-tangki-air/"><span class="hp-num">02</span><span><strong>Cuci Tangki Air</strong><span class="hp-sub">Air bersih, mandi tak was-was.</span></span><span class="hp-tag">RM300 tetap</span></a>
           <a class="hp-row" href="/servis-mengecat/"><span class="hp-num">03</span><span><strong>Cat Rumah &amp; Ofis</strong><span class="hp-sub">Dinding segar, rumah nampak baru.</span></span><span class="hp-tag">Sebut harga percuma</span></a>
         </aside>
@@ -331,35 +342,35 @@
     <section class="section sec-services" id="servis">
       <div class="container">
         <div class="section-head reveal">
-          <div><span class="section-kicker">Servis kami</span><h2>Satu team. Tiga cara kami baiki rumah anda.</h2></div>
-          <p>Pilih yang anda perlu dulu. Nanti yang lain — kami masih di sini.</p>
+          <div><span class="section-kicker">Servis kami</span><h2>Pilih servis yang anda perlu. Kami uruskan yang lain.</h2></div>
+          <p>Satu pasukan, tiga servis. Mula dengan satu — kami masih ada untuk selebihnya.</p>
         </div>
         <div class="svc-grid reveal">
           <article class="svc-card">
             <a class="svc-img" href="/servis-tukar-atap/"><img src="/images/roof/roof-hero-1200.webp" width="1200" height="800" loading="lazy" decoding="async" alt="Pemilik rumah memandang kesan kebocoran berulang pada siling"></a>
             <div class="svc-body">
               <span class="svc-kicker">Tukar Atap Baharu</span>
-              <h3>Setiap kali hujan lebat, dada anda berdebar?</h3>
-              <p>Dah tiga, empat kali repair — masalah sama berulang. Kali ini tukar terus. Atap baharu dipasang dengan rekod foto penuh, harga anda setuju dulu.</p>
-              <a class="btn btn-primary" href="/servis-tukar-atap/">Lihat Servis Atap</a>
+              <h3>Anda dah repair atap berkali-kali tapi masih bocor.</h3>
+              <p>Berhenti tampal. Kami ganti atap terus — ukur dulu, sebut harga, anda setuju baru mula. Rekod foto penuh dihantar ke WhatsApp anda.</p>
+              <a class="btn btn-primary" href="/servis-tukar-atap/">Dapatkan Sebut Harga Atap</a>
             </div>
           </article>
           <article class="svc-card">
             <a class="svc-img" href="/servis-cuci-tangki-air/"><img src="/images/tank/tank-emotional-1200.webp" width="1200" height="800" loading="lazy" decoding="async" alt="Ilustrasi penggunaan air bersih dan keadaan dalam tangki air rumah"></a>
             <div class="svc-body">
               <span class="svc-kicker">Cuci Tangki Air</span>
-              <h3>Bila kali terakhir anda tengok dalam tangki rumah?</h3>
-              <p>Air yang anda guna mandi, masak, basuh muka anak — lalu celah kelodak bertahun. Harga tetap RM300. Deposit RM150, terus tempah &amp; bayar online.</p>
-              <a class="btn btn-primary" href="/servis-cuci-tangki-air/">Tempah Online — Deposit RM150</a>
+              <h3>Anda guna air tangki setiap hari tapi tak tahu bila kali terakhir dicuci.</h3>
+              <p>Harga tetap RM300 satu tangki. Deposit RM150 — bayar online, terus tempah. Air bersih untuk mandi, masak, dan guna harian.</p>
+              <a class="btn btn-primary" href="/servis-cuci-tangki-air/">Tempah Cuci Tangki — Deposit RM150</a>
             </div>
           </article>
           <article class="svc-card">
             <a class="svc-img" href="/servis-mengecat/"><img src="/images/paint/paint-hero-1200.webp" width="1200" height="800" loading="lazy" decoding="async" alt="Ruang rumah kelihatan segar selepas dinding dicat semula"></a>
             <div class="svc-body">
               <span class="svc-kicker">Cat Rumah &amp; Ofis</span>
-              <h3>Dinding dah kusam, tetamu pun perasan?</h3>
-              <p>Cat mengelupas bukan je nampak buruk — ia dedahkan dinding pada lembap. Kami cat semula sampai segar. Perabot dilindungi, harga dipersetujui dulu.</p>
-              <a class="btn btn-primary" href="/servis-mengecat/">Lihat Servis Cat</a>
+              <h3>Dinding rumah anda dah kusam dan cat mula mengelupas.</h3>
+              <p>Kami cat semula dinding anda. Perabot dilindungi semasa kerja. Harga anda setuju dulu sebelum kami mula.</p>
+              <a class="btn btn-primary" href="/servis-mengecat/">Dapatkan Sebut Harga Cat</a>
             </div>
           </article>
         </div>
@@ -369,14 +380,14 @@
     <section class="section sec-why" id="kenapa">
       <div class="container">
         <div class="section-head reveal">
-          <div><span class="section-kicker">Kenapa JAYABINA</span><h2>Kami tak minta anda percaya. Kami minta anda semak.</h2></div>
-          <p>Cara kami kerja — telus, direkod, dan anda tahu setiap langkah.</p>
+          <div><span class="section-kicker">Kenapa JAYABINA</span><h2>Kami tak janji. Kami tunjuk bukti.</h2></div>
+          <p>Setiap kerja direkod dengan foto. Harga ditetapkan sebelum mula. Tiada apa yang tersembunyi.</p>
         </div>
         <div class="benefits-grid reveal">
-          <article class="benefit-card"><span class="benefit-icon">01</span><div><h3>Harga dipersetujui dahulu</h3><p>Anda tahu skop dan kos sebelum kerja mula. Tiada kejutan lepas siap.</p></div></article>
-          <article class="benefit-card"><span class="benefit-icon">02</span><div><h3>Rekod foto sebelum, semasa, selepas</h3><p>Setiap peringkat ada gambar — anda lihat sendiri, bukan dengar cakap kami.</p></div></article>
-          <article class="benefit-card"><span class="benefit-icon">03</span><div><h3>Tiada kerja tambahan rahsia</h3><p>Jumpa isu lain semasa kerja? Kami bagitahu dan tunggu kebenaran anda.</p></div></article>
-          <article class="benefit-card"><span class="benefit-icon">04</span><div><h3>Semakan WhatsApp percuma</h3><p>Hantar gambar dan poskod. Kami semak dulu — tak perlu komitmen apa-apa.</p></div></article>
+          <article class="benefit-card"><span class="benefit-icon">01</span><div><h3>Harga Anda Setuju Dulu</h3><p>Anda tahu skop dan kos sebelum sebarang kerja dimulakan.</p></div></article>
+          <article class="benefit-card"><span class="benefit-icon">02</span><div><h3>Rekod Foto Setiap Langkah</h3><p>Foto sebelum, semasa, dan selepas — dihantar terus ke WhatsApp anda.</p></div></article>
+          <article class="benefit-card"><span class="benefit-icon">03</span><div><h3>Tiada Kerja Tambahan Tersembunyi</h3><p>Jumpa isu lain? Kami bagitahu dan tunggu kebenaran anda dulu.</p></div></article>
+          <article class="benefit-card"><span class="benefit-icon">04</span><div><h3>Semakan WhatsApp Percuma</h3><p>Hantar gambar dan poskod. Kami semak — anda tak wajib teruskan.</p></div></article>
         </div>
       </div>
     </section>
@@ -385,12 +396,50 @@
       <div class="container">
         <div class="section-head reveal">
           <div><span class="section-kicker">Cara nak mula</span><h2>Tiga langkah. Satu WhatsApp. Kerja siap.</h2></div>
-          <p>Tak perlu isi borang panjang. Tak perlu jumpa ramai orang.</p>
+          <p>Tak perlu isi borang panjang atau jumpa ramai orang.</p>
         </div>
         <div class="step-grid reveal">
-          <article class="step-card"><div class="step-num">01</div><h3>WhatsApp dulu</h3><p>Hantar gambar &amp; poskod. Ceritakan masalah — atap, tangki, atau cat.</p></article>
-          <article class="step-card"><div class="step-num">02</div><h3>Semak &amp; setuju</h3><p>Kami beri anggaran atau sebut harga. Anda setuju — baru kami jadualkan.</p></article>
-          <article class="step-card"><div class="step-num">03</div><h3>Kerja siap + rekod</h3><p>Kerja dijalankan. Foto penuh dihantar ke WhatsApp anda sebagai bukti.</p></article>
+          <article class="step-card"><div class="step-num">01</div><h3>Hantar Gambar di WhatsApp</h3><p>Snap gambar masalah, sertakan poskod. Hantar ke 60139373275.</p></article>
+          <article class="step-card"><div class="step-num">02</div><h3>Kami Semak &amp; Beri Harga</h3><p>Kami balas dengan anggaran atau sebut harga. Anda setuju — baru kami jadualkan.</p></article>
+          <article class="step-card"><div class="step-num">03</div><h3>Kerja Siap + Foto Dihantar</h3><p>Kerja dijalankan ikut skop. Rekod foto penuh dihantar ke WhatsApp anda sebagai bukti.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section sec-about" id="tentang">
+      <div class="container">
+        <div class="about-layout">
+          <div class="about-copy reveal">
+            <span class="section-kicker">Tentang Kami</span>
+            <h2>Primex Jaya Bina Solutions — syarikat servis rumah berdaftar di KL &amp; Selangor.</h2>
+            <p>Kami menyediakan tiga servis utama di bawah satu jenama — JAYABINA. Tukar atap, cuci tangki air, dan mengecat rumah serta ofis. Satu standard untuk semua kerja: anda tahu kos sebelum mula, anda terima rekod foto setiap langkah, dan tiada kerja tambahan tanpa kebenaran anda.</p>
+            <div class="about-facts">
+              <div class="about-fact"><span>Nama syarikat</span><strong>Primex Jaya Bina Solutions</strong></div>
+              <div class="about-fact"><span>No. pendaftaran</span><strong>JR0188646-T</strong></div>
+              <div class="about-fact"><span>Kawasan operasi</span><strong>Kuala Lumpur &amp; Selangor</strong></div>
+              <div class="about-fact"><span>Hubungan</span><strong><a class="js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tahu lanjut pasal servis anda: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener" style="color:var(--green-700)">WhatsApp 60139373275</a></strong></div>
+            </div>
+          </div>
+          <div class="about-img reveal">[GAMBAR: Pasukan JAYABINA atau pejabat operasi —<br>foto sebenar akan dimuat naik]</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section sec-about" id="tentang">
+      <div class="container">
+        <div class="about-layout">
+          <div class="about-copy reveal">
+            <span class="section-kicker">Tentang Kami</span>
+            <h2>Primex Jaya Bina Solutions — syarikat servis rumah berdaftar di KL &amp; Selangor.</h2>
+            <p>Kami menyediakan tiga servis utama di bawah satu jenama — JAYABINA. Tukar atap, cuci tangki air, dan mengecat rumah serta ofis. Satu standard untuk semua kerja: anda tahu kos sebelum mula, anda terima rekod foto setiap langkah, dan tiada kerja tambahan tanpa kebenaran anda.</p>
+            <div class="about-facts">
+              <div class="about-fact"><span>Nama syarikat</span><strong>Primex Jaya Bina Solutions</strong></div>
+              <div class="about-fact"><span>No. pendaftaran</span><strong>JR0188646-T</strong></div>
+              <div class="about-fact"><span>Kawasan operasi</span><strong>Kuala Lumpur &amp; Selangor</strong></div>
+              <div class="about-fact"><span>Hubungan</span><strong><a class="js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tahu lanjut pasal servis anda: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener" style="color:var(--green-700)">WhatsApp 60139373275</a></strong></div>
+            </div>
+          </div>
+          <div class="about-img reveal">[GAMBAR: Pasukan JAYABINA atau pejabat operasi —<br>foto sebenar akan dimuat naik]</div>
         </div>
       </div>
     </section>
@@ -399,18 +448,18 @@
       <div class="container faq-layout">
         <div class="reveal"><span class="section-kicker">Soalan lazim</span><h2>Jawapan jujur. Sebelum anda tanya.</h2><p class="muted">Kalau dah jelas — terus WhatsApp. Kalau belum, baca dulu.</p></div>
         <div class="faq-list reveal">
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq1"><span>Kawasan mana JAYABINA cover?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq1" hidden><p>Kuala Lumpur &amp; Selangor sahaja. Luar kawasan? WhatsApp dulu — kami cakap jujur kalau tak dapat cover.</p></div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq2"><span>Saya tak pasti servis mana nak guna. Macam mana?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq2" hidden><p>Hantar gambar dan ceritakan masalah anda di WhatsApp. Kami bantu kenal pasti — dan kami tak akan syorkan benda yang anda tak perlu.</p></div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq3"><span>Harga macam mana? Ada yang tetap, ada yang tak?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq3" hidden><p>Cuci tangki = RM300 tetap (deposit RM150, boleh tempah online). Atap &amp; cat = harga ikut keadaan tapak, ditentukan lepas semakan dan anda setuju dulu. Semakan awal percuma.</p></div></div>
-          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq4"><span>Lepas tanya, wajib teruskan ke?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq4" hidden><p>Tak wajib langsung. Tanya, dapat maklumat, fikir dulu — anda yang tentukan.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq1"><span>Kawasan mana JAYABINA cover?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq1" hidden><p>Kuala Lumpur &amp; Selangor sahaja. Jika luar kawasan, WhatsApp kami dulu — kami beritahu terus terang.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq2"><span>Saya tak pasti servis mana nak guna. Macam mana?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq2" hidden><p>Hantar gambar dan ceritakan masalah anda di WhatsApp. Kami bantu kenal pasti tanpa syorkan benda yang anda tak perlu.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq3"><span>Harga macam mana?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq3" hidden><p>Cuci tangki = RM300 tetap (deposit RM150, boleh tempah online). Atap &amp; cat = harga ikut tapak, ditentukan selepas semakan. Semakan awal percuma.</p></div></div>
+          <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false" aria-controls="faq4"><span>Lepas tanya, wajib teruskan ke?</span><span class="faq-plus" aria-hidden="true">+</span></button><div class="faq-answer" id="faq4" hidden><p>Tak wajib langsung. Anda tanya, dapat maklumat, fikir dulu — kemudian baru putuskan.</p></div></div>
         </div>
       </div>
     </section>
 
     <section class="final-cta">
       <div class="container final-inner reveal">
-        <div><h2>Rumah anda patut jadi tempat paling tenang. Bukan punca resah.</h2><p>Atap yang tak bocor waktu hujan. Air yang bersih setiap kali guna. Dinding yang segar dipandang. Hantar WhatsApp sekarang — ceritakan masalah anda.</p></div>
-        <div class="final-actions"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tanya pasal servis: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____. Cerita masalah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp — Semakan Percuma</a><a class="btn btn-light" href="#servis">Lihat Semua Servis</a></div>
+        <div><h2>Hantar gambar sekarang. Kami beri sebut harga percuma.</h2><p>Satu WhatsApp, ceritakan masalah anda. Atap bocor, tangki kotor, atau dinding kusam — kami uruskan. Hantar gambar dan poskod ke 60139373275. Semakan percuma, tanpa komitmen.</p></div>
+        <div class="final-actions"><a class="btn btn-wa js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tanya pasal servis: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____. Cerita masalah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp — Dapatkan Sebut Harga Percuma</a><a class="btn btn-light" href="#servis">Lihat Semua Servis</a></div>
       </div>
     </section>
   </main>
