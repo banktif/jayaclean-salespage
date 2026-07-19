@@ -11,17 +11,17 @@
 This section supersedes older Supabase architecture and deploy notes below.
 
 - ⛔ **ADMIN SYSTEM LOCKED (owner order, 2026-07-18):** `admin.jayabina.com` (Pages project `jayabina-admin`, `admin/index.html`, `admin/editor.html`, `admin/vendor/`) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session.
-- Frontend: Cloudflare Pages project `jayaclean` (`jayabina-pages.pages.dev`). Booking funnel PRIMARY (2026-07-18) di `www.jayabina.com/servis-cuci-tangki-air/`: booking → Bayarcash deposit RM150 → `www.jayabina.com/success.html`. Worker var `SITE_URL=https://www.jayabina.com`.
-- `cuci.jayabina.com` (Worker `jayabina-cuci-router`, `cf-cuci-router/`): `/` dan `/success.html` = 301 ke www (query dikekalkan); `/worker/`, `/customer/`, `/blog/` masih proxy ke Pages `jayaclean`.
+- Frontend: Cloudflare Pages project `jayabina-pages` (`jayabina-pages.pages.dev`). Booking funnel PRIMARY (2026-07-18) di `www.jayabina.com/servis-cuci-tangki-air/`: booking → Bayarcash deposit RM150 → `www.jayabina.com/success.html`. Worker var `SITE_URL=https://www.jayabina.com`.
+- `cuci.jayabina.com` (Worker `jayabina-cuci-router`, `cf-cuci-router/`): `/` dan `/success.html` = 301 ke www (query dikekalkan); `/worker/`, `/customer/`, `/blog/` masih proxy ke Pages `jayabina-pages`.
 - Portals (2026-07-18): staff → `staff.jayabina.com` (Worker `jayabina-staff-router`, `cf-staff-router/`, serve app `/worker/`); pelanggan → `akaun.jayabina.com` (Worker `jayabina-akaun-router`, `cf-akaun-router/`, serve app `/customer/`). Path lama cuci kekal berfungsi.
-- CI: `.github/workflows/deploy-cloudflare-pages.yml` deploys ALL THREE on push to master: `jayabina` (www, `--branch main`), `jayabina-admin` (`--branch master`), `jayaclean` (cuci booking site, `bash build.sh` then `--branch master`).
+- CI: `.github/workflows/deploy-cloudflare-pages.yml` deploys ALL THREE on push to master: `jayabina` (www, `--branch main`), `jayabina-admin` (`--branch master`), `jayabina-pages` (cuci booking site, `bash build.sh` then `--branch master`).
 - API: Cloudflare Worker `jayabina-api` (`cf-api/`). **Canonical public URL: `https://api.jayabina.com`** (Worker custom domain, added 2026-07-18). The legacy `https://jayabina-api.banktifweb.workers.dev` hostname still works but must not be referenced in frontend code. Do NOT redeploy the Worker under a new name — secrets (Bayarcash, backup, GH_PAT) cannot be copied and payments would break.
-- Database/Auth: Cloudflare D1 `jayaclean-db` plus custom PBKDF2/JWT auth. Supabase is legacy source data only and is no longer called by the production frontend.
+- Database/Auth: Cloudflare D1 `jayabina-db` plus custom PBKDF2/JWT auth. Supabase is legacy source data only and is no longer called by the production frontend.
 - Frontend client: `/jc-api.js`; served apps are `admin/index.html`, `worker/index.html`, and `customer/index.html`.
-- Backup: native R2 binding `BACKUP_R2` to bucket `jayaclean-backups`; password hashes and `private_settings` are excluded from archive payloads.
+- Backup: native R2 binding `BACKUP_R2` to bucket `jayabina-backups`; password hashes and `private_settings` are excluded from archive payloads.
 - Secrets: use `wrangler secret put`. Never add empty secret placeholders to `wrangler.jsonc`, because a deploy can overwrite a real secret binding.
 - Worker deploy: `cd cf-api && wrangler deploy`.
-- Frontend deploy: run `build.sh` where Hugo is installed, then `wrangler pages deploy public --project-name jayaclean --branch master`.
+- Frontend deploy: run `build.sh` where Hugo is installed, then `wrangler pages deploy public --project-name jayabina-pages --branch master`.
 - D1 sync must be idempotent. Do not truncate D1 during future legacy-data imports.
 - Supabase Auth password hashes are not portable. Reset migrated staff passwords from Admin > Staff; never restore first-login password claiming.
 
@@ -239,7 +239,7 @@ Root `admin.html`, `staff.html`, `login.html` = redirect stubs. `login/` removed
 
 ### Backup system
 - **Code → GitLab:** `.github/workflows/mirror-to-gitlab.yml`, cron `0 19 * * *` (daily 3AM MYT) + manual dispatch. Mirrors ALL owned repos (private) via `push --mirror`. Repo secrets: `GH_PAT`, `GL_TOKEN`, `GL_USER`.
-- **DB → Google Drive + Cloudflare R2:** hourly pg_cron `jayaclean-db-backup` calls `backup` fn with `x-backup-key`; fn honors `backup_freq_drive` / `backup_freq_r2` (hourly/daily/weekly/monthly). Config entered in admin Backup page → `private_settings`.
+- **DB → Google Drive + Cloudflare R2:** hourly pg_cron `jayabina-db-backup` calls `backup` fn with `x-backup-key`; fn honors `backup_freq_drive` / `backup_freq_r2` (hourly/daily/weekly/monthly). Config entered in admin Backup page → `private_settings`.
 - Admin Backup page = `showBackup()` in `admin/index.html` (nav `dsBackup`, hash `#backup`). If it disappears, a GrapesJS/overwrite happened — re-add from PROJECT-MEMORY/BUILD-PLAN.
 
 ### app_settings — backup keys
@@ -258,7 +258,7 @@ Root `admin.html`, `staff.html`, `login.html` = redirect stubs. `login/` removed
 `sw.js` network-first, cache `jayabina-v3`. Cloudflare cache rule bypasses `/sw.js`, `/theme.css`, HTML. To force update: purge Cloudflare + clear browser SW/site data once.
 
 ### Deploy note
-Deploy Edge Functions + git ops from repo root (`Downloads/Jayaclean`). Management API for SQL:
+Deploy Edge Functions + git ops from repo root (`Downloads/Jayabina`). Management API for SQL:
 `POST https://api.supabase.com/v1/projects/thbscwlcyhcnqsppoyfn/database/query` with `SUPABASE_ACCESS_TOKEN` (read SQL via `[System.IO.File]::ReadAllText` to avoid PS note-property JSON bug; keep SQL ASCII — no em-dashes).
 
 ---
