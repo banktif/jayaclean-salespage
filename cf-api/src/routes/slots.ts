@@ -19,12 +19,11 @@ export async function handleSlots(req: Request, env: Env, path: string): Promise
 
     const booked = await db.select({ time_slot: slots.timeSlot }).from(slots)
       .where(and(eq(slots.date, date), eq(slots.isBooked, 1)));
-    const bookedSet = new Set(booked.map(row => row.time_slot));
     const [bookedCount] = await db.select({ cnt: count() }).from(slots)
       .where(and(eq(slots.date, date), eq(slots.isBooked, 1)));
     const dayAvailable = (bookedCount?.cnt || 0) < maxSlotsPerDay;
 
-    const result = slotList.map(s => ({ time_slot: s, available: dayAvailable && !bookedSet.has(s) }));
+    const result = slotList.map(s => ({ time_slot: s, available: dayAvailable }));
 
     return ok(result);
   }

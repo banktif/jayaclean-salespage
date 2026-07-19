@@ -12,6 +12,7 @@ const bookingFields = {
   customer_name: bookings.customerName,
   customer_phone: bookings.customerPhone,
   customer_address: bookings.customerAddress,
+  customer_email: bookings.customerEmail,
   booking_date: bookings.bookingDate,
   booking_time: bookings.bookingTime,
   amount: bookings.amount,
@@ -97,7 +98,7 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
   // POST /api/bookings - public booking creation
   if (path === '/api/bookings' && req.method === 'POST') {
     const body = await req.json() as any;
-    const { customer_name, customer_phone, customer_address, booking_date, booking_time } = body;
+    const { customer_name, customer_phone, customer_address, customer_email, booking_date, booking_time } = body;
 
     if (!customer_name || !customer_phone || !customer_address || !booking_date || !booking_time) {
       return err('Missing required fields: customer_name, customer_phone, customer_address, booking_date, booking_time');
@@ -114,10 +115,6 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
     const existing = await db.select({ cnt: count() }).from(slots)
       .where(and(eq(slots.date, booking_date), eq(slots.isBooked, 1))).get();
     if (existing && existing.cnt >= maxSlots) return err('No slots available for this date', 409);
-    const existingSlot = await db.select({ id: slots.id }).from(slots).where(and(
-      eq(slots.date, booking_date), eq(slots.timeSlot, booking_time), eq(slots.isBooked, 1)
-    )).get();
-    if (existingSlot) return err('This time slot is already booked', 409);
 
     const priceTotal = parseFloat(await getSetting(db, 'price_total') || '300');
     const priceDeposit = parseFloat(await getSetting(db, 'price_deposit') || '150');
@@ -132,24 +129,24 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
     let cust = await db.select({ id: customers.id }).from(customers).where(eq(customers.phone, phoneDigits)).get();
     if (!cust) {
       const custId = uuid();
-      await db.insert(customers).values({ id: custId, phone: phoneDigits, name: customer_name, address: customer_address });
+      await db.insert(customers).values({ id: custId, phone: phoneDigits, name: customer_name, email: (customer_email||'').trim(), address: customer_address });
       cust = { id: custId };
     } else {
-      await db.update(customers).set({ name: customer_name, address: customer_address }).where(eq(customers.id, cust.id));
+      await db.update(customers).set({ name: customer_name, email: (customer_email||'').trim(), address: customer_address }).where(eq(customers.id, cust.id));
     }
 
     try {
       await db.batch([
         db.insert(bookings).values({
           id: bookingId, customerName: customer_name, customerPhone: phoneDigits,
-          customerAddress: customer_address, bookingDate: booking_date, bookingTime: booking_time,
+          customerAddress: customer_address, customerEmail: (customer_email||'').trim(),
+          bookingDate: booking_date, bookingTime: booking_time,
           amount: priceTotal, depositAmount: priceDeposit, customerId: cust.id,
           createdAt: now, updatedAt: now
         }),
         db.insert(slots).values({ id: slotId, date: booking_date, timeSlot: booking_time, isBooked: 1, bookingId })
       ]);
     } catch (e: any) {
-      if (String(e?.message || e).includes('UNIQUE constraint')) return err('This time slot is already booked', 409);
       throw e;
     }
 
@@ -196,12 +193,11 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
         const allowedSlots = (await getSetting(db, 'slots') || '9am,11am,2pm,4pm').split(',').map(s => s.trim()).filter(Boolean);
         if (!allowedSlots.includes(nextTime)) return err('Invalid booking time');
       }
-      if (body.booking_date !== undefined || body.booking_time !== undefined || body.status === 'confirmed') {
-        const conflict = await db.select({ booking_id: slots.bookingId }).from(slots).where(and(
-          eq(slots.date, nextDate), eq(slots.timeSlot, nextTime), eq(slots.isBooked, 1),
-          sql`${slots.bookingId} <> ${bookingId}`
-        )).get();
-        if (conflict) return err('This time slot is already booked', 409);
+      if (body.booking_date !== undefined || body.booking_time !== undefined) {
+        const slot = await db.select({ id: slots.id }).from(slots).where(eq(slots.bookingId, bookingId)).get();
+        if (slot) {
+          await db.update(slots).set({ date: nextDate, timeSlot: nextTime }).where(eq(slots.bookingId, bookingId));
+        }
       }
 
       const updates: Partial<typeof bookings.$inferInsert> = { updatedAt: now };
@@ -233,24 +229,13 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
       if (body.customer_name !== undefined) updates.customerName = body.customer_name;
       if (body.customer_phone !== undefined) updates.customerPhone = normPhone(body.customer_phone);
       if (body.customer_address !== undefined) updates.customerAddress = body.customer_address;
+      if (body.customer_email !== undefined) updates.customerEmail = (body.customer_email||'').trim();
       if (body.notes !== undefined) updates.notes = body.notes;
       if (body.booking_date !== undefined) updates.bookingDate = body.booking_date;
       if (body.booking_time !== undefined) updates.bookingTime = body.booking_time;
 
       await db.update(bookings).set(updates).where(eq(bookings.id, bookingId));
 
-      if (body.booking_date !== undefined || body.booking_time !== undefined) {
-        const slot = await db.select({ id: slots.id }).from(slots).where(eq(slots.bookingId, bookingId)).get();
-        if (slot) {
-          await db.update(slots).set({ date: nextDate, timeSlot: nextTime }).where(eq(slots.bookingId, bookingId));
-        } else {
-          await db.insert(slots).values({
-            id: uuid(), date: nextDate, timeSlot: nextTime,
-            isBooked: body.status === 'cancelled' || current.status === 'cancelled' ? 0 : 1,
-            bookingId
-          });
-        }
-      }
       if (body.status === 'cancelled') {
         await db.update(slots).set({ isBooked: 0 }).where(eq(slots.bookingId, bookingId));
         await db.update(tasks).set({ status: 'cancelled', updatedAt: now })
