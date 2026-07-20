@@ -114,10 +114,6 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
     const existing = await db.select({ cnt: count() }).from(slots)
       .where(and(eq(slots.date, booking_date), eq(slots.isBooked, 1))).get();
     if (existing && existing.cnt >= maxSlots) return err('No slots available for this date', 409);
-    const existingSlot = await db.select({ id: slots.id }).from(slots).where(and(
-      eq(slots.date, booking_date), eq(slots.timeSlot, booking_time), eq(slots.isBooked, 1)
-    )).get();
-    if (existingSlot) return err('This time slot is already booked', 409);
 
     const priceTotal = parseFloat(await getSetting(db, 'price_total') || '300');
     const priceDeposit = parseFloat(await getSetting(db, 'price_deposit') || '150');

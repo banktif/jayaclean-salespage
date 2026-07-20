@@ -89,7 +89,6 @@ export const slots = sqliteTable('slots', {
   bookingId: text('booking_id').references(() => bookings.id)
 }, (table) => [
   index('idx_slots_date').on(table.date),
-  uniqueIndex('idx_slots_date_time_booked').on(table.date, table.timeSlot).where(sql`${table.isBooked} = 1`),
   check('slots_booked_check', sql`${table.isBooked} IN (0,1)`)
 ]);
 
