@@ -111,131 +111,96 @@
 
 <script src="vendor/grapes-editor.bundle.js?v=0.23.2-full-all"></script>
 
-<script>
-'use strict';
-var editor=null,dirty=false,previewMode=false,outlineMode=false;
-var currentEnvelope=null,currentFileName='';
-var G=window.JayaGrapesFull||{};
-var _initRetries=0,_MAX_INIT_RETRIES=40;
+<script>'use strict';
+var e=null,d=false,E=null,N='',T=0,X=40;
+function ct(t,n){var o=document.getElementById('fileInfo');o.className='file-info';if(t==='dirty'){o.classList.add('dirty');o.innerHTML='<b>'+((N||'Untitled'))+'</b><small>'+(n||'Unsaved')+'</small>'}else if(t==='loaded'){o.classList.add('saved');o.innerHTML='<b>'+((N||'Untitled'))+'</b><small>'+(n||'Ready')+'</small>'}else{o.innerHTML='<b>No file loaded</b><small>Open an HTML file to edit</small>'}}
+function tt(t,n){var o=document.getElementById('toast');o.textContent=t;o.className='toast '+(n?'ok':'error')+' show';clearTimeout(o._t);o._t=setTimeout(function(){o.className='toast'},n?3500:6000)}
+function L(t){var o=document.getElementById('fileInfo');if(o)o.innerHTML='<b>'+t+'</b>';console.log(t)}
 
-function initEditor(){
-  if(!window.JayaGrapesFull||!window.JayaGrapesFull.grapesjs||window.JayaGrapesFull.version!=='0.23.2'){
-    _initRetries++;
-    if(_initRetries>=_MAX_INIT_RETRIES){
-      var es=document.getElementById('emptyState');
-      if(es){
-        es.querySelector('h1').textContent='Editor failed to load';
-        es.querySelector('p').textContent='The GrapesJS bundle could not initialize. Check your connection and refresh the page.';
-        es.querySelector('.empty-actions').innerHTML='<button class="btn primary" onclick="location.reload()"><svg><use href=\"#i-upload\"/></svg> Refresh page</button>';
-        es.classList.remove('hidden');
-      }
-      setInfo();toast('Editor bundle failed to load after '+_MAX_INIT_RETRIES+' attempts. Refresh and try again.',false);return
-    }
-    document.getElementById('fileInfo').innerHTML='<b>Loading editor...</b><small>GrapesJS 0.23.2 ('+_initRetries+'/'+_MAX_INIT_RETRIES+')</small>';
-    setTimeout(initEditor,600);return
-  }
-  G=window.JayaGrapesFull;setInfo();document.getElementById('canvasStatus').classList.add('hidden');setupDragDrop()
+var B=false,O=false,R=window.JayaGrapesFull||{};
+
+function IE(){
+  var r=window.JayaGrapesFull;
+  if(!r||!r.grapesjs||r.version!=='0.23.2'){T++;if(T>=X){ct();tt('Bundle failed. Refresh.',false);return}
+    L('Loading... '+T+'/'+X);setTimeout(IE,500);return}
+  R=r;ct();document.getElementById('canvasStatus').classList.add('hidden');SD()
+}
+window._initEditor=IE;
+if(sessionStorage.getItem('gjs_u'))IE();
+
+function SD(){var b=document.body,o=document.getElementById('dragOverlay');b.addEventListener('dragover',function(ev){ev.preventDefault();ev.dataTransfer.dropEffect='copy';o.classList.add('active')});b.addEventListener('dragleave',function(ev){if(!ev.relatedTarget||ev.relatedTarget===document.documentElement)o.classList.remove('active')});b.addEventListener('drop',function(ev){ev.preventDefault();o.classList.remove('active');var f=ev.dataTransfer.files[0];if(f&&/\\.html?$/i.test(f.name))HO(f);else tt('Drop .html file',false)})}
+
+function HO(file){
+  if(!file){L('No file');return}if(d&&!confirm('Discard changes?')){L('Cancelled');return}
+  N=file.name||'untitled.html';L('File: '+N+' ('+Math.round(file.size/1024)+' KB)');
+  var r=new FileReader();r.onload=function(ev){L('Read OK');try{SP(ev.target.result);L('Parsed: '+(E.bodyHtml||'').length+' chars');OW()}catch(err){L('Parse: '+err.message);tt('Parse failed: '+err.message,false);ct()}};
+  r.onerror=function(){L('Read error');tt('Failed to read file',false);ct()};L('Reading...');r.readAsText(file)
 }
 
-if(sessionStorage.getItem('gjs_unlock')){initEditor()}
+function OW(){if(!window.JayaGrapesFull||!window.JayaGrapesFull.grapesjs){L('Waiting for bundle...');setTimeout(OW,500);return}L('Bundle ready');try{BE()}catch(err){L('Init: '+err.message);tt('Init failed',false);ct()}}
 
-function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function toast(message,ok){var el=document.getElementById('toast');el.textContent=message;el.className='toast '+(ok?'ok':'error')+' show';clearTimeout(toast.timer);toast.timer=setTimeout(function(){el.className='toast'},ok?3500:8000)}
-function setInfo(status,detail){var el=document.getElementById('fileInfo');el.className='file-info';if(status==='dirty'){el.classList.add('dirty');el.innerHTML='<b>'+esc(currentFileName||'Untitled')+'</b><small>'+esc(detail||'Unsaved changes')+'</small>'}else if(status==='loaded'){el.classList.add('saved');el.innerHTML='<b>'+esc(currentFileName||'Untitled')+'</b><small>'+esc(detail||'Ready to edit')+'</small>'}else{el.innerHTML='<b>No file loaded</b><small>Open an HTML file to edit</small>'}}
-function confirmDiscard(){return!dirty||confirm('Discard unsaved changes?')}
-
-function splitDocument(html){
-  var doc=String(html||'');var doctype=(doc.match(/<!doctype[^>]*>/i)||['<!doctype html>'])[0];var htmlMatch=doc.match(/<html([^>]*)>/i);var headMatch=doc.match(/<head[^>]*>([\s\S]*?)<\/head>/i);var bodyMatch=doc.match(/<body([^>]*)>([\s\S]*?)<\/body>/i);var head=headMatch?headMatch[1]:'';var body=bodyMatch?bodyMatch[2]:doc;var scriptsHead=(head.match(/<script\b[\s\S]*?<\/script>/gi)||[]).join('\n');var scriptsBody=(body.match(/<script\b[\s\S]*?<\/script>/gi)||[]).join('\n');var css='';head.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi,function(_,v){css+=v;return _});body.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi,function(_,v){css+=v;return _});var staticHead=head.replace(/<script\b[\s\S]*?<\/script>/gi,'').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').trim();var cleanBody=body.replace(/<script\b[\s\S]*?<\/script>/gi,'').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').trim();var links=[];head.replace(/<link\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi,function(tag){var m=tag.match(/href=["']([^"']+)["']/i);if(m)links.push(m[1]);return tag});return{doctype:doctype,htmlAttrs:htmlMatch?htmlMatch[1]:' lang="en"',bodyAttrs:bodyMatch?bodyMatch[1]:'',staticHead:staticHead,headScripts:scriptsHead,bodyScripts:scriptsBody,bodyHtml:cleanBody,css:css,stylesheets:links}}
+function SP(html){
+  var s=String(html||''),dt=(s.match(/<!doctype[^>]*>/i)||['<!doctype html>'])[0];
+  var hm=s.match(/<html([^>]*)>/i);
+  var hdm=s.match(/<head[^>]*>([\\s\\S]*?)<\\/head>/i);
+  var bm=s.match(/<body([^>]*)>([\\s\\S]*?)<\\/body>/i);
+  var hd=hdm?hdm[1]:'',bd=bm?bm[2]:s;
+  var sTag=/<script\\b[\\s\\S]*?<\\/script>/gi;
+  var stTag=/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi;
+  var sh=(hd.match(sTag)||[]).join('\n');
+  var sb=(bd.match(sTag)||[]).join('\n');
+  var cs='';
+  hd.replace(stTag,function(_,v){cs+=v;return _});
+  bd.replace(stTag,function(_,v){cs+=v;return _});
+  var sH=hd.replace(sTag,'').replace(stTag,'').trim();
+  var cB=bd.replace(sTag,'').replace(stTag,'').trim();
+  var lk=[];
+  hd.replace(/<link\\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi,function(t){var m=t.match(/href=["']([^"']+)["']/i);if(m)lk.push(m[1]);return t});
+  E={doctype:dt,htmlAttrs:hm?hm[1]:' lang="en"',bodyAttrs:bm?bm[1]:'',staticHead:sH,headScripts:sh,bodyScripts:sb,bodyHtml:cB,css:cs,stylesheets:lk}
 }
 
-function handleFileOpen(file){
-  if(!file){_log('No file selected');return}
-  if(!confirmDiscard()){_log('Discard cancelled');return}
-  currentFileName=file.name||'untitled.html';
-  _log('File: '+esc(currentFileName)+' ('+Math.round(file.size/1024)+' KB)');
-  var reader=new FileReader();
-  reader.onload=function(e){_log('File read OK');try{currentEnvelope=splitDocument(e.target.result);_log('HTML parsed: '+(currentEnvelope.bodyHtml||'').length+' chars body');_openWithRetry()}catch(err){_log('PARSE ERROR: '+err.message,true);toast('Failed to parse HTML: '+err.message,false);onEditorError('The file could not be parsed as valid HTML: '+err.message)}};
-  reader.onerror=function(){_log('READ ERROR');toast('Failed to read file',false);setInfo()};
-  _log('Reading file...');
-  reader.readAsText(file)
+function BE(){
+  if(e){e.destroy();document.getElementById('gjs').innerHTML=''}R=window.JayaGrapesFull;
+  var pl=[R.presetWebpage,R.blocksBasic,R.pluginForms,R.pluginExport,R.customCode,R.touch,R.tabs,R.tooltip,R.styleBg,R.parserPostcss,R.blocksFlexbox,R.styleFilter,R.styleGradient,R.typed].filter(Boolean);
+  var cs=(E.stylesheets||[]).map(function(h){try{return new URL(h,location.href||'https://localhost/').href}catch(er){return h}});
+  var cf={container:'#gjs',height:'100%',width:'auto',fromElement:false,storageManager:false,panels:{defaults:[]},
+    blockManager:{appendTo:'#blocksPanel'},styleManager:{appendTo:'#stylesPanel',sectors:SS()},
+    traitManager:{appendTo:'#traitsPanel'},layerManager:{appendTo:'#layersPanel'},selectorManager:{appendTo:'#selectorsPanel'},
+    assetManager:{assets:[],upload:false},canvas:{styles:cs},
+    deviceManager:{devices:[{id:'desktop',name:'Desktop',width:''},{id:'tablet',name:'Tablet',width:'768px',widthMedia:'992px'},{id:'mobile',name:'Mobile',width:'390px',widthMedia:'600px'}]},
+    plugins:pl,pluginsOpts:{[R.presetWebpage]:{modalImportTitle:'Import HTML',modalImportLabel:'Paste HTML and CSS here',blocksBasicOpts:{flexGrid:true},navbarOpts:{},countdownOpts:{},formsOpts:{}},[R.customCode]:{},[R.touch]:{},[R.tabs]:{},[R.tooltip]:{},[R.styleBg]:{},[R.parserPostcss]:{},[R.blocksFlexbox]:{},[R.styleFilter]:{},[R.styleGradient]:{},[R.typed]:{}},
+    showOffsets:true,noticeOnUnload:false,avoidInlineStyle:true,components:E.bodyHtml,style:E.css};
+  e=R.grapesjs.init(cf);L('Editor: '+(e?'OK':'NULL'));if(!e){tt('Init returned null',false);ct();return}
+  window.editor=e;AB();
+  e.on('load',function(){e.clearDirtyCount()});
+  e.on('update',function(){if(!e.getDirtyCount())return;d=true;document.getElementById('downloadBtn').disabled=false;ct('dirty','Unsaved')});
+  d=false;document.getElementById('downloadBtn').disabled=false;document.getElementById('emptyState').classList.add('hidden');document.getElementById('canvasStatus').classList.remove('hidden');document.getElementById('canvasSite').textContent=N;ct('loaded','Ready');tt(N+' loaded',true)
 }
 
-function _log(msg,isError){var el=document.getElementById('fileInfo');el.className='file-info';if(isError)el.classList.add('dirty');el.innerHTML='<b>'+esc(msg)+'</b>';console.log('[GJS]',msg)}
+function SS(){return[{name:'Layout',open:true,buildProps:['display','position','top','right','bottom','left','flex-direction','flex-wrap','justify-content','align-items','gap','grid-template-columns']},{name:'Size',open:true,buildProps:['width','height','max-width','min-height','margin','padding']},{name:'Typography',open:false,buildProps:['font-family','font-size','font-weight','letter-spacing','line-height','color','text-align','text-decoration','text-shadow']},{name:'Background',open:false,buildProps:['background-color','background']},{name:'Border',open:false,buildProps:['border','border-radius','box-shadow','opacity','overflow','transform','transition']}]}
 
-function _openWithRetry(){
-  if(!window.JayaGrapesFull||!window.JayaGrapesFull.grapesjs){
-    _log('Bundle not ready, retrying...');
-    setTimeout(_openWithRetry,500);return
-  }
-  var cw=document.getElementById('emptyState');if(cw)cw.classList.add('hidden');
-  var cs=document.getElementById('canvasStatus');if(cs)cs.classList.remove('hidden');
-  try{buildEditor()}catch(e){
-    _log('INIT ERROR: '+e.message,true);
-    toast('Editor init failed: '+e.message,false);
-    onEditorError(e.message);
-  }
-}
-function onEditorError(msg){
-  var es=document.getElementById('emptyState');
-  if(es){
-    es.querySelector('h1').textContent='Could not open this file';
-    es.querySelector('p').textContent=msg||'The editor was unable to load the HTML content. The file may be too large or contain unsupported markup.';
-    es.querySelector('.empty-actions').innerHTML='<button class="btn primary" onclick="document.getElementById(\'fileInput\').click()"><svg><use href=\"#i-upload\"/></svg> Try a different file</button><button class="btn" onclick="location.reload()"><svg><use href=\"#i-close\"/></svg> Reload editor</button>';
-    es.classList.remove('hidden');
-  }
-  setInfo();
-  var saveBtn=document.getElementById('downloadBtn');if(saveBtn)saveBtn.disabled=true;
-}
+function AB(){var b=e.Blocks,it=[['jb-h','Hero','Sections','<section style="padding:96px 24px;text-align:center;background:linear-gradient(135deg,#ecfdf3,#fff)"><div style="max-width:1080px;margin:auto"><p style="font-weight:800;color:#166534;letter-spacing:.12em;margin-top:0">TRUSTED SERVICE</p><h1 style="font-size:clamp(2.4rem,6vw,5rem);line-height:1.05;margin:14px 0">Headline here</h1><p style="font-size:1.15rem;color:#52635a;max-width:680px;margin:0 auto 28px">Description here.</p><a href="#" style="display:inline-block;padding:16px 28px;border-radius:999px;background:#166534;color:white;text-decoration:none;font-weight:800">CTA</a></div></section>'],['jb-tr','Trust','Sections','<section style="padding:56px 24px"><div style="max-width:1080px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:18px"><div style="padding:24px;border:1px solid #d8e4db;border-radius:18px"><strong style="font-size:2rem;color:#166534">10+</strong><p>Detail</p></div><div style="padding:24px;border:1px solid #d8e4db;border-radius:18px"><strong style="font-size:2rem;color:#166534">Fast</strong><p>Detail</p></div><div style="padding:24px;border:1px solid #d8e4db;border-radius:18px"><strong style="font-size:2rem;color:#166534">Clear</strong><p>Detail</p></div></div></section>'],['jb-cd','3 Cards','Sections','<section style="padding:72px 24px;background:#f5f8f6"><div style="max-width:1080px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:22px"><article style="background:white;padding:26px;border-radius:20px"><h3>Service</h3><p>Description</p></article><article style="background:white;padding:26px;border-radius:20px"><h3>Service</h3><p>Description</p></article><article style="background:white;padding:26px;border-radius:20px"><h3>Service</h3><p>Description</p></article></div></section>'],['jb-ct','CTA','Sections','<section style="padding:64px 24px;text-align:center;background:linear-gradient(135deg,#166534,#0a3d22);color:white"><div style="max-width:640px;margin:auto"><h2 style="font-size:2rem;margin:0 0 12px;color:white">Ready?</h2><p style="color:rgba(255,255,255,.8);margin:0 auto 24px">Take action today.</p><a href="#" style="display:inline-block;padding:16px 28px;border-radius:999px;background:white;color:#166534;text-decoration:none;font-weight:800">Book now</a></div></section>'],['jb-tx','Text','Basic','<div><h2>Heading</h2><p>Paragraph text goes here. Keep it short.</p></div>']];it.forEach(function(i){b.add(i[0],{label:i[1],category:i[2],content:i[3]})})}
 
-function buildEditor(){
-  G=window.JayaGrapesFull;
-  if(!currentEnvelope){onEditorError('No file data available. Please re-open the file.');return}
-  if(!G.grapesjs){onEditorError('GrapesJS is not available. The bundle may not have loaded yet.');return}
-  if(editor){try{editor.destroy()}catch(e){}document.getElementById('gjs').innerHTML=''}
-  var safeGet=function(obj,prop){try{return obj[prop]}catch(e){return null}};
-  var plugins=[safeGet(G,'presetWebpage'),safeGet(G,'blocksBasic'),safeGet(G,'pluginForms'),safeGet(G,'pluginExport'),safeGet(G,'customCode'),safeGet(G,'touch'),safeGet(G,'tabs'),safeGet(G,'tooltip'),safeGet(G,'styleBg'),safeGet(G,'parserPostcss'),safeGet(G,'blocksFlexbox'),safeGet(G,'styleFilter'),safeGet(G,'styleGradient'),safeGet(G,'typed')].filter(Boolean);
-  var canvasStyles=[];try{canvasStyles=(currentEnvelope.stylesheets||[]).map(function(href){try{return new URL(href,location.href).href}catch(e){return href}})}catch(e){canvasStyles=[]}
-  var pluginsOpts={};try{
-    var bp=safeGet(G,'presetWebpage');if(bp)pluginsOpts[bp]={modalImportTitle:'Import HTML',modalImportLabel:'Paste HTML and CSS here',blocksBasicOpts:{flexGrid:true},navbarOpts:{},countdownOpts:{},formsOpts:{}};
-    var keys=[{n:'customCode'},{n:'touch'},{n:'tabs'},{n:'tooltip'},{n:'styleBg'},{n:'parserPostcss'},{n:'blocksFlexbox'},{n:'styleFilter'},{n:'styleGradient'},{n:'typed'}];
-    keys.forEach(function(k){var v=safeGet(G,k.n);if(v)pluginsOpts[v]={}});
-  }catch(e){}
-  var config={container:'#gjs',height:'100%',width:'auto',fromElement:false,storageManager:false,panels:{defaults:[]},blockManager:{appendTo:'#blocksPanel'},styleManager:{appendTo:'#stylesPanel',sectors:styleSectors()},traitManager:{appendTo:'#traitsPanel'},layerManager:{appendTo:'#layersPanel'},selectorManager:{appendTo:'#selectorsPanel'},assetManager:{assets:[],upload:false},canvas:{styles:canvasStyles},deviceManager:{devices:[{id:'desktop',name:'Desktop',width:''},{id:'tablet',name:'Tablet',width:'768px',widthMedia:'992px'},{id:'mobile',name:'Mobile',width:'390px',widthMedia:'600px'}]},plugins:plugins,pluginsOpts:pluginsOpts,showOffsets:true,noticeOnUnload:false,avoidInlineStyle:true,components:currentEnvelope.bodyHtml,style:currentEnvelope.css};
-  try{editor=G.grapesjs.init(config)}catch(e){onEditorError('GrapesJS init() threw: '+e.message);return}
-  if(!editor){onEditorError('GrapesJS init() returned null. The editor may be incompatible with this browser.');return}
-  editor.on('load',function(){editor.clearDirtyCount()});
-  editor.on('update',function(){if(!editor.getDirtyCount())return;dirty=true;document.getElementById('downloadBtn').disabled=false;setInfo('dirty','Unsaved changes')});
-  editor.on('component:selected',function(){if(innerWidth<=760){showRightPane('styles');document.getElementById('rightSidebar').classList.add('open')}});
-  dirty=false;document.getElementById('downloadBtn').disabled=false;document.getElementById('emptyState').classList.add('hidden');document.getElementById('canvasStatus').classList.remove('hidden');document.getElementById('canvasSite').textContent=currentFileName;setInfo('loaded','Ready to edit');toast(currentFileName+' loaded',true);
-  addMarketingBlocks()
-}
+function RC(){if(!e||!E)return'';var h=e.getHtml(),c=e.getCss();return[E.doctype,'<html'+E.htmlAttrs+'>','<head>',E.staticHead,'<style>'+c+'</style>',E.headScripts,'</head>','<body'+E.bodyAttrs+'>',h,E.bodyScripts,'</body>','</html>'].filter(function(p){return p!==''}).join('\n')}
 
-function styleSectors(){return[{name:'Layout',open:true,buildProps:['display','position','top','right','bottom','left','flex-direction','flex-wrap','justify-content','align-items','gap','grid-template-columns']},{name:'Size & spacing',open:true,buildProps:['width','height','max-width','min-height','margin','padding']},{name:'Typography',open:false,buildProps:['font-family','font-size','font-weight','letter-spacing','line-height','color','text-align','text-decoration','text-shadow']},{name:'Background',open:false,buildProps:['background-color','background']},{name:'Border & effects',open:false,buildProps:['border','border-radius','box-shadow','opacity','overflow','transform','transition']}]}
+function HD(){if(!e){tt('No file',false);return}var html=RC(),bl=new Blob([html],{type:'text/html;charset=utf-8'}),u=URL.createObjectURL(bl),a=document.createElement('a');a.href=u;a.download=N||'edited.html';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);d=false;e.clearDirtyCount();ct('loaded','Downloaded');tt('Saved: '+a.download,true)}
 
-function addMarketingBlocks(){var blocks=editor.Blocks;var items=[['jb-hero','Hero section','Sections','<section style="padding:96px 24px;text-align:center;background:linear-gradient(135deg,#ecfdf3,#fff)"><div style="max-width:1080px;margin:auto"><p style="font-weight:800;color:#166534;letter-spacing:.12em;margin-top:0">TRUSTED LOCAL SERVICE</p><h1 style="font-size:clamp(2.4rem,6vw,5rem);line-height:1.05;margin:14px 0">A clear headline that earns attention</h1><p style="font-size:1.15rem;color:#52635a;max-width:680px;margin:0 auto 28px">Explain the transformation and why customers should act now.</p><a href="#contact" style="display:inline-block;padding:16px 28px;border-radius:999px;background:#166534;color:white;text-decoration:none;font-weight:800">Get a quotation</a></div></section>'],['jb-proof','Trust statistics','Sections','<section style="padding:56px 24px"><div style="max-width:1080px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:18px"><div style="padding:24px;border:1px solid #d8e4db;border-radius:18px"><strong style="font-size:2rem;color:#166534">10+ years</strong><p>Local experience</p></div><div style="padding:24px;border:1px solid #d8e4db;border-radius:18px"><strong style="font-size:2rem;color:#166534">Fast</strong><p>WhatsApp response</p></div><div style="padding:24px;border:1px solid #d8e4db;border-radius:18px"><strong style="font-size:2rem;color:#166534">Clear</strong><p>Scope before work</p></div></div></section>'],['jb-cards','3 cards','Sections','<section style="padding:72px 24px;background:#f5f8f6"><div style="max-width:1080px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:22px"><article style="background:white;padding:26px;border-radius:20px"><h3>Service one</h3><p>Describe the problem and outcome.</p></article><article style="background:white;padding:26px;border-radius:20px"><h3>Service two</h3><p>Describe the problem and outcome.</p></article><article style="background:white;padding:26px;border-radius:20px"><h3>Service three</h3><p>Describe the problem and outcome.</p></article></div></section>'],['jb-cta','Call to action','Sections','<section style="padding:64px 24px;text-align:center;background:linear-gradient(135deg,#166534,#0a3d22);color:white"><div style="max-width:640px;margin:auto"><h2 style="font-size:2rem;margin:0 0 12px;color:white">Ready to start?</h2><p style="color:rgba(255,255,255,.8);margin:0 auto 24px">Take the next step today.</p><a href="#book" style="display:inline-block;padding:16px 28px;border-radius:999px;background:white;color:#166534;text-decoration:none;font-weight:800">Book now</a></div></section>'],['jb-text','Text block','Basic','<div><h2>Heading</h2><p>Paragraph text goes here. Keep it short and to the point so readers can scan quickly.</p></div>']];items.forEach(function(item){blocks.add(item[0],{label:item[1],category:item[2],content:item[3]})})}
+function RCmd(c){if(!e)return tt('Open a file first',false);try{e.runCommand(c)}catch(err){tt(err.message,false)}}
+function SD(dev,btn){if(!e)return;e.setDevice(dev);document.querySelectorAll('.device-btn').forEach(function(el){el.classList.toggle('active',el===btn)});document.getElementById('canvasDevice').textContent=dev}
+function TP(){if(!e)return;B=!B;if(B)e.runCommand('preview');else e.stopCommand('preview')}
+function TO(){if(!e)return;O=!O;if(O)e.runCommand('sw-visibility');else e.stopCommand('sw-visibility')}
+function OC(){if(!e)return tt('Open a file first',false);document.getElementById('codeHtml').value=e.getHtml();document.getElementById('codeCss').value=e.getCss();document.getElementById('codeModal').classList.add('open')}
+function AC(){if(!e)return;e.setComponents(document.getElementById('codeHtml').value);e.setStyle(document.getElementById('codeCss').value);d=true;CM('codeModal');ct('dirty','Code edited');tt('Applied',true)}
+function CM(id){document.getElementById(id).classList.remove('open')}
+function SR(name,btn){document.querySelectorAll('.right-pane').forEach(function(el){el.classList.toggle('active',el.id==='pane'+name.charAt(0).toUpperCase()+name.slice(1))});document.querySelectorAll('.right-tabs button').forEach(function(el){el.classList.remove('active')});if(btn)btn.classList.add('active');else{var m={styles:0,traits:1,layers:2},bt=document.querySelectorAll('.right-tabs button');if(bt[m[name]])bt[m[name]].classList.add('active')}}
+function TS(side,btn){var t=document.getElementById(side==='left'?'leftSidebar':'rightSidebar'),w=t.classList.contains('open');CS();if(!w){t.classList.add('open');if(btn)btn.classList.add('active')}}
+function CS(){document.querySelectorAll('.sidebar').forEach(function(el){el.classList.remove('open')});document.querySelectorAll('.panel-btn,.mobile-dock button').forEach(function(el){el.classList.remove('active')})}
 
-function reconstructDocument(){if(!editor||!currentEnvelope)return'';var html=editor.getHtml(),css=editor.getCss();return[currentEnvelope.doctype,'<html'+currentEnvelope.htmlAttrs+'>','<head>',currentEnvelope.staticHead,'<style data-grapesjs="jayabina">'+css+'</style>',currentEnvelope.headScripts,'</head>','<body'+currentEnvelope.bodyAttrs+'>',html,currentEnvelope.bodyScripts,'</body>','</html>'].filter(function(p){return p!==''}).join('\n')}
-
-function handleDownload(){if(!editor){toast('No file loaded',false);return}var html=reconstructDocument();var blob=new Blob([html],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=currentFileName||'edited.html';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);dirty=false;editor.clearDirtyCount();setInfo('loaded','Downloaded');toast('HTML downloaded as '+a.download,true)}
-
-function setupDragDrop(){var body=document.body,overlay=document.getElementById('dragOverlay');body.addEventListener('dragover',function(e){e.preventDefault();e.dataTransfer.dropEffect='copy';overlay.classList.add('active')});body.addEventListener('dragleave',function(e){if(!e.relatedTarget||e.relatedTarget===document.documentElement)overlay.classList.remove('active')});body.addEventListener('drop',function(e){e.preventDefault();overlay.classList.remove('active');var file=e.dataTransfer.files[0];if(file&&/\.html?$/i.test(file.name))handleFileOpen(file);else toast('Drop an .html file',false)})}
-
-function runCommand(command){if(!editor)return toast('Open a file first',false);try{editor.runCommand(command)}catch(e){toast(e.message,false)}}
-function setDevice(name,button){if(!editor)return;editor.setDevice(name);document.querySelectorAll('.device-btn').forEach(function(el){el.classList.toggle('active',el===button)});document.getElementById('canvasDevice').textContent=name}
-function togglePreviewMode(){if(!editor)return;previewMode=!previewMode;if(previewMode)editor.runCommand('preview');else editor.stopCommand('preview');toast(previewMode?'Preview mode on':'Preview mode off',true)}
-function toggleOutline(){if(!editor)return;outlineMode=!outlineMode;if(outlineMode)editor.runCommand('sw-visibility');else editor.stopCommand('sw-visibility')}
-function openCode(){if(!editor)return toast('Open a file first',false);document.getElementById('codeHtml').value=editor.getHtml();document.getElementById('codeCss').value=editor.getCss();document.getElementById('codeModal').classList.add('open')}
-function applyCode(){if(!editor)return;editor.setComponents(document.getElementById('codeHtml').value);editor.setStyle(document.getElementById('codeCss').value);dirty=true;closeModal('codeModal');setInfo('dirty','Code edited');toast('Code applied to canvas',true)}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-function showRightPane(name,button){document.querySelectorAll('.right-pane').forEach(function(el){el.classList.toggle('active',el.id==='pane'+name.charAt(0).toUpperCase()+name.slice(1))});document.querySelectorAll('.right-tabs button').forEach(function(el){el.classList.remove('active')});if(button)button.classList.add('active');else{var map={styles:0,traits:1,layers:2};var btns=document.querySelectorAll('.right-tabs button');if(btns[map[name]])btns[map[name]].classList.add('active')}}
-function toggleSide(side,button){var target=document.getElementById(side==='left'?'leftSidebar':'rightSidebar');var was=target.classList.contains('open');closeSides();if(!was){target.classList.add('open');if(button)button.classList.add('active')}}
-function closeSides(){document.querySelectorAll('.sidebar').forEach(function(el){el.classList.remove('open')});document.querySelectorAll('.panel-btn,.mobile-dock button').forEach(function(el){el.classList.remove('active')})}
-
-window.addEventListener('beforeunload',function(event){if(dirty){event.preventDefault();event.returnValue=''}});
-document.addEventListener('keydown',function(event){
-  if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='s'){event.preventDefault();handleDownload()}
-  if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='o'){event.preventDefault();document.getElementById('fileInput').click()}
-  if(event.key==='Escape'){closeSides();document.querySelectorAll('.modal.open').forEach(function(el){el.classList.remove('open')})}
+window.addEventListener('beforeunload',function(ev){if(d){ev.preventDefault();ev.returnValue=''}});
+document.addEventListener('keydown',function(ev){
+  if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='s'){ev.preventDefault();HD()}
+  if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='o'){ev.preventDefault();document.getElementById('fileInput').click()}
+  if(ev.key==='Escape'){CS();document.querySelectorAll('.modal.open').forEach(function(el){el.classList.remove('open')})}
 });
 </script>
 </body>
