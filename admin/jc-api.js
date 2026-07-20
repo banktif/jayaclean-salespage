@@ -43,7 +43,6 @@
           self._token = d.data.token;
           localStorage.setItem('jc_token', d.data.token);
           localStorage.setItem('jc_user', JSON.stringify(d.data.user));
-          document.cookie = 'jc_token=' + encodeURIComponent(d.data.token) + ';domain=.jayabina.com;path=/;Secure;SameSite=Lax;max-age=86400';
         }
         return d;
       },
@@ -51,7 +50,6 @@
         self._token = null;
         localStorage.removeItem('jc_token');
         localStorage.removeItem('jc_user');
-        document.cookie = 'jc_token=;domain=.jayabina.com;path=/;Secure;expires=Thu,01 Jan 1970 00:00:00 GMT';
       },
       getToken: function() { return self._token; }
     };
