@@ -7,8 +7,8 @@ backend:
 media_folder: "blog/static/img"
 public_folder: "/blog/img"
 
-site_url: https://cuci.jayabina.com
-display_url: https://cuci.jayabina.com
+site_url: https://www.jayabina.com
+display_url: https://www.jayabina.com
 
 locale: "ms"
 

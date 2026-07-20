@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>Homepage Version Manager — JAYACUCI</title>
+  <title>Homepage Version Manager — JAYABINA</title>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
 :root{--bg:#0B1413;--surf:#101B1A;--border:rgba(255,255,255,.08);--teal:#0E8C86;--teal-s:rgba(14,140,134,.15);--green:#16a34a;--green-bg:rgba(22,163,74,.15);--amber:#f59e0b;--amber-bg:rgba(245,158,11,.15);--text:#E8F6F4;--t2:rgba(232,246,244,.6);--t3:rgba(232,246,244,.35)}
@@ -46,7 +46,7 @@ h1 span{background:var(--teal-s);color:var(--teal);padding:2px 10px;border-radiu
 <body>
 <div class="wrap">
   <h1>⚙️ Homepage Version <span>Main Domain</span></h1>
-  <p class="sub">Pilih version sales page untuk dipublish ke homepage utama (cuci.jayabina.com).</p>
+  <p class="sub">Pilih version sales page untuk dipublish ke homepage utama (www.jayabina.com).</p>
 
   <div class="live-banner" id="liveBanner">
     <div class="live-dot"></div>
@@ -96,7 +96,7 @@ function publish(file, name){
   localStorage.setItem('homepage_version', file);
   render();
   var toast = document.getElementById('toast');
-  toast.textContent = '✅ Published! ' + name + ' is now LIVE on cuci.jayabina.com';
+  toast.textContent = '✅ Published! ' + name + ' is now LIVE on www.jayabina.com';
   toast.classList.add('show');
   setTimeout(function(){toast.classList.remove('show')}, 3000);
   // Also set in sessionStorage for admin panel detection

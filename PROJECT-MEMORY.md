@@ -1,8 +1,8 @@
-# JAYACLEAN — Project Memory
+# JAYABINA — Project Memory
 
 ## Current production architecture (updated 2026-07-16)
 
-- `cuci.jayabina.com` is on Cloudflare Pages (`jayaclean`).
+- `www.jayabina.com` is on Cloudflare Pages (`jayaclean`).
 - The live frontend uses `/jc-api.js` and Cloudflare Worker `jayaclean-api`; it no longer loads the Supabase SDK or calls Supabase endpoints.
 - Production data/auth is Cloudflare D1 (`jayaclean-db`) with PBKDF2 passwords and signed JWT sessions.
 - Supabase remains a legacy source/rollback system only. Do not add Supabase URLs back into production pages.
@@ -26,7 +26,7 @@
 > Last updated: 2026-07-12
 
 ## TL;DR
-Water-tank cleaning business (**JAYACLEAN**, company: Jaya Bina Services). Static site (GitHub Pages + Cloudflare) + Supabase backend. Public sales page + Bayarcash deposit + full staff task manager + auto backups. Domain: **cuci.jayabina.com**. Free stack.
+Water-tank cleaning business (**JAYABINA**, company: Jaya Bina Services). Static site (GitHub Pages + Cloudflare) + Supabase backend. Public sales page + Bayarcash deposit + full staff task manager + auto backups. Domain: **www.jayabina.com**. Free stack.
 
 ## Language rule
 Admin/staff (worker) system + docs = **English**. WhatsApp templates = **Malay**. Customer-facing pages (sales/success/customer portal) = **Malay**.
@@ -91,7 +91,7 @@ Root `admin.html`/`staff.html`/etc. = redirect stubs. `/login/` removed (login i
 - If stale: purge Cloudflare + clear browser SW/site data once.
 
 ## GrapesJS Editor — multi-site + GUARD
-`editor.html` supports **multiple sales pages** (add any GitHub repo via token). A safety guard (`protectReason()`) blocks editing app/system files on BOTH load & save: any `admin/worker/customer/dashboard/login/staff/app/api` path, app-named `.html`, `sw.js`/`theme.css`/`manifest.json`, non-HTML files, and (in `jayaclean-salespage` repo) anything except `index.html`. Save preserves original `<script>` tags. So you can edit many sales pages but it can NEVER overwrite the JAYACLEAN app.
+`editor.html` supports **multiple sales pages** (add any GitHub repo via token). A safety guard (`protectReason()`) blocks editing app/system files on BOTH load & save: any `admin/worker/customer/dashboard/login/staff/app/api` path, app-named `.html`, `sw.js`/`theme.css`/`manifest.json`, non-HTML files, and (in `jayaclean-salespage` repo) anything except `index.html`. Save preserves original `<script>` tags. So you can edit many sales pages but it can NEVER overwrite the JAYABINA app.
 
 ## Pending / notes
 1. Google Drive is optional and still needs its service-account credentials in Backup. Cloudflare R2 is already active through the native Worker binding.
@@ -100,7 +100,7 @@ Root `admin.html`/`staff.html`/etc. = redirect stubs. `/login/` removed (login i
 4. Concurrent editing caused repeated overwrites — run ONE session at a time; editor now locked so it can't wipe admin.
 
 ## Cloudflare production state (authoritative, 2026-07-16)
-- Customer/sales site: Pages project `jayaclean` on `https://cuci.jayabina.com`.
+- Customer/sales site: Pages project `jayaclean` on `https://www.jayabina.com`.
 - Admin portal: Pages project `jayabina-admin`; custom domain `https://admin.jayabina.com`.
 - API: Worker `jayaclean-api` backed by D1 `jayaclean-db` and R2 `jayaclean-backups`.
 - Admin > Website provides structured Hugo settings for site identity, company/contact details, SEO, navigation and the three homepage service cards. The Worker validates the complete payload and writes `site/hugo.toml`, `site/data/business.yaml`, `site/data/services.yaml` and `site/content/_index.md` as one atomic GitHub commit; Content & code remains available for advanced editing.

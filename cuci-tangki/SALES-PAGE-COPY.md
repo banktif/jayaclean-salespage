@@ -1,7 +1,7 @@
 # SALES PAGE v4 — KILLER EDITION
 ## Blueprint Lengkap: Design + Copywriting + Psikologi + Layout
 
-> **Status:** READY TO BUILD | **Brand:** JAYACUCI (Jaya Bina Services)
+> **Status:** READY TO BUILD | **Brand:** JAYABINA (Jaya Bina Services)
 > **Reference:** SALES-PAGE-COPY.md v1-v3 + 4 Expert Audits
 > **Target:** Highest-converting sales page for Malaysian Muslim market
 
@@ -115,7 +115,7 @@ Footer    → #0B1413
 | 2 | **Masalah** | Dark (#16302D) | Shock image + problem cards |
 | 3 | **Transisi** | 4-stop gradient | Visual breathing room — dark→light |
 | 4 | **Edukasi** | Light (#E8F6F4) | KKM authority + self-diagnosis checklist |
-| 5 | **Solusi** | Light (#F7FCFB) | Introduce JAYACUCI — honest/new |
+| 5 | **Solusi** | Light (#F7FCFB) | Introduce JAYABINA — honest/new |
 | 6 | **Proses** | Light (#E8F6F4) | 4-step timeline with photos |
 | 7 | **Bukti** | White | Before/After slider — REAL proof |
 | 8 | **Kenapa Kami** | Light (#E8F6F4) | 4 USP cards |
@@ -225,7 +225,7 @@ Ini bahagian di mana halaman "bernafas" — latar belakang beralih dari gelap ke
 
 ### C5. SOLUSI
 
-**Eyebrow:** 💪 JAYACUCI
+**Eyebrow:** 💪 JAYABINA
 
 **Headline:**
 > Kami baru. Sebab tu **kami kerja dua kali ganda keras.**
@@ -376,7 +376,7 @@ Baki Selepas Servis     RM150
 > Baru. Dan itu **kelebihan terbesar kami.**
 
 **Body:**
-> JAYACUCI bermula dengan satu benda je: **setiap keluarga berhak dapat air bersih.** Simple.
+> JAYABINA bermula dengan satu benda je: **setiap keluarga berhak dapat air bersih.** Simple.
 
 > Orang skeptical bila dengar "baru". Kami faham. Tapi baru bermaksud **kami tak mampu buat kerja separuh jalan.** Setiap rumah = reputasi kami. Setiap servis = peluang buktikan.
 
@@ -389,7 +389,7 @@ Baki Selepas Servis     RM150
 **Closing:**
 > Bila kau buka paip lepas servis — tarik nafas lega. Air bersih. Anak selamat. **Itu ukuran kejayaan kami.**
 
-**📷 Gambar 10:** Owner JAYACUCI — Abdul Latif
+**📷 Gambar 10:** Owner JAYABINA — Abdul Latif
 
 ---
 
@@ -487,7 +487,7 @@ Baki Selepas Servis     RM150
 |---|---------|------|
 | 1 | Hero | Tangan menadah air wudhu' — air jernih |
 | 2 | Edukasi | Infografik KKM 6-12 bulan |
-| 3 | Solusi | Team JAYACUCI — profesional |
+| 3 | Solusi | Team JAYABINA — profesional |
 | 4 | Proses 1 | Pemeriksaan tangki |
 | 5 | Proses 2 | Air kotor disedut keluar |
 | 6 | Proses 3 | Cucian & disinfeksi |

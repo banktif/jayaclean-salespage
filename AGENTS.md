@@ -1,4 +1,4 @@
-# JAYACLEAN — AGENTS.md
+# JAYABINA — AGENTS.md
 # Project rules & memory anchor. READ THIS FIRST every new session.
 # Last updated: 2026-07-16
 # ⚠️ Site refactored to CLEAN URLS — real apps live in folders: admin/index.html,
@@ -11,16 +11,16 @@
 This section supersedes older Supabase architecture and deploy notes below.
 
 - ⛔ **ADMIN SYSTEM LOCKED (owner order, 2026-07-18):** `admin.jayabina.com` (Pages project `jayabina-admin`, `admin/index.html`, `admin/editor.html`, `admin/vendor/`) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session.
-- Frontend: Cloudflare Pages project `jayaclean` (`jayaclean-29f.pages.dev`). Booking funnel PRIMARY (2026-07-18) di `www.jayabina.com/servis-cuci-tangki-air/`: booking → Bayarcash deposit RM150 → `www.jayabina.com/success.html`. Worker var `SITE_URL=https://www.jayabina.com`.
-- Portals (2026-07-18): staff → `staff.jayabina.com` (Worker `jayabina-staff-router`, `cf-staff-router/`, serve app `/worker/`); pelanggan → `akaun.jayabina.com` (Worker `jayabina-akaun-router`, `cf-akaun-router/`, serve app `/customer/`). Path lama cuci kekal berfungsi.
-- CI: `.github/workflows/deploy-cloudflare-pages.yml` deploys ALL THREE on push to master: `jayabina` (www, `--branch main`), `jayabina-admin` (`--branch master`), `jayaclean` (cuci booking site, `bash build.sh` then `--branch master`).
+- Frontend: www.jayabina.com (Hugo build from `site/`). Booking funnel PRIMARY di `www.jayabina.com/servis-cuci-tangki-air/`: booking → Bayarcash deposit RM150 → `www.jayabina.com/success.html`. Worker var `SITE_URL=https://www.jayabina.com`. The old cuci.jayabina.com Pages project (`jayaclean`) has been decommissioned — all content migrated to www.
+- Portals: staff → `staff.jayabina.com` (Worker `jayabina-staff-router`, `cf-staff-router/`, serves `/worker/` from www); pelanggan → `akaun.jayabina.com` (Worker `jayabina-akaun-router`, `cf-akaun-router/`, serves `/customer/` from www).
+- CI: `.github/workflows/deploy-cloudflare-pages.yml` deploys TWO projects on push to master: `jayabina` (www, Hugo build from `site/`, `--branch main`) and `jayabina-admin` (admin panel, `--branch master`).
 - API: Cloudflare Worker `jayaclean-api` (`cf-api/`). **Canonical public URL: `https://api.jayabina.com`** (Worker custom domain, added 2026-07-18). The legacy `https://jayaclean-api.banktifweb.workers.dev` hostname still works but must not be referenced in frontend code. Do NOT redeploy the Worker under a new name — secrets (Bayarcash, backup, GH_PAT) cannot be copied and payments would break.
 - Database/Auth: Cloudflare D1 `jayaclean-db` plus custom PBKDF2/JWT auth. Supabase is legacy source data only and is no longer called by the production frontend.
 - Frontend client: `/jc-api.js`; served apps are `admin/index.html`, `worker/index.html`, and `customer/index.html`.
 - Backup: native R2 binding `BACKUP_R2` to bucket `jayaclean-backups`; password hashes and `private_settings` are excluded from archive payloads.
 - Secrets: use `wrangler secret put`. Never add empty secret placeholders to `wrangler.jsonc`, because a deploy can overwrite a real secret binding.
 - Worker deploy: `cd cf-api && wrangler deploy`.
-- Frontend deploy: run `build.sh` where Hugo is installed, then `wrangler pages deploy public --project-name jayaclean --branch master`.
+- Frontend deploy: run `build.sh` where Hugo is installed, then `wrangler pages deploy public --project-name jayabina --branch main`.
 - D1 sync must be idempotent. Do not truncate D1 during future legacy-data imports.
 - Supabase Auth password hashes are not portable. Reset migrated staff passwords from Admin > Staff; never restore first-login password claiming.
 
@@ -35,7 +35,7 @@ This section supersedes older Supabase architecture and deploy notes below.
 ---
 
 ## 1. WHAT THIS IS
-JAYACLEAN — a water-tank cleaning service business (company: **Jaya Bina Services**).
+JAYABINA — a water-tank cleaning service business (company: **Jaya Bina Services**).
 - Public sales page + online booking + Bayarcash deposit payment
 - Admin dashboard to manage bookings
 - (Building) Staff task manager: 50 staff accounts, task assignment, before/after photos, schedule/calendar, WhatsApp notifications
@@ -61,18 +61,18 @@ Domain: `www.jayabina.com` (Cloudflare Pages; CNAME file present for migration)
 ---
 
 ## 3. LOCKED DECISIONS (do not change without explicit owner approval)
-- **Brand name:** JAYACLEAN (renamed from JAYACUCI). Company name **Jaya Bina Services** stays. Domain `www.jayabina.com` stays. Logo initials `JC` stay.
+- **Brand name:** JAYABINA. Company name **Jaya Bina Services** stays. Domain `www.jayabina.com` stays. Logo initials `JB`.
 - **Language:** All admin/staff system UI + docs + code = **English**. WhatsApp message templates = **Bahasa Melayu**. Customer-facing pages (`index.html`, `success.html`, `test-pay.html`) stay **Bahasa Melayu**.
 - **WhatsApp:** Semi-auto `wa.me` (free). No paid gateway. Messages pre-filled, sent with one tap.
 - **Auth:** Supabase Auth. Admin + 50 staff have real accounts. Staff login via phone → synthetic email (`<digits>@staff.jayabina.local`) + password set by admin.
-- **Photo storage:** Cloudinary unsigned upload preset. Folder `jayaclean/tasks`.
+- **Photo storage:** Cloudinary unsigned upload preset. Folder `jayabina/tasks`.
 - **Auto-assign:** Toggle in Settings > Automation. Can be On (auto) or Off (manual). Default: Off.
 - **Config:** Non-secret config in `app_settings` table (Settings UI). Secrets in Supabase Edge secrets. Staff credentials in Supabase Auth (never plaintext).
 - **Payment amount:** Always computed server-side from DB (`bookings.deposit_amount`), never trusted from client.
 - **Pricing:** Total RM300, deposit RM150, balance RM150 (configurable via `app_settings`).
 - **Theme:** Forest-green (accent `#166534`). `theme.css` is the single source of truth (tokens incl. `--menu-bg`/`--menu-overlay`). Favicon `/favicon.svg` = single letter **J**.
 - **URL structure:** Clean URLs. Apps in folders (`admin/`, `worker/`, `customer/`), served from repo root. Editing the wrong file = broken app.
-- **GrapesJS editor:** Multi-site (add any repo) for editing SALES PAGES, but has a **safety GUARD** (`protectReason()` in `editor.html`) that blocks app/system files: any path with `admin/worker/customer/dashboard/login/staff/app/api`, files `*.html` named admin/worker/customer/login/staff/dashboard, `sw.js`, `theme.css`, `manifest.json`, non-`.html` files, and (in the `jayaclean-salespage` repo) anything except `index.html`. Guard runs on BOTH load and save. This lets the owner edit many sales-page repos without ever destroying the JAYACLEAN app.
+- **GrapesJS editor:** Multi-site (add any repo) for editing SALES PAGES, but has a **safety GUARD** (`protectReason()` in `editor.html`) that blocks app/system files: any path with `admin/worker/customer/dashboard/login/staff/app/api`, files `*.html` named admin/worker/customer/login/staff/dashboard, `sw.js`, `theme.css`, `manifest.json`, non-`.html` files, and (in the repo) anything except `index.html`. Guard runs on BOTH load and save. This lets the owner edit many sales-page repos without ever destroying the JAYABINA app.
 - **DB backup destinations:** Google Drive + Cloudflare R2 ONLY. **Do NOT use Supabase Storage** (protect the 1 GB free quota). Retention keep-48 + auto-delete on both.
 - **PWA:** `sw.js` MUST stay network-first (never cache-first) so updates show. Cloudflare cache rule bypasses `/sw.js`, `/theme.css`, HTML.
 
@@ -162,7 +162,7 @@ Template placeholders: `{nama}`, `{alamat}`, `{tarikh}`, `{slot}`, `{baki}`, `{b
 | `build.sh` | Cloudflare Pages build script (Hugo + static copy) | — |
 | `blog/config.toml` | Hugo configuration | — |
 | `blog/content/blog/` | Blog articles (Markdown) | Malay |
-| `blog/layouts/` | Custom JAYACLEAN blog templates | — |
+| `blog/layouts/` | Custom JAYABINA blog templates | — |
 | `blog/assets/css/blog.css` | Blog stylesheet (Poppins, green theme) | — |
 | `blog/static/blog/admin/` | Decap CMS editor (blog admin) | — |
 
@@ -224,7 +224,7 @@ Cloudflare Pages serves the `public/` output directory. Real apps in folders; ed
 | `/editor` | `editor.html` | LOCKED to sales page only. |
 | shared | `theme.css`, `favicon.svg`, `sw.js`, `manifest.json` | |
 Root `admin.html`, `staff.html`, `login.html` = redirect stubs. `login/` removed.
-⚠️ Always edit `admin/index.html` (NOT root `admin.html` or the old `cuci-tangki/` copy).
+⚠️ Always edit `admin/index.html` (NOT root `admin.html`).
 
 ### New tables (beyond section 5)
 - `private_settings` — key/value, **RLS admin-only** (`is_admin()`), for secrets: `gdrive_client_email/private_key/folder_id`, `r2_account_id/access_key/secret_key/bucket`. Staff CANNOT read.
@@ -254,7 +254,7 @@ Root `admin.html`, `staff.html`, `login.html` = redirect stubs. `login/` removed
 | Cloudflare | zone `916289c458db6233106080096fe910ed`; cache-bypass rule set for sw.js/theme.css/HTML |
 
 ### PWA / cache
-`sw.js` network-first, cache `jayaclean-v3`. Cloudflare cache rule bypasses `/sw.js`, `/theme.css`, HTML. To force update: purge Cloudflare + clear browser SW/site data once.
+`sw.js` network-first, cache `jayabina-v1`. Cloudflare cache rule bypasses `/sw.js`, `/theme.css`, HTML. To force update: purge Cloudflare + clear browser SW/site data once.
 
 ### Deploy note
 Deploy Edge Functions + git ops from repo root (`Downloads/Jayaclean`). Management API for SQL:

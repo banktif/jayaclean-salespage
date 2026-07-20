@@ -1,4 +1,4 @@
-# JAYACLEAN — AGENTS.md
+# JAYABINA — AGENTS.md
 # Project rules & memory anchor. READ THIS FIRST every new session.
 # Last updated: 2026-07-11
 
@@ -12,7 +12,7 @@
 ---
 
 ## 1. WHAT THIS IS
-JAYACLEAN — a water-tank cleaning service business (company: **Jaya Bina Services**).
+JAYABINA — a water-tank cleaning service business (company: **Jaya Bina Services**).
 - Public sales page + online booking + Bayarcash deposit payment
 - Admin dashboard to manage bookings
 - (Building) Staff task manager: 50 staff accounts, task assignment, before/after photos, schedule/calendar, WhatsApp notifications
@@ -33,12 +33,12 @@ Owner: Abdul Latif / banktifweb@gmail.com
 
 Supabase project ref: `thbscwlcyhcnqsppoyfn` — https://thbscwlcyhcnqsppoyfn.supabase.co
 GitHub repo: `banktif/jayaclean-salespage` (branch `master`)
-Domain: `cuci.jayabina.com` (GitHub Pages; CNAME file present)
+Domain: `www.jayabina.com` (GitHub Pages; CNAME file present)
 
 ---
 
 ## 3. LOCKED DECISIONS (do not change without explicit owner approval)
-- **Brand name:** JAYACLEAN (renamed from JAYACUCI). Company name **Jaya Bina Services** stays. Domain `cuci.jayabina.com` stays. Logo initials `JC` stay.
+- **Brand name:** JAYABINA (renamed from JAYABINA). Company name **Jaya Bina Services** stays. Domain `www.jayabina.com` stays. Logo initials `JC` stay.
 - **Language:** All admin/staff system UI + docs + code = **English**. WhatsApp message templates = **Bahasa Melayu**. Customer-facing pages (`index.html`, `success.html`, `test-pay.html`) stay **Bahasa Melayu**.
 - **WhatsApp:** Semi-auto `wa.me` (free). No paid gateway. Messages pre-filled, sent with one tap.
 - **Auth:** Supabase Auth. Admin + 50 staff have real accounts. Staff login via phone → synthetic email (`<digits>@staff.jayabina.local`) + password set by admin.

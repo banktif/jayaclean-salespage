@@ -1,4 +1,4 @@
-# JAYACLEAN — BUILD-PLAN.md
+# JAYABINA — BUILD-PLAN.md
 # Phased build runbook. Update checkboxes as you go. Verify each phase before moving on.
 # Last updated: 2026-07-11
 
@@ -33,7 +33,7 @@ Goal: real Supabase Auth for admin + staff; staff account management; settings b
 - [x] `login.html`: Supabase Auth sign-in (email or phone), role redirect
 - [x] `admin.html`: Supabase Auth guard (role=admin) + Staff Management + Settings sections + English UI
 - [x] `staff.html`: auth-guarded stub (full build Phase 3)
-- [x] Rename JAYACUCI -> JAYACLEAN (admin.html, manifest.json)
+- [x] Rename JAYABINA -> JAYABINA (admin.html, manifest.json)
 
 Deploy + Verify:
 - [x] Migration applied via Management API; tables + policies + seed confirmed

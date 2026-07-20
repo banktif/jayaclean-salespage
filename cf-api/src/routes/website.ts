@@ -27,7 +27,7 @@ export type WebsiteEditorSite = {
 
 export const DEFAULT_EDITOR_SITES: WebsiteEditorSite[] = [{
   id: 'jayaclean-sales',
-  name: 'JAYACLEAN Sales Page',
+  name: 'JAYABINA Sales Page',
   repo: REPO,
   branch: BRANCH,
   file: 'index.html',
@@ -785,7 +785,7 @@ export function editorProtectReason(repo: string, file: string): string {
   const base = normalizedFile.split('/').pop()?.toLowerCase() || '';
   if (['admin.html', 'worker.html', 'customer.html', 'login.html', 'staff.html', 'dashboard.html'].includes(base)) return 'App and system pages are protected from visual editing';
   if (/jayaclean-salespage$/i.test(normalizedRepo) && !(normalizedFile.toLowerCase() === 'index.html' || /^home\/[a-z0-9_.-]+\.html?$/i.test(normalizedFile))) {
-    return 'Only the public sales page and home page variants are editable in the JAYACLEAN repository';
+    return 'Only the public sales page and home page variants are editable in the JAYABINA repository';
   }
   return '';
 }

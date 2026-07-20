@@ -1,9 +1,9 @@
-# JAYACLEAN — Project Memory
+# JAYABINA — Project Memory
 
 > Full rules & schema: see `AGENTS.md`. Build progress: see `BUILD-PLAN.md`.
 
 ## TL;DR
-Water-tank cleaning business. Brand: **JAYACLEAN** (company: Jaya Bina Services). Sales page + booking + Bayarcash payment + admin panel. Building: staff task manager (50 staff, assignment, before/after photos, schedule, WhatsApp). Free stack.
+Water-tank cleaning business. Brand: **JAYABINA** (company: Jaya Bina Services). Sales page + booking + Bayarcash payment + admin panel. Building: staff task manager (50 staff, assignment, before/after photos, schedule, WhatsApp). Free stack.
 
 ## Language rule
 Admin/staff system + docs = English. WhatsApp templates = Malay. Customer pages (index/success/test-pay) = Malay.
@@ -11,11 +11,11 @@ Admin/staff system + docs = English. WhatsApp templates = Malay. Customer pages 
 ## URLs
 | Page | URL |
 |------|-----|
-| Sales page | https://cuci.jayabina.com |
-| Editor | https://cuci.jayabina.com/editor |
-| Admin panel | https://cuci.jayabina.com/admin |
-| Test calendar | https://cuci.jayabina.com/test-cal.html |
-| Test payment (RM2) | https://cuci.jayabina.com/test-pay.html |
+| Sales page | https://www.jayabina.com |
+| Editor | https://www.jayabina.com/editor |
+| Admin panel | https://www.jayabina.com/admin |
+| Test calendar | https://www.jayabina.com/test-cal.html |
+| Test payment (RM2) | https://www.jayabina.com/test-pay.html |
 | GitHub repo | https://github.com/banktif/jayaclean-salespage |
 
 ## Tech Stack (RM0)
@@ -49,7 +49,7 @@ All API keys, tokens, passwords are in the chat history. Ask user to re-provide 
 
 ## Admin Panel
 - Auth credentials must not be stored in source control or project notes. Production authentication now uses the Cloudflare Worker and D1.
-- Brand: JAYACLEAN, logo: JC
+- Brand: JAYABINA, logo: JC
 - Theme: light/dark/system, responsive (mobile <1024px, desktop >=1024px)
 - Mobile: hamburger drawer + bottom nav 4 tabs
 - Desktop: 260px sidebar + data table
@@ -71,7 +71,7 @@ Hero (wudhu) → Masalah → Edukasi → Solusi → Proses (4 steps) → Kenapa 
 2. Replace 10 image placeholders with real photos
 3. ~~Replace WhatsApp placeholder number~~ DONE — now 60139373275
 4. Enable HTTPS enforcement on GitHub Pages
-5. **Staff Task Manager** (in progress) — see BUILD-PLAN.md phases 1-5. Rename JAYACUCI→JAYACLEAN done in docs.
+5. **Staff Task Manager** (in progress) — see BUILD-PLAN.md phases 1-5. Rename JAYABINA→JAYABINA done in docs.
 
 ## Payment Flow (Bayarcash)
 - Browser: insert booking (pending) → POST {booking_id} to Edge Function `/create-intent`
