@@ -94,8 +94,10 @@ var editor=null,dirty=false,previewMode=false,outlineMode=false;
 var currentEnvelope=null,currentFileName='';
 var G=window.JayaGrapesFull||{};
 
-function checkPassword(){var inp=document.getElementById('pwInput');var err=document.getElementById('pwErr');if(inp.value==='jaya2026'){document.getElementById('pwGate').style.display='none';sessionStorage.setItem('gjs_unlock','1')}else{err.style.display='block';inp.select();setTimeout(function(){err.style.display='none'},2500)}}
-(function(){if(sessionStorage.getItem('gjs_unlock')){document.getElementById('pwGate').style.display='none'}else{document.getElementById('pwInput').focus()}})();
+function checkPassword(){var inp=document.getElementById('pwInput');var err=document.getElementById('pwErr');if(inp.value==='jaya2026'){document.getElementById('pwGate').style.display='none';sessionStorage.setItem('gjs_unlock','1');initEditor()}else{err.style.display='block';inp.select();setTimeout(function(){err.style.display='none'},2500)}}
+(function(){if(sessionStorage.getItem('gjs_unlock')){document.getElementById('pwGate').style.display='none';initEditor()}else{document.getElementById('pwInput').focus()}})();
+
+function initEditor(){setTimeout(function(){if(!G.grapesjs||G.version!=='0.23.2'){toast('Editor bundle loading... please wait.',true);setTimeout(initEditor,1000);return}setInfo();document.getElementById('canvasStatus').classList.add('hidden');setupDragDrop()},300)}
 
 function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function toast(message,ok){var el=document.getElementById('toast');el.textContent=message;el.className='toast '+(ok?'ok':'error')+' show';clearTimeout(toast.timer);toast.timer=setTimeout(function(){el.className='toast'},3500)}
@@ -174,8 +176,6 @@ document.addEventListener('keydown',function(event){
   if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='o'){event.preventDefault();document.getElementById('fileInput').click()}
   if(event.key==='Escape'){closeSides();document.querySelectorAll('.modal.open').forEach(function(el){el.classList.remove('open')})}
 });
-
-start();
 </script>
 </body>
 </html>
