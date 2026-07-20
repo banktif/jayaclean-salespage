@@ -73,7 +73,7 @@
 <div class="modal" id="codeModal" role="dialog" aria-modal="true"><div class="modal-card"><div class="modal-head"><div><h2>HTML &amp; CSS code</h2><p>Advanced editing for the current canvas. Original scripts and metadata remain protected.</p></div><button class="icon-btn" onclick="closeModal('codeModal')"><svg><use href="#i-close"/></svg></button></div><div class="modal-body"><div class="code-grid"><label>Body HTML<textarea id="codeHtml" spellcheck="false"></textarea></label><label>Page CSS<textarea id="codeCss" spellcheck="false"></textarea></label></div></div><div class="modal-foot"><button class="btn" onclick="closeModal('codeModal')">Cancel</button><button class="btn primary" onclick="applyCode()"><svg><use href="#i-code"/></svg> Apply to canvas</button></div></div></div>
 
 <div class="toast" id="toast"></div>
-<div class="pw-gate" id="pwGate"><div class="pw-card"><div class="brand-mark">J</div><h1>Visual Editor</h1><p>Enter the access password to continue.</p><input type="password" id="pwInput" placeholder="Password" autocomplete="off" onkeydown="if(event.key==='Enter')checkPassword()"><div class="pw-err" id="pwErr">Incorrect password</div></div></div>
+<div class="pw-gate" id="pwGate"><div class="pw-card"><div class="brand-mark">J</div><h1>Visual Editor</h1><p>Enter the access password to continue.</p><input type="password" id="pwInput" placeholder="Password" autocomplete="off" onkeydown="if(event.key==='Enter')checkPassword()"><div class="pw-err" id="pwErr">Incorrect password</div><button class="btn primary" style="margin-top:12px;width:100%;height:44px;border-radius:11px" onclick="checkPassword()">Unlock</button></div></div>
 
 <svg width="0" height="0" style="position:absolute"><defs>
   <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m0 0-5 5m5-5 5 5M5 20h14"/></symbol>
@@ -94,7 +94,7 @@ var editor=null,dirty=false,previewMode=false,outlineMode=false;
 var currentEnvelope=null,currentFileName='';
 var G=window.JayaGrapesFull||{};
 
-function checkPassword(){var inp=document.getElementById('pwInput');var err=document.getElementById('pwErr');if(inp.value==='jaya2026'){document.getElementById('pwGate').style.display='none';sessionStorage.setItem('gjs_unlock','1')}else{err.style.display='block';inp.value='';setTimeout(function(){err.style.display='none'},2000)}}
+function checkPassword(){var inp=document.getElementById('pwInput');var err=document.getElementById('pwErr');if(inp.value==='jaya2026'){document.getElementById('pwGate').style.display='none';sessionStorage.setItem('gjs_unlock','1')}else{err.style.display='block';inp.select();setTimeout(function(){err.style.display='none'},2500)}}
 (function(){if(sessionStorage.getItem('gjs_unlock')){document.getElementById('pwGate').style.display='none'}else{document.getElementById('pwInput').focus()}})();
 
 function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
