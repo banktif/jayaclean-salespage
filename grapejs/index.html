@@ -6,9 +6,9 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="theme-color" content="#07150d">
   <title>JAYABINA Visual Editor</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/vendor/grapes.min.css?v=0.23.2">
-  <link rel="stylesheet" href="/vendor/tui-image-editor.min.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="vendor/grapes.min.css?v=0.23.2">
+  <link rel="stylesheet" href="vendor/tui-image-editor.min.css">
   <style>
     :root{--bg:#07150d;--surface:#0d1f15;--surface2:#13291c;--surface3:#193624;--line:#284b35;--text:#f2faf4;--muted:#9ab5a2;--accent:#38b86a;--accent2:#9ce7b7;--danger:#ff6b6b;--warning:#f8c15c;--radius:14px;--shadow:0 18px 55px rgba(0,0,0,.34)}
     *{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font:14px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
@@ -25,10 +25,8 @@
     .status-strip{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:18;background:rgba(7,21,13,.92);border:1px solid var(--line);box-shadow:var(--shadow);padding:7px 12px;border-radius:999px;font-size:11px;color:var(--muted);pointer-events:none}.status-strip b{color:var(--text)}
     .mobile-dock{display:none}
     .toast{position:fixed;bottom:26px;right:16px;z-index:2000;max-width:380px;padding:11px 16px;border-radius:12px;font-size:12px;font-weight:700;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:all .25s}.toast.show{opacity:1;transform:none}.toast.ok{background:#0d3620;border:1px solid var(--accent);color:var(--accent2)}.toast.error{background:#3a1414;border:1px solid #a33838;color:#fccaca}
-    /* Password gate */
     .pw-gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px}.pw-card{text-align:center;max-width:380px}.pw-card .brand-mark{width:48px;height:48px;border-radius:14px;font-size:20px;margin:0 auto 20px}.pw-card h1{font-size:22px;margin:0 0 6px}.pw-card p{color:var(--muted);font-size:12px;margin:0 0 20px}.pw-card input{width:100%;height:46px;border:1px solid var(--line);border-radius:11px;background:var(--surface2);color:var(--text);padding:0 14px;font-size:16px;text-align:center;outline:none;letter-spacing:.3em}.pw-card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,184,106,.14)}.pw-err{color:var(--danger);font-size:11px;margin-top:10px;display:none}
-    /* GrapesJS integration */
-    .gjs-one-bg{background-color:var(--surface)!important}.gjs-two-color{color:#d7e8dc!important}.gjs-three-bg{background-color:var(--surface2)!important;color:var(--text)!important}.gjs-four-color,.gjs-four-color-h:hover{color:var(--accent)!important}.gjs-cv-canvas{background:#d8dfda!important;top:0!important;width:100%!important;height:100%!important}.gjs-frame-wrapper{border-radius:2px;box-shadow:0 5px 28px rgba(0,0,0,.2)}.gjs-blocks-c{padding:9px!important;gap:7px}.gjs-block{width:calc(50% - 4px)!important;min-height:74px!important;margin:0!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--surface2)!important;box-shadow:none!important;color:#d9eadf!important}.gjs-block:hover{border-color:var(--accent)!important;transform:translateY(-1px)}.gjs-block-label{font-size:10px!important;font-weight:700}.gjs-block svg{max-height:28px}.gjs-category-title,.gjs-sm-sector-title{background:var(--surface2)!important;border-bottom:1px solid var(--line)!important;padding:11px 10px!important;font-size:11px!important;font-weight:800!important}.gjs-sm-sector{border-bottom:1px solid var(--line)!important}.gjs-sm-properties{padding:10px!important}.gjs-sm-property{font-size:11px!important}.gjs-field{background:#08170f!important;border:1px solid var(--line)!important;border-radius:7px!important}.gjs-field input,.gjs-field select{color:var(--text)!important}.gjs-trt-traits{padding:8px!important}.gjs-trt-trait{padding:6px 4px!important}.gjs-layer{font-size:11px!important;border-bottom:1px solid rgba(40,75,53,.45)!important}.gjs-layer:hover{background:var(--surface2)!important}.gjs-layer.gjs-selected{background:var(--surface3)!important}.gjs-mdl-dialog{background:var(--surface)!important;border-radius:16px!important;max-width:min(780px,92vw)!important}.gjs-mdl-header{border-bottom:1px solid var(--line)!important}.gjs-am-file-uploader>form{background:var(--surface2)!important;border:2px dashed var(--line)!important}.gjs-am-assets-cont{background:var(--surface2)!important}
+    .gjs-one-bg{background-color:var(--surface)!important}.gjs-two-color{color:#d7e8dc!important}.gjs-three-bg{background-color:var(--surface2)!important;color:var(--text)!important}.gjs-four-color,.gjs-four-color-h:hover{color:var(--accent)!important}.gjs-cv-canvas{background:#d8dfda!important;top:0!important;width:100%!important;height:100%!important}.gjs-frame-wrapper{border-radius:2px;box-shadow:0 5px 28px rgba(0,0,0,.2)}.gjs-blocks-c{padding:9px!important;gap:7px}.gjs-block{width:calc(50% - 4px)!important;min-height:74px!important;margin:0!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--surface2)!important;box-shadow:none!important;color:#d9eadf!important}.gjs-block:hover{border-color:var(--accent)!important;transform:translateY(-1px)}.gjs-block-label{font-size:10px!important;font-weight:700}.gjs-block svg{max-height:28px}.gjs-category-title,.gjs-sm-sector-title{background:var(--surface2)!important;border-bottom:1px solid var(--line)!important;padding:11px 10px!important;font-size:11px!important;font-weight:800!important}.gjs-sm-sector{border-bottom:1px solid var(--line)!important}.gjs-sm-properties{padding:10px!important}.gjs-sm-property{font-size:11px!important}.gjs-field{background:#08170f!important;border:1px solid var(--line)!important;border-radius:7px!important}.gjs-field input,.gjs-field select{color:var(--text)!important}.gjs-trt-traits{padding:8px!important}.gjs-trt-trait{padding:6px 4px!important}.gjs-layer{font-size:11px!important;border-bottom:1px solid rgba(40,75,53,.45)!important}.gjs-layer:hover{background:var(--surface2)!important}.gjs-layer.gjs-selected{background:var(--surface3)!important}.gjs-mdl-dialog{background:var(--surface)!important;border-radius:16px!important;max-width:min(780px,92vw)!important}.gjs-mdl-header{border-bottom:1px solid var(--line)!important}.gjs-am-file-uploader>form{background:var(--surface2)!important;border:2px dashed var(--line)!important}.gjs-am-assets-cont{background:var(--surface)!important}
     .modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.modal-card{width:min(1040px,96vw);max-height:90dvh;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}.modal-head,.modal-foot{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid var(--line)}.modal-foot{border-bottom:0;border-top:1px solid var(--line);justify-content:flex-end}.modal-head h2{font-size:17px;margin:0}.modal-head .icon-btn{margin-left:auto}.modal-body{padding:16px 18px;overflow:auto}.code-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}.code-grid label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:11px;font-weight:700}.code-grid textarea{height:52dvh;resize:none;border:1px solid var(--line);border-radius:10px;background:#08170f;color:var(--text);padding:11px;font:12px/1.5 ui-monospace,Consolas,monospace;outline:none}
     @media(max-width:1120px){.workspace{grid-template-columns:240px minmax(300px,1fr) 270px}.brand-copy{display:none}}
     @media(max-width:760px){.app{grid-template-rows:auto auto minmax(0,1fr)}.top-main{padding:7px;min-height:52px;gap:6px;flex-wrap:nowrap}.brand-mark{width:36px;height:36px}.file-info{display:none}.top-tools{padding:5px 7px;overflow-x:auto;scrollbar-width:none}.top-tools::-webkit-scrollbar{display:none}.tool-label{display:none}.tool-group{flex:0 0 auto}.workspace{display:block}.canvas-wrap{height:100%;width:100%}.sidebar{position:absolute;top:0;bottom:0;width:min(86vw,320px);box-shadow:var(--shadow);transition:transform .22s;z-index:50}.sidebar.left{left:0;transform:translateX(-105%)}.sidebar.right{right:0;transform:translateX(105%)}.sidebar.open{transform:none}.side-close{display:grid}.mobile-dock{position:fixed;display:grid;grid-template-columns:repeat(4,1fr);left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));z-index:70;border:1px solid var(--line);border-radius:14px;background:rgba(7,21,13,.96);box-shadow:var(--shadow);padding:5px}.mobile-dock button{height:40px;border:0;border-radius:9px;background:transparent;color:var(--muted);font-weight:800;font-size:10px}.mobile-dock button.active{background:var(--surface3);color:var(--accent2)}.status-strip{bottom:64px;max-width:86%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.empty-card{padding:25px 18px}.empty h1{font-size:20px}.modal{padding:8px}.modal-card{max-height:96dvh;border-radius:15px}.modal-body{padding:12px}.code-grid{grid-template-columns:1fr}.code-grid textarea{height:32dvh}.toast{bottom:70px;right:10px}.gjs-block{min-height:67px!important}}
@@ -61,7 +59,7 @@
     <div class="canvas-wrap">
       <div id="gjs"></div>
       <div class="drag-overlay" id="dragOverlay"><span>Drop HTML file here</span></div>
-      <div class="empty" id="emptyState"><div class="empty-card"><div class="empty-icon">◆</div><h1>Open an HTML file</h1><p>Upload a complete HTML file to edit it visually. Scripts and metadata are preserved.</p><div class="empty-actions"><button class="btn primary" onclick="document.getElementById('fileInput').click()"><svg><use href="#i-upload"/></svg> Open HTML file</button></div></div></div>
+      <div class="empty" id="emptyState"><div class="empty-card"><div class="empty-icon">&#9670;</div><h1>Open an HTML file</h1><p>Upload a complete HTML file to edit it visually. Scripts and metadata are preserved.</p><div class="empty-actions"><button class="btn primary" onclick="document.getElementById('fileInput').click()"><svg><use href="#i-upload"/></svg> Open HTML file</button></div></div></div>
       <div class="status-strip hidden" id="canvasStatus"><b id="canvasSite">No file</b> · <span id="canvasDevice">Desktop</span></div>
     </div>
     <aside class="sidebar right" id="rightSidebar"><div class="side-head"><b>Design inspector</b><button class="icon-btn side-close" onclick="closeSides()"><svg><use href="#i-close"/></svg></button></div><div class="right-tabs"><button class="active" onclick="showRightPane('styles',this)">Styles</button><button onclick="showRightPane('traits',this)">Settings</button><button onclick="showRightPane('layers',this)">Layers</button></div><div class="side-scroll"><div class="right-pane active" id="paneStyles"><div id="selectorsPanel"></div><div id="stylesPanel"></div></div><div class="right-pane" id="paneTraits"><div id="traitsPanel"></div></div><div class="right-pane" id="paneLayers"><div id="layersPanel"></div></div></div></aside>
@@ -86,53 +84,79 @@
   <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
 </defs></svg>
 
-<script src="/vendor/grapes-editor.bundle.js?v=0.23.2-full-all"></script>
-<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<!-- Password gate: MUST run FIRST, before any external script can block -->
+<script>
+(function(){
+  function checkPassword(){
+    var inp = document.getElementById('pwInput');
+    var err = document.getElementById('pwErr');
+    if (inp.value === 'jaya2026') {
+      document.getElementById('pwGate').style.display = 'none';
+      sessionStorage.setItem('gjs_unlock', '1');
+      if (typeof initEditor === 'function') initEditor();
+      else document.getElementById('fileInfo').innerHTML = '<b>Loading editor...</b><small>Waiting for bundle</small>';
+    } else {
+      err.style.display = 'block';
+      inp.select();
+      setTimeout(function(){ err.style.display = 'none'; }, 2500);
+    }
+  }
+  window._checkPassword = checkPassword;
+
+  if (sessionStorage.getItem('gjs_unlock')) {
+    document.getElementById('pwGate').style.display = 'none';
+  } else {
+    document.getElementById('pwInput').focus();
+  }
+})();
+</script>
+
+<script src="vendor/grapes-editor.bundle.js?v=0.23.2-full-all"></script>
+<script async src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+
 <script>
 'use strict';
 var editor=null,dirty=false,previewMode=false,outlineMode=false;
 var currentEnvelope=null,currentFileName='';
 var G=window.JayaGrapesFull||{};
+var _initRetries=0,_MAX_INIT_RETRIES=25;
 
-function checkPassword(){var inp=document.getElementById('pwInput');var err=document.getElementById('pwErr');if(inp.value==='jaya2026'){document.getElementById('pwGate').style.display='none';sessionStorage.setItem('gjs_unlock','1');setTimeout(initEditor,100)}else{err.style.display='block';inp.select();setTimeout(function(){err.style.display='none'},2500)}}
-(function(){if(sessionStorage.getItem('gjs_unlock')){document.getElementById('pwGate').style.display='none';setTimeout(initEditor,100)}else{document.getElementById('pwInput').focus()}})();
+function checkPassword(){return window._checkPassword()}
 
-function initEditor(){if(!window.JayaGrapesFull||!window.JayaGrapesFull.grapesjs||window.JayaGrapesFull.version!=='0.23.2'){document.getElementById('fileInfo').innerHTML='<b>Loading editor...</b><small>GrapesJS 0.23.2</small>';setTimeout(initEditor,600);return}G=window.JayaGrapesFull;setInfo();document.getElementById('canvasStatus').classList.add('hidden');setupDragDrop()}
+function initEditor(){
+  if(!window.JayaGrapesFull||!window.JayaGrapesFull.grapesjs||window.JayaGrapesFull.version!=='0.23.2'){
+    _initRetries++;
+    if(_initRetries>=_MAX_INIT_RETRIES){setInfo();toast('Editor bundle failed to load. Refresh and try again.',false);return}
+    document.getElementById('fileInfo').innerHTML='<b>Loading editor...</b><small>GrapesJS 0.23.2 ('+_initRetries+'/'+_MAX_INIT_RETRIES+')</small>';
+    setTimeout(initEditor,600);return
+  }
+  G=window.JayaGrapesFull;setInfo();document.getElementById('canvasStatus').classList.add('hidden');setupDragDrop()
+}
+
+if(sessionStorage.getItem('gjs_unlock')){initEditor()}
 
 function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function toast(message,ok){var el=document.getElementById('toast');el.textContent=message;el.className='toast '+(ok?'ok':'error')+' show';clearTimeout(toast.timer);toast.timer=setTimeout(function(){el.className='toast'},3500)}
 function setInfo(status,detail){var el=document.getElementById('fileInfo');el.className='file-info';if(status==='dirty'){el.classList.add('dirty');el.innerHTML='<b>'+esc(currentFileName||'Untitled')+'</b><small>'+esc(detail||'Unsaved changes')+'</small>'}else if(status==='loaded'){el.classList.add('saved');el.innerHTML='<b>'+esc(currentFileName||'Untitled')+'</b><small>'+esc(detail||'Ready to edit')+'</small>'}else{el.innerHTML='<b>No file loaded</b><small>Open an HTML file to edit</small>'}}
-
-function confirmDiscard(){return !dirty||confirm('Discard unsaved changes?')}
-
-function start(){
-  if(!G.grapesjs||G.version!=='0.23.2'){toast('Editor bundle failed to load. Refresh the page.',false);return}
-  setInfo();
-  document.getElementById('canvasStatus').classList.add('hidden');
-  setupDragDrop();
-}
+function confirmDiscard(){return!dirty||confirm('Discard unsaved changes?')}
 
 function splitDocument(html){
   var doc=String(html||'');var doctype=(doc.match(/<!doctype[^>]*>/i)||['<!doctype html>'])[0];var htmlMatch=doc.match(/<html([^>]*)>/i);var headMatch=doc.match(/<head[^>]*>([\s\S]*?)<\/head>/i);var bodyMatch=doc.match(/<body([^>]*)>([\s\S]*?)<\/body>/i);var head=headMatch?headMatch[1]:'';var body=bodyMatch?bodyMatch[2]:doc;var scriptsHead=(head.match(/<script\b[\s\S]*?<\/script>/gi)||[]).join('\n');var scriptsBody=(body.match(/<script\b[\s\S]*?<\/script>/gi)||[]).join('\n');var css='';head.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi,function(_,v){css+=v;return _});body.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi,function(_,v){css+=v;return _});var staticHead=head.replace(/<script\b[\s\S]*?<\/script>/gi,'').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').trim();var cleanBody=body.replace(/<script\b[\s\S]*?<\/script>/gi,'').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').trim();var links=[];head.replace(/<link\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi,function(tag){var m=tag.match(/href=["']([^"']+)["']/i);if(m)links.push(m[1]);return tag});return{doctype:doctype,htmlAttrs:htmlMatch?htmlMatch[1]:' lang="en"',bodyAttrs:bodyMatch?bodyMatch[1]:'',staticHead:staticHead,headScripts:scriptsHead,bodyScripts:scriptsBody,bodyHtml:cleanBody,css:css,stylesheets:links}}
 }
 
 function handleFileOpen(file){
-  if(!file){return}if(!confirmDiscard())return;
-  currentFileName=file.name||'untitled.html';
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var html=e.target.result;
-    try{currentEnvelope=splitDocument(html);buildEditor()}catch(err){toast('Failed to parse HTML: '+err.message,false)}
-  };
-  reader.onerror=function(){toast('Failed to read file',false)};
-  reader.readAsText(file);
+  if(!file)return;if(!confirmDiscard())return;
+  currentFileName=file.name||'untitled.html';var reader=new FileReader();
+  reader.onload=function(e){try{currentEnvelope=splitDocument(e.target.result);buildEditor()}catch(err){toast('Failed to parse HTML: '+err.message,false)}};
+  reader.onerror=function(){toast('Failed to read file',false)};reader.readAsText(file)
 }
 
 function buildEditor(){
-  if(editor){editor.destroy();document.getElementById('gjs').innerHTML=''}
+  if(!window.JayaGrapesFull||!window.JayaGrapesFull.grapesjs){toast('Editor bundle not loaded. Refresh and try again.',false);return}
+  G=window.JayaGrapesFull;if(editor){editor.destroy();document.getElementById('gjs').innerHTML=''}
   var plugins=[G.presetWebpage,G.blocksBasic,G.pluginForms,G.pluginExport,G.customCode,G.touch,G.tabs,G.tooltip,G.styleBg,G.parserPostcss,G.blocksFlexbox,G.styleFilter,G.styleGradient,G.typed,G.tuiImageEditor,G.codeEditor,G.ckeditor].filter(Boolean);
   var canvasStyles=(currentEnvelope.stylesheets||[]).map(function(href){try{return new URL(href,location.href).href}catch(e){return href}});
-  var config={container:'#gjs',height:'100%',width:'auto',fromElement:false,storageManager:false,panels:{defaults:[]},blockManager:{appendTo:'#blocksPanel'},styleManager:{appendTo:'#stylesPanel',sectors:styleSectors()},traitManager:{appendTo:'#traitsPanel'},layerManager:{appendTo:'#layersPanel'},selectorManager:{appendTo:'#selectorsPanel'},assetManager:{assets:[],upload:false},canvas:{styles:canvasStyles},deviceManager:{devices:[{id:'desktop',name:'Desktop',width:''},{id:'tablet',name:'Tablet',width:'768px',widthMedia:'992px'},{id:'mobile',name:'Mobile',width:'390px',widthMedia:'600px'}]},plugins:plugins,pluginsOpts:{[G.presetWebpage]:{modalImportTitle:'Import HTML',modalImportLabel:'Paste HTML and CSS here',blocksBasicOpts:{flexGrid:true},navbarOpts:{},countdownOpts:{},formsOpts:{}},[G.customCode]:{},[G.touch]:{},[G.tabs]:{},[G.tooltip]:{},[G.styleBg]:{},[G.parserPostcss]:{},[G.blocksFlexbox]:{},[G.styleFilter]:{},[G.styleGradient]:{},[G.typed]:{},[G.tuiImageEditor]:{config:{includeHotkeys:!0,usageStatistics:!1,hideHeader:!0,selectionStyle:{cornerStyle:'circle',cornerSize:16}}},[G.codeEditor]:{},[G.ckeditor]:{options:{language:'en'}}},showOffsets:true,noticeOnUnload:false,avoidInlineStyle:true,components:currentEnvelope.bodyHtml,style:currentEnvelope.css};
+  var config={container:'#gjs',height:'100%',width:'auto',fromElement:false,storageManager:false,panels:{defaults:[]},blockManager:{appendTo:'#blocksPanel'},styleManager:{appendTo:'#stylesPanel',sectors:styleSectors()},traitManager:{appendTo:'#traitsPanel'},layerManager:{appendTo:'#layersPanel'},selectorManager:{appendTo:'#selectorsPanel'},assetManager:{assets:[],upload:false},canvas:{styles:canvasStyles},deviceManager:{devices:[{id:'desktop',name:'Desktop',width:''},{id:'tablet',name:'Tablet',width:'768px',widthMedia:'992px'},{id:'mobile',name:'Mobile',width:'390px',widthMedia:'600px'}]},plugins:plugins,pluginsOpts:{[G.presetWebpage]:{modalImportTitle:'Import HTML',modalImportLabel:'Paste HTML and CSS here',blocksBasicOpts:{flexGrid:true},navbarOpts:{},countdownOpts:{},formsOpts:{}},[G.customCode]:{},[G.touch]:{},[G.tabs]:{},[G.tooltip]:{},[G.styleBg]:{},[G.parserPostcss]:{},[G.blocksFlexbox]:{},[G.styleFilter]:{},[G.styleGradient]:{},[G.typed]:{},[G.tuiImageEditor]:{config:{includeHotkeys:true,usageStatistics:false,hideHeader:true,selectionStyle:{cornerStyle:'circle',cornerSize:16}}},[G.codeEditor]:{},[G.ckeditor]:{options:{language:'en'}}},showOffsets:true,noticeOnUnload:false,avoidInlineStyle:true,components:currentEnvelope.bodyHtml,style:currentEnvelope.css};
   editor=G.grapesjs.init(config);window.editor=editor;addMarketingBlocks();
   editor.on('load',function(){editor.clearDirtyCount()});
   editor.on('update',function(){if(!editor.getDirtyCount())return;dirty=true;document.getElementById('downloadBtn').disabled=false;setInfo('dirty','Unsaved changes')});
@@ -144,20 +168,11 @@ function styleSectors(){return[{name:'Layout',open:true,buildProps:['display','p
 
 function addMarketingBlocks(){var blocks=editor.Blocks;var items=[['jb-hero','Hero section','Sections','<section style="padding:96px 24px;text-align:center;background:linear-gradient(135deg,#ecfdf3,#fff)"><div style="max-width:1080px;margin:auto"><p style="font-weight:800;color:#166534;letter-spacing:.12em;margin-top:0">TRUSTED LOCAL SERVICE</p><h1 style="font-size:clamp(2.4rem,6vw,5rem);line-height:1.05;margin:14px 0">A clear headline that earns attention</h1><p style="font-size:1.15rem;color:#52635a;max-width:680px;margin:0 auto 28px">Explain the transformation and why customers should act now.</p><a href="#contact" style="display:inline-block;padding:16px 28px;border-radius:999px;background:#166534;color:white;text-decoration:none;font-weight:800">Get a quotation</a></div></section>'],['jb-proof','Trust statistics','Sections','<section style="padding:56px 24px"><div style="max-width:1080px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:18px"><div style="padding:24px;border:1px solid #d8e4db;border-radius:18px"><strong style="font-size:2rem;color:#166534">10+ years</strong><p>Local experience</p></div><div style="padding:24px;border:1px solid #d8e4db;border-radius:18px"><strong style="font-size:2rem;color:#166534">Fast</strong><p>WhatsApp response</p></div><div style="padding:24px;border:1px solid #d8e4db;border-radius:18px"><strong style="font-size:2rem;color:#166534">Clear</strong><p>Scope before work</p></div></div></section>'],['jb-cards','3 cards','Sections','<section style="padding:72px 24px;background:#f5f8f6"><div style="max-width:1080px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:22px"><article style="background:white;padding:26px;border-radius:20px"><h3>Service one</h3><p>Describe the problem and outcome.</p></article><article style="background:white;padding:26px;border-radius:20px"><h3>Service two</h3><p>Describe the problem and outcome.</p></article><article style="background:white;padding:26px;border-radius:20px"><h3>Service three</h3><p>Describe the problem and outcome.</p></article></div></section>'],['jb-cta','Call to action','Sections','<section style="padding:64px 24px;text-align:center;background:linear-gradient(135deg,#166534,#0a3d22);color:white"><div style="max-width:640px;margin:auto"><h2 style="font-size:2rem;margin:0 0 12px;color:white">Ready to start?</h2><p style="color:rgba(255,255,255,.8);margin:0 auto 24px">Take the next step today.</p><a href="#book" style="display:inline-block;padding:16px 28px;border-radius:999px;background:white;color:#166534;text-decoration:none;font-weight:800">Book now</a></div></section>'],['jb-text','Text block','Basic','<div><h2>Heading</h2><p>Paragraph text goes here. Keep it short and to the point so readers can scan quickly.</p></div>']];items.forEach(function(item){blocks.add(item[0],{label:item[1],category:item[2],content:item[3]})})}
 
-function reconstructDocument(){if(!editor||!currentEnvelope)return'';var html=editor.getHtml(),css=editor.getCss();return[currentEnvelope.doctype,'<html'+currentEnvelope.htmlAttrs+'>','<head>',currentEnvelope.staticHead,currentEnvelope.headScripts?'<style data-grapesjs="jayabina">'+css+'</style>':'<style data-grapesjs="jayabina">'+css+'</style>',currentEnvelope.headScripts,'</head>','<body'+currentEnvelope.bodyAttrs+'>',html,currentEnvelope.bodyScripts,'</body>','</html>'].filter(function(p){return p!==''}).join('\n')}
+function reconstructDocument(){if(!editor||!currentEnvelope)return'';var html=editor.getHtml(),css=editor.getCss();return[currentEnvelope.doctype,'<html'+currentEnvelope.htmlAttrs+'>','<head>',currentEnvelope.staticHead,'<style data-grapesjs="jayabina">'+css+'</style>',currentEnvelope.headScripts,'</head>','<body'+currentEnvelope.bodyAttrs+'>',html,currentEnvelope.bodyScripts,'</body>','</html>'].filter(function(p){return p!==''}).join('\n')}
 
-function handleDownload(){
-  if(!editor){toast('No file loaded',false);return}
-  var html=reconstructDocument();var blob=new Blob([html],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=currentFileName||'edited.html';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-  dirty=false;editor.clearDirtyCount();setInfo('loaded','Downloaded');toast('HTML downloaded as '+a.download,true)
-}
+function handleDownload(){if(!editor){toast('No file loaded',false);return}var html=reconstructDocument();var blob=new Blob([html],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=currentFileName||'edited.html';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);dirty=false;editor.clearDirtyCount();setInfo('loaded','Downloaded');toast('HTML downloaded as '+a.download,true)}
 
-function setupDragDrop(){
-  var body=document.body,overlay=document.getElementById('dragOverlay');
-  body.addEventListener('dragover',function(e){e.preventDefault();e.dataTransfer.dropEffect='copy';overlay.classList.add('active')});
-  body.addEventListener('dragleave',function(e){if(!e.relatedTarget||e.relatedTarget===document.documentElement)overlay.classList.remove('active')});
-  body.addEventListener('drop',function(e){e.preventDefault();overlay.classList.remove('active');var file=e.dataTransfer.files[0];if(file&&/\.html?$/i.test(file.name))handleFileOpen(file);else toast('Drop an .html file',false)})
-}
+function setupDragDrop(){var body=document.body,overlay=document.getElementById('dragOverlay');body.addEventListener('dragover',function(e){e.preventDefault();e.dataTransfer.dropEffect='copy';overlay.classList.add('active')});body.addEventListener('dragleave',function(e){if(!e.relatedTarget||e.relatedTarget===document.documentElement)overlay.classList.remove('active')});body.addEventListener('drop',function(e){e.preventDefault();overlay.classList.remove('active');var file=e.dataTransfer.files[0];if(file&&/\.html?$/i.test(file.name))handleFileOpen(file);else toast('Drop an .html file',false)})}
 
 function runCommand(command){if(!editor)return toast('Open a file first',false);try{editor.runCommand(command)}catch(e){toast(e.message,false)}}
 function setDevice(name,button){if(!editor)return;editor.setDevice(name);document.querySelectorAll('.device-btn').forEach(function(el){el.classList.toggle('active',el===button)});document.getElementById('canvasDevice').textContent=name}
