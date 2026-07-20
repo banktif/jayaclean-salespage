@@ -3,7 +3,7 @@ import type { Env } from '../types';
 import { err, ok, uuid, hashPassword } from '../utils/helpers';
 import { requireAuth, requireAdmin } from '../utils/middleware';
 import { createDb } from '../db/client';
-import { profiles as profilesTable } from '../db/schema';
+import { profiles as profilesTable, tasks as tasksTable, taskPhotos as taskPhotosTable } from '../db/schema';
 
 const profileFields = {
   id: profilesTable.id,
@@ -118,6 +118,32 @@ export async function handleProfiles(req: Request, env: Env, path: string): Prom
       const updated = await db.select(profileFields).from(profilesTable)
         .where(eq(profilesTable.id, profileId)).get();
       return ok(updated);
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  // DELETE /api/profiles/:id (admin: delete staff)
+  const deleteMatch = path.match(/^\/api\/profiles\/([a-f0-9-]+)$/);
+  if (deleteMatch && req.method === 'DELETE') {
+    try {
+      const payload = await requireAuth(req, env);
+      requireAdmin(payload);
+      const profileId = deleteMatch[1];
+
+      if (payload.sub === profileId) return err('Cannot delete your own account', 409);
+
+      const existing = await db.select({ id: profilesTable.id }).from(profilesTable)
+        .where(eq(profilesTable.id, profileId)).get();
+      if (!existing) return err('Profile not found', 404);
+
+      // Unassign any tasks assigned to this staff member
+      await db.update(tasksTable).set({ assignedTo: null }).where(eq(tasksTable.assignedTo, profileId));
+
+      // Delete profile
+      await db.delete(profilesTable).where(eq(profilesTable.id, profileId));
+
+      return ok({ deleted: profileId });
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);
     }

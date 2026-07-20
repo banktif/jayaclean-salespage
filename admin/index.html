@@ -1071,6 +1071,7 @@ async function showStaff(){
         h+='<td><div class="d-acts">';
         h+='<button class="d-btn" onclick="openEditStaff(\''+p.id+'\')">Edit</button>';
         h+=p.is_active?'<button class="d-btn del" onclick="setStaffActive(\''+p.id+'\',false)">Deactivate</button>':'<button class="d-btn acc" onclick="setStaffActive(\''+p.id+'\',true)">Activate</button>';
+        h+='<button class="d-btn del" onclick="deleteStaff(\''+p.id+'\',\''+esc(p.full_name)+'\')">Delete</button>';
         h+='</div></td></tr>';
       });
       h+='</tbody></table></div>';
@@ -1088,6 +1089,7 @@ async function showStaff(){
         h+='</div>';
         h+='<div class="staff-card-acts">';
         h+='<button class="d-btn" onclick="openEditStaff(\''+p.id+'\')">Edit</button>';
+        h+='<button class="d-btn del" onclick="deleteStaff(\''+p.id+'\',\''+esc(p.full_name)+'\')">Delete</button>';
         h+='</div></div>';
       });
       h+='</div>';
@@ -1124,7 +1126,8 @@ function openEditStaff(id){
       '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Address</div><textarea id="edAddress" class="mv-sel" rows="2">'+esc(p.address)+'</textarea>'+
       '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Assigned Area</div><select id="edArea" class="mv-sel">'+aHTML+'</select>'+
       '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Phone (login ID)</div><input id="edPhone" class="mv-sel" value="'+esc(p.phone)+'">'+
-      '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">New Password (leave blank to keep current)</div><input id="edPass" type="password" class="mv-sel" placeholder="Min 8 chars" autocomplete="new-password">';
+      '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Password</div><div style="display:flex;gap:8px;align-items:center"><input id="edPass" type="password" class="mv-sel" style="flex:1" placeholder="Min 8 chars" autocomplete="new-password"><button class="d-btn" onclick="generateStaffPassword()" title="Generate random password"><i data-lucide="key"></i> Generate</button></div>'+
+      '<div id="edPassResult" style="display:none;margin-top:6px;padding:8px 10px;background:var(--success-bg, #052e16);border-radius:6px;font-size:.85rem;font-family:monospace;word-break:break-all"></div>';
     document.getElementById('mActs').innerHTML='<button class="m-btn accept" onclick="saveEditStaff(\''+id+'\')">Save</button><button class="m-btn close" onclick="closeModal()">Close</button>';
     openModalFrame();
     relucide();
@@ -1136,6 +1139,16 @@ function pickEditAvatar(){
     try{var url=await cloudinaryUpload(inp.files[0],'jayabina/staff');editAvatar=url;prev.innerHTML='<img src="'+url+'">';}
     catch(e){alert(e.message);prev.innerHTML='<i data-lucide="user"></i>';relucide();}};
   inp.click();
+}
+function generateStaffPassword(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
+  var pw='';
+  for(var i=0;i<12;i++)pw+=chars.charAt(Math.floor(Math.random()*chars.length));
+  var inp=document.getElementById('edPass');
+  inp.type='text';inp.value=pw;
+  var res=document.getElementById('edPassResult');
+  res.style.display='block';
+  res.innerHTML='<span style="font-size:.7rem;color:var(--text2)">Generated password (copy it now):</span><br><strong style="font-size:1.1rem">'+esc(pw)+'</strong><br><span style="font-size:.65rem;color:var(--text3)">This password has been set. Click Save to keep it.</span>';
 }
 async function saveEditStaff(id){
   var r=await callStaffAdmin({action:'update',user_id:id,full_name:document.getElementById('edName').value.trim(),email:document.getElementById('edEmail').value.trim(),phone:document.getElementById('edPhone').value.trim(),address:document.getElementById('edAddress').value.trim(),service_area:document.getElementById('edArea').value,avatar_url:editAvatar});
@@ -1160,6 +1173,9 @@ async function callStaffAdmin(payload){
   }else if(payload.action==='reset_password'){
     url=API_URL+'/api/auth/reset-password';method='POST';
     body={user_id:payload.user_id,new_password:payload.password};
+  }else if(payload.action==='delete'){
+    url=API_URL+'/api/profiles/'+payload.user_id;method='DELETE';
+    body=undefined;
   }else if(payload.action==='bulk_create'){
     url=API_URL+'/api/profiles/bulk';method='POST';
     body={staff:payload.staff};
@@ -1182,6 +1198,11 @@ async function addStaff(){
 }
 async function setStaffActive(id,active){
   var r=await callStaffAdmin({action:'set_active',user_id:id,is_active:active});
+  if(r.ok)showStaff();else alert('Error: '+(r.body.error||'failed'));
+}
+async function deleteStaff(id,name){
+  if(!confirm('Delete staff "'+name+'" permanently? This cannot be undone.'))return;
+  var r=await callStaffAdmin({action:'delete',user_id:id});
   if(r.ok)showStaff();else alert('Error: '+(r.body.error||'failed'));
 }
 async function resetStaffPassword(id){
