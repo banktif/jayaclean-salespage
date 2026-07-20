@@ -32,7 +32,7 @@ Owner: Abdul Latif / banktifweb@gmail.com
 | Editor | GrapesJS (sales page editor) |
 
 Supabase project ref: `thbscwlcyhcnqsppoyfn` — https://thbscwlcyhcnqsppoyfn.supabase.co
-GitHub repo: `banktif/jayaclean-salespage` (branch `master`)
+GitHub repo: `banktif/jayabina-salespage` (branch `master`)
 Domain: `www.jayabina.com` (GitHub Pages; CNAME file present)
 
 ---
@@ -42,7 +42,7 @@ Domain: `www.jayabina.com` (GitHub Pages; CNAME file present)
 - **Language:** All admin/staff system UI + docs + code = **English**. WhatsApp message templates = **Bahasa Melayu**. Customer-facing pages (`index.html`, `success.html`, `test-pay.html`) stay **Bahasa Melayu**.
 - **WhatsApp:** Semi-auto `wa.me` (free). No paid gateway. Messages pre-filled, sent with one tap.
 - **Auth:** Supabase Auth. Admin + 50 staff have real accounts. Staff login via phone → synthetic email (`<digits>@staff.jayabina.local`) + password set by admin.
-- **Photo storage:** Cloudinary unsigned upload preset. Folder `jayaclean/tasks`.
+- **Photo storage:** Cloudinary unsigned upload preset. Folder `jayabina/tasks`.
 - **Auto-assign:** Toggle in Settings > Automation. Can be On (auto) or Off (manual). Default: Off.
 - **Config:** Non-secret config in `app_settings` table (Settings UI). Secrets in Supabase Edge secrets. Staff credentials in Supabase Auth (never plaintext).
 - **Payment amount:** Always computed server-side from DB (`bookings.deposit_amount`), never trusted from client.

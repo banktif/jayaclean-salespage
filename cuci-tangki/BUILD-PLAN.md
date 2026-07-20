@@ -69,7 +69,7 @@ Goal: staff see their schedule, start/finish jobs with photos.
 - [x] Photos saved to `task_photos`
 
 Verify: staff RLS end-to-end tested (read own task, read booking, update status, insert photo) - all OK. Syntax checked.
-- [ ] Owner action: create Cloudinary unsigned preset `jayaclean_tasks` (folder `jayaclean/tasks`) so real uploads work
+- [ ] Owner action: create Cloudinary unsigned preset `jayabina_tasks` (folder `jayabina/tasks`) so real uploads work
 
 ---
 
@@ -98,4 +98,4 @@ Verify: new confirmed booking auto-assigned (round-robin) OK; distribute RPC ass
 - [ ] Admin email confirmed: `banktifweb1@gmail.com` (set password on first login / via dashboard)
 - [ ] 50 staff list (name + phone) for bulk import
 - [ ] Bank details + QR image (upload to Cloudinary)
-- [ ] Cloudinary: create unsigned upload preset (folder `jayaclean/tasks`) + rotate exposed api_secret
+- [ ] Cloudinary: create unsigned upload preset (folder `jayabina/tasks`) + rotate exposed api_secret

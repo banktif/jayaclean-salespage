@@ -11,13 +11,13 @@
 This section supersedes older Supabase architecture and deploy notes below.
 
 - ⛔ **ADMIN SYSTEM LOCKED (owner order, 2026-07-18):** `admin.jayabina.com` (Pages project `jayabina-admin`, `admin/index.html`, `admin/editor.html`, `admin/vendor/`) must NEVER be deleted, modified, or redeployed without an explicit owner instruction in the current session.
-- Frontend: www.jayabina.com (Hugo build from `site/`). Booking funnel PRIMARY di `www.jayabina.com/servis-cuci-tangki-air/`: booking → Bayarcash deposit RM150 → `www.jayabina.com/success.html`. Worker var `SITE_URL=https://www.jayabina.com`. The old cuci.jayabina.com Pages project (`jayaclean`) has been decommissioned — all content migrated to www.
+- Frontend: www.jayabina.com (Hugo build from `site/`). Booking funnel PRIMARY di `www.jayabina.com/servis-cuci-tangki-air/`: booking → Bayarcash deposit RM150 → `www.jayabina.com/success.html`. Worker var `SITE_URL=https://www.jayabina.com`. The old cuci.jayabina.com Pages project (`jayabina`) has been decommissioned — all content migrated to www.
 - Portals: staff → `staff.jayabina.com` (Worker `jayabina-staff-router`, `cf-staff-router/`, serves `/worker/` from www); pelanggan → `akaun.jayabina.com` (Worker `jayabina-akaun-router`, `cf-akaun-router/`, serves `/customer/` from www).
 - CI: `.github/workflows/deploy-cloudflare-pages.yml` deploys TWO projects on push to master: `jayabina` (www, Hugo build from `site/`, `--branch main`) and `jayabina-admin` (admin panel, `--branch master`).
-- API: Cloudflare Worker `jayaclean-api` (`cf-api/`). **Canonical public URL: `https://api.jayabina.com`** (Worker custom domain, added 2026-07-18). The legacy `https://jayaclean-api.banktifweb.workers.dev` hostname still works but must not be referenced in frontend code. Do NOT redeploy the Worker under a new name — secrets (Bayarcash, backup, GH_PAT) cannot be copied and payments would break.
-- Database/Auth: Cloudflare D1 `jayaclean-db` plus custom PBKDF2/JWT auth. Supabase is legacy source data only and is no longer called by the production frontend.
+- API: Cloudflare Worker `jayabina-api` (`cf-api/`). **Canonical public URL: `https://api.jayabina.com`** (Worker custom domain, added 2026-07-18). The legacy `https://jayabina-api.banktifweb.workers.dev` hostname still works but must not be referenced in frontend code. Do NOT redeploy the Worker under a new name — secrets (Bayarcash, backup, GH_PAT) cannot be copied and payments would break.
+- Database/Auth: Cloudflare D1 `jayabina-db` plus custom PBKDF2/JWT auth. Supabase is legacy source data only and is no longer called by the production frontend.
 - Frontend client: `/jc-api.js`; served apps are `admin/index.html`, `worker/index.html`, and `customer/index.html`.
-- Backup: native R2 binding `BACKUP_R2` to bucket `jayaclean-backups`; password hashes and `private_settings` are excluded from archive payloads.
+- Backup: native R2 binding `BACKUP_R2` to bucket `jayabina-backups`; password hashes and `private_settings` are excluded from archive payloads.
 - Secrets: use `wrangler secret put`. Never add empty secret placeholders to `wrangler.jsonc`, because a deploy can overwrite a real secret binding.
 - Worker deploy: `cd cf-api && wrangler deploy`.
 - Frontend deploy: run `build.sh` where Hugo is installed, then `wrangler pages deploy public --project-name jayabina --branch main`.
@@ -55,7 +55,7 @@ Owner: Abdul Latif / banktifweb@gmail.com
 | Editor | GrapesJS (sales page editor) |
 
 Supabase project ref: `thbscwlcyhcnqsppoyfn` — https://thbscwlcyhcnqsppoyfn.supabase.co
-GitHub repo: `banktif/jayaclean-salespage` (branch `master`)
+GitHub repo: `banktif/jayabina-salespage` (branch `master`)
 Domain: `www.jayabina.com` (Cloudflare Pages; CNAME file present for migration)
 
 ---
@@ -205,7 +205,7 @@ Template placeholders: `{nama}`, `{alamat}`, `{tarikh}`, `{slot}`, `{baki}`, `{b
 
 ### Hosting
 **Cloudflare Pages** (migrated from GitHub Pages). Build command: `bash build.sh`. Output: `public/`.
-Repo source: `banktif/jayaclean-salespage` (branch `master`).
+Repo source: `banktif/jayabina-salespage` (branch `master`).
 Cloudflare Pages auto-deploys on every push to master.
 
 ### URL / file structure (clean URLs)
@@ -238,7 +238,7 @@ Root `admin.html`, `staff.html`, `login.html` = redirect stubs. `login/` removed
 
 ### Backup system
 - **Code → GitLab:** `.github/workflows/mirror-to-gitlab.yml`, cron `0 19 * * *` (daily 3AM MYT) + manual dispatch. Mirrors ALL owned repos (private) via `push --mirror`. Repo secrets: `GH_PAT`, `GL_TOKEN`, `GL_USER`.
-- **DB → Google Drive + Cloudflare R2:** hourly pg_cron `jayaclean-db-backup` calls `backup` fn with `x-backup-key`; fn honors `backup_freq_drive` / `backup_freq_r2` (hourly/daily/weekly/monthly). Config entered in admin Backup page → `private_settings`.
+- **DB → Google Drive + Cloudflare R2:** hourly pg_cron `jayabina-db-backup` calls `backup` fn with `x-backup-key`; fn honors `backup_freq_drive` / `backup_freq_r2` (hourly/daily/weekly/monthly). Config entered in admin Backup page → `private_settings`.
 - Admin Backup page = `showBackup()` in `admin/index.html` (nav `dsBackup`, hash `#backup`). If it disappears, a GrapesJS/overwrite happened — re-add from PROJECT-MEMORY/BUILD-PLAN.
 
 ### app_settings — backup keys
@@ -257,7 +257,7 @@ Root `admin.html`, `staff.html`, `login.html` = redirect stubs. `login/` removed
 `sw.js` network-first, cache `jayabina-v1`. Cloudflare cache rule bypasses `/sw.js`, `/theme.css`, HTML. To force update: purge Cloudflare + clear browser SW/site data once.
 
 ### Deploy note
-Deploy Edge Functions + git ops from repo root (`Downloads/Jayaclean`). Management API for SQL:
+Deploy Edge Functions + git ops from repo root (`Downloads/jayabina`). Management API for SQL:
 `POST https://api.supabase.com/v1/projects/thbscwlcyhcnqsppoyfn/database/query` with `SUPABASE_ACCESS_TOKEN` (read SQL via `[System.IO.File]::ReadAllText` to avoid PS note-property JSON bug; keep SQL ASCII — no em-dashes).
 
 ---
@@ -310,7 +310,7 @@ blog/content/
 5. Zero touch for 3 months until all 5000 articles are live.
 
 ### Decap CMS (`blog/static/blog/admin/`)
-- `config.yml`: Backend=GitHub, repo=banktif/jayaclean-salespage, branch=master.
+- `config.yml`: Backend=GitHub, repo=banktif/jayabina-salespage, branch=master.
 - Collections: "blog" → folder `blog/content/blog`, fields: title, date, kategori, tag, description, image, body.
 - Media: Cloudinary (cloud_name `dkibczut`). Images uploaded via drag-drop in editor.
 

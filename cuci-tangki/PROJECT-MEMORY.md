@@ -16,7 +16,7 @@ Admin/staff system + docs = English. WhatsApp templates = Malay. Customer pages 
 | Admin panel | https://www.jayabina.com/admin |
 | Test calendar | https://www.jayabina.com/test-cal.html |
 | Test payment (RM2) | https://www.jayabina.com/test-pay.html |
-| GitHub repo | https://github.com/banktif/jayaclean-salespage |
+| GitHub repo | https://github.com/banktif/jayabina-salespage |
 
 ## Tech Stack (RM0)
 - Hosting: GitHub Pages + Cloudflare CDN/DNS (proxy ON, orange cloud)
@@ -40,7 +40,7 @@ All API keys, tokens, passwords are in the chat history. Ask user to re-provide 
 - Supabase: https://thbscwlcyhcnqsppoyfn.supabase.co
 - Bayarcash: https://console.bayar.cash
 - Cloudinary: https://console.cloudinary.com (dkibczut)
-- GitHub: account banktif, repo jayaclean-salespage
+- GitHub: account banktif, repo jayabina-salespage
 
 ## Database (Supabase)
 - Tables: bookings, slots (+ building: profiles, tasks, task_photos, app_settings)
