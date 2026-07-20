@@ -134,6 +134,24 @@
       .d-btn.acc:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
       .d-btn.don:hover{background:var(--accent2);color:#fff;border-color:var(--accent2)}
       .d-btn.del:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+      .staff-table-wrap{display:block}
+      .staff-card-list{display:none}
+    }
+
+    /* ════════ MOBILE STAFF CARDS ════════ */
+    @media(max-width:1023px){
+      .staff-table-wrap{display:none}
+      .staff-card-list{display:grid;gap:10px}
+      .staff-card{display:flex;align-items:center;gap:12px;background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .15s}
+      .staff-card:active{transform:scale(.985);border-color:var(--accent)}
+      .staff-card-av{width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--accent-light);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1.2rem;flex-shrink:0}
+      .staff-card-av img{width:100%;height:100%;object-fit:cover}
+      .staff-card-body{flex:1;min-width:0}
+      .staff-card-name{font-weight:700;font-size:.88rem}
+      .staff-card-phone{font-size:.74rem;color:var(--text3)}
+      .staff-card-email{font-size:.68rem;color:var(--text3)}
+      .staff-card-meta{font-size:.62rem;color:var(--text3);margin-top:2px}
+      .staff-card-acts{flex-shrink:0}
     }
 
     /* ════════ BADGE (shared) ════════ */
@@ -1042,7 +1060,7 @@ async function showStaff(){
     h+='<div class="sec"><span class="sec-title">Staff List</span><span class="sec-count">'+staff.length+'</span></div>';
     if(!staff.length){h+='<div class="empty"><div class="eicon"><i data-lucide="users"></i></div><h2>No staff yet</h2><p>Add your first staff above.</p></div>';}
     else{
-      h+='<div class="d-card"><table><thead><tr><th>Staff</th><th>Phone</th><th>Address</th><th>Area</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+      h+='<div class="d-card staff-table-wrap"><table><thead><tr><th>Staff</th><th>Phone</th><th>Address</th><th>Area</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
       staff.forEach(function(p){
         var av=p.avatar_url?'<div class="st-av sm"><img src="'+esc(p.avatar_url)+'"></div>':'<div class="st-av sm"><i data-lucide="user"></i></div>';
         h+='<tr><td><div style="display:flex;align-items:center;gap:10px">'+av+'<div><div class="d-name"><strong>'+esc(p.full_name)+'</strong></div>'+(p.email?'<span class="d-phone">'+esc(p.email)+'</span>':'')+'</div></div></td>';
@@ -1052,11 +1070,27 @@ async function showStaff(){
         h+='<td>'+(p.is_active?'<span class="bc-badge confirmed"><span class="bdot"></span>Active</span>':'<span class="bc-badge cancelled"><span class="bdot"></span>Inactive</span>')+'</td>';
         h+='<td><div class="d-acts">';
         h+='<button class="d-btn" onclick="openEditStaff(\''+p.id+'\')">Edit</button>';
-        h+='<button class="d-btn" onclick="resetStaffPassword(\''+p.id+'\')">Reset PW</button>';
         h+=p.is_active?'<button class="d-btn del" onclick="setStaffActive(\''+p.id+'\',false)">Deactivate</button>':'<button class="d-btn acc" onclick="setStaffActive(\''+p.id+'\',true)">Activate</button>';
         h+='</div></td></tr>';
       });
       h+='</tbody></table></div>';
+      // Mobile card list (visible below 1024px)
+      h+='<div class="staff-card-list">';
+      staff.forEach(function(p){
+        var av=p.avatar_url?'<img src="'+esc(p.avatar_url)+'">':'<i data-lucide="user"></i>';
+        h+='<div class="staff-card">';
+        h+='<div class="staff-card-av">'+av+'</div>';
+        h+='<div class="staff-card-body">';
+        h+='<div class="staff-card-name">'+esc(p.full_name)+'</div>';
+        h+='<div class="staff-card-phone">'+esc(p.phone)+'</div>';
+        if(p.email)h+='<div class="staff-card-email">'+esc(p.email)+'</div>';
+        h+='<div class="staff-card-meta">'+(p.service_area?esc(p.service_area):'-')+' &middot; '+(p.is_active?'Active':'Inactive')+'</div>';
+        h+='</div>';
+        h+='<div class="staff-card-acts">';
+        h+='<button class="d-btn" onclick="openEditStaff(\''+p.id+'\')">Edit</button>';
+        h+='</div></div>';
+      });
+      h+='</div>';
     }
     l.innerHTML=h;
   }catch(e){if(viewActive(viewId,'staff'))l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="alert-triangle"></i></div><h2>Error</h2><p>'+esc(errorMessage(e))+'</p></div>';}
@@ -1078,21 +1112,23 @@ function pickStaffAvatar(){
   inp.click();
 }
 function openEditStaff(id){
-  var p=staffCache.find(function(x){return x.id===id});if(!p)return;editAvatar=p.avatar_url||'';
-  document.getElementById('mTitle').innerHTML='<span class="m-dot"></span>Edit Staff';
-  var aHTML='<option value="">None</option>';
-  (settings.service_areas||'').split(',').map(function(s){return s.trim()}).filter(Boolean).forEach(function(a){aHTML+='<option value="'+esc(a)+'"'+(p.service_area===a?' selected':'')+'>'+esc(a)+'</option>'});
-  document.getElementById('mBody').innerHTML=
-    '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px"><div class="st-av" id="edAvPrev">'+(editAvatar?'<img src="'+esc(editAvatar)+'">':'<i data-lucide="user"></i>')+'</div><button class="d-btn" onclick="pickEditAvatar()">Change Photo</button></div>'+
-    '<div style="margin:6px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Full Name</div><input id="edName" class="mv-sel" value="'+esc(p.full_name)+'">'+
-    '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Email</div><input id="edEmail" class="mv-sel" value="'+esc(p.email)+'">'+
-    '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Address</div><textarea id="edAddress" class="mv-sel" rows="2">'+esc(p.address)+'</textarea>'+
-    '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Assigned Area</div><select id="edArea" class="mv-sel">'+aHTML+'</select>'+
-    '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Phone (login ID)</div><input id="edPhone" class="mv-sel" value="'+esc(p.phone)+'">'+
-    '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">New Password (leave blank to keep current)</div><input id="edPass" type="password" class="mv-sel" placeholder="Min 8 chars" autocomplete="new-password">';
-  document.getElementById('mActs').innerHTML='<button class="m-btn accept" onclick="saveEditStaff(\''+id+'\')">Save</button><button class="m-btn close" onclick="closeModal()">Close</button>';
-  openModalFrame();
-  relucide();
+  try{
+    var p=staffCache.find(function(x){return x.id===id});if(!p){alert('Staff not found in cache. Try refreshing.');return}editAvatar=p.avatar_url||'';
+    document.getElementById('mTitle').innerHTML='<span class="m-dot"></span>Edit Staff';
+    var aHTML='<option value="">None</option>';
+    (settings.service_areas||'').split(',').map(function(s){return s.trim()}).filter(Boolean).forEach(function(a){aHTML+='<option value="'+esc(a)+'"'+(p.service_area===a?' selected':'')+'>'+esc(a)+'</option>'});
+    document.getElementById('mBody').innerHTML=
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px"><div class="st-av" id="edAvPrev">'+(editAvatar?'<img src="'+esc(editAvatar)+'">':'<i data-lucide="user"></i>')+'</div><button class="d-btn" onclick="pickEditAvatar()">Change Photo</button></div>'+
+      '<div style="margin:6px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Full Name</div><input id="edName" class="mv-sel" value="'+esc(p.full_name)+'">'+
+      '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Email</div><input id="edEmail" class="mv-sel" value="'+esc(p.email)+'">'+
+      '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Address</div><textarea id="edAddress" class="mv-sel" rows="2">'+esc(p.address)+'</textarea>'+
+      '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Assigned Area</div><select id="edArea" class="mv-sel">'+aHTML+'</select>'+
+      '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">Phone (login ID)</div><input id="edPhone" class="mv-sel" value="'+esc(p.phone)+'">'+
+      '<div style="margin:10px 0 4px;font-size:.7rem;color:var(--text3);font-weight:600">New Password (leave blank to keep current)</div><input id="edPass" type="password" class="mv-sel" placeholder="Min 8 chars" autocomplete="new-password">';
+    document.getElementById('mActs').innerHTML='<button class="m-btn accept" onclick="saveEditStaff(\''+id+'\')">Save</button><button class="m-btn close" onclick="closeModal()">Close</button>';
+    openModalFrame();
+    relucide();
+  }catch(e){alert('Edit error: '+e.message);}
 }
 function pickEditAvatar(){
   var inp=document.createElement('input');inp.type='file';inp.accept='image/*';
