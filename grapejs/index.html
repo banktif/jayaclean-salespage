@@ -8,7 +8,6 @@
   <title>JAYABINA Visual Editor</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="vendor/grapes.min.css?v=0.23.2">
-  <link rel="stylesheet" href="vendor/tui-image-editor.min.css">
   <style>
     :root{--bg:#07150d;--surface:#0d1f15;--surface2:#13291c;--surface3:#193624;--line:#284b35;--text:#f2faf4;--muted:#9ab5a2;--accent:#38b86a;--accent2:#9ce7b7;--danger:#ff6b6b;--warning:#f8c15c;--radius:14px;--shadow:0 18px 55px rgba(0,0,0,.34)}
     *{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font:14px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
@@ -112,7 +111,6 @@
 </script>
 
 <script src="vendor/grapes-editor.bundle.js?v=0.23.2-full-all"></script>
-<script async src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 
 <script>
 'use strict';
@@ -144,17 +142,26 @@ function splitDocument(html){
 
 function handleFileOpen(file){
   if(!file)return;if(!confirmDiscard())return;
-  currentFileName=file.name||'untitled.html';var reader=new FileReader();
-  reader.onload=function(e){try{currentEnvelope=splitDocument(e.target.result);buildEditor()}catch(err){toast('Failed to parse HTML: '+err.message,false)}};
-  reader.onerror=function(){toast('Failed to read file',false)};reader.readAsText(file)
+  currentFileName=file.name||'untitled.html';
+  document.getElementById('fileInfo').innerHTML='<b>Loading '+esc(currentFileName)+'...</b><small>Parsing HTML</small>';
+  var reader=new FileReader();
+  reader.onload=function(e){try{currentEnvelope=splitDocument(e.target.result);_openWithRetry()}catch(err){toast('Failed to parse HTML: '+err.message,false);setInfo()}};
+  reader.onerror=function(){toast('Failed to read file',false);setInfo()};reader.readAsText(file)
+}
+
+function _openWithRetry(){
+  if(!window.JayaGrapesFull||!window.JayaGrapesFull.grapesjs){
+    document.getElementById('fileInfo').innerHTML='<b>Loading editor bundle...</b><small>Please wait</small>';
+    setTimeout(_openWithRetry,500);return
+  }
+  try{buildEditor()}catch(e){toast('Editor init failed: '+e.message,false);setInfo()}
 }
 
 function buildEditor(){
-  if(!window.JayaGrapesFull||!window.JayaGrapesFull.grapesjs){toast('Editor bundle not loaded. Refresh and try again.',false);return}
   G=window.JayaGrapesFull;if(editor){editor.destroy();document.getElementById('gjs').innerHTML=''}
-  var plugins=[G.presetWebpage,G.blocksBasic,G.pluginForms,G.pluginExport,G.customCode,G.touch,G.tabs,G.tooltip,G.styleBg,G.parserPostcss,G.blocksFlexbox,G.styleFilter,G.styleGradient,G.typed,G.tuiImageEditor,G.codeEditor,G.ckeditor].filter(Boolean);
+  var plugins=[G.presetWebpage,G.blocksBasic,G.pluginForms,G.pluginExport,G.customCode,G.touch,G.tabs,G.tooltip,G.styleBg,G.parserPostcss,G.blocksFlexbox,G.styleFilter,G.styleGradient,G.typed].filter(Boolean);
   var canvasStyles=(currentEnvelope.stylesheets||[]).map(function(href){try{return new URL(href,location.href).href}catch(e){return href}});
-  var config={container:'#gjs',height:'100%',width:'auto',fromElement:false,storageManager:false,panels:{defaults:[]},blockManager:{appendTo:'#blocksPanel'},styleManager:{appendTo:'#stylesPanel',sectors:styleSectors()},traitManager:{appendTo:'#traitsPanel'},layerManager:{appendTo:'#layersPanel'},selectorManager:{appendTo:'#selectorsPanel'},assetManager:{assets:[],upload:false},canvas:{styles:canvasStyles},deviceManager:{devices:[{id:'desktop',name:'Desktop',width:''},{id:'tablet',name:'Tablet',width:'768px',widthMedia:'992px'},{id:'mobile',name:'Mobile',width:'390px',widthMedia:'600px'}]},plugins:plugins,pluginsOpts:{[G.presetWebpage]:{modalImportTitle:'Import HTML',modalImportLabel:'Paste HTML and CSS here',blocksBasicOpts:{flexGrid:true},navbarOpts:{},countdownOpts:{},formsOpts:{}},[G.customCode]:{},[G.touch]:{},[G.tabs]:{},[G.tooltip]:{},[G.styleBg]:{},[G.parserPostcss]:{},[G.blocksFlexbox]:{},[G.styleFilter]:{},[G.styleGradient]:{},[G.typed]:{},[G.tuiImageEditor]:{config:{includeHotkeys:true,usageStatistics:false,hideHeader:true,selectionStyle:{cornerStyle:'circle',cornerSize:16}}},[G.codeEditor]:{},[G.ckeditor]:{options:{language:'en'}}},showOffsets:true,noticeOnUnload:false,avoidInlineStyle:true,components:currentEnvelope.bodyHtml,style:currentEnvelope.css};
+  var config={container:'#gjs',height:'100%',width:'auto',fromElement:false,storageManager:false,panels:{defaults:[]},blockManager:{appendTo:'#blocksPanel'},styleManager:{appendTo:'#stylesPanel',sectors:styleSectors()},traitManager:{appendTo:'#traitsPanel'},layerManager:{appendTo:'#layersPanel'},selectorManager:{appendTo:'#selectorsPanel'},assetManager:{assets:[],upload:false},canvas:{styles:canvasStyles},deviceManager:{devices:[{id:'desktop',name:'Desktop',width:''},{id:'tablet',name:'Tablet',width:'768px',widthMedia:'992px'},{id:'mobile',name:'Mobile',width:'390px',widthMedia:'600px'}]},plugins:plugins,pluginsOpts:{[G.presetWebpage]:{modalImportTitle:'Import HTML',modalImportLabel:'Paste HTML and CSS here',blocksBasicOpts:{flexGrid:true},navbarOpts:{},countdownOpts:{},formsOpts:{}},[G.customCode]:{},[G.touch]:{},[G.tabs]:{},[G.tooltip]:{},[G.styleBg]:{},[G.parserPostcss]:{},[G.blocksFlexbox]:{},[G.styleFilter]:{},[G.styleGradient]:{},[G.typed]:{}},showOffsets:true,noticeOnUnload:false,avoidInlineStyle:true,components:currentEnvelope.bodyHtml,style:currentEnvelope.css};
   editor=G.grapesjs.init(config);window.editor=editor;addMarketingBlocks();
   editor.on('load',function(){editor.clearDirtyCount()});
   editor.on('update',function(){if(!editor.getDirtyCount())return;dirty=true;document.getElementById('downloadBtn').disabled=false;setInfo('dirty','Unsaved changes')});
