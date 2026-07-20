@@ -4,6 +4,7 @@ import { err, ok, uuid, nowISO } from '../utils/helpers';
 import { requireAuth } from '../utils/middleware';
 import { createDb, type AppDb } from '../db/client';
 import { appSettings, bookings, customers, profiles, slots, taskPhotos, tasks } from '../db/schema';
+import { autoAssignTask } from './bookings';
 
 const taskFields = {
   id: tasks.id,
@@ -170,6 +171,61 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
 
       const updated = await db.select(taskFields).from(tasks).where(eq(tasks.id, taskId)).get();
       return ok(updated);
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  // POST /api/tasks/:id/accept (staff: accept assigned task → in_progress)
+  const acceptMatch = path.match(/^\/api\/tasks\/([a-f0-9-]+)\/accept$/);
+  if (acceptMatch && req.method === 'POST') {
+    try {
+      const payload = await requireAuth(req, env);
+      if (payload.role !== 'staff') return err('Staff only', 403);
+      const taskId = acceptMatch[1];
+      const now = nowISO();
+
+      const task = await db.select({ assigned_to: tasks.assignedTo, status: tasks.status })
+        .from(tasks).where(eq(tasks.id, taskId)).get();
+      if (!task) return err('Task not found', 404);
+      if (task.assigned_to !== payload.sub) return err('This task is not assigned to you', 403);
+      if (task.status !== 'assigned') return err('Task must be in assigned status', 409);
+
+      await db.update(tasks).set({ status: 'in_progress', startedAt: now, updatedAt: now })
+        .where(eq(tasks.id, taskId));
+
+      return ok({ message: 'Job accepted. You can now upload photos and complete the job.' });
+    } catch (e: any) {
+      return err(e.msg || 'Error', e.status || 400);
+    }
+  }
+
+  // POST /api/tasks/:id/reject (staff: reject assigned task → auto-reassign)
+  const rejectMatch = path.match(/^\/api\/tasks\/([a-f0-9-]+)\/reject$/);
+  if (rejectMatch && req.method === 'POST') {
+    try {
+      const payload = await requireAuth(req, env);
+      if (payload.role !== 'staff') return err('Staff only', 403);
+      const taskId = rejectMatch[1];
+      const now = nowISO();
+
+      const task = await db.select({ assigned_to: tasks.assignedTo, booking_id: tasks.bookingId })
+        .from(tasks).where(eq(tasks.id, taskId)).get();
+      if (!task) return err('Task not found', 404);
+      if (task.assigned_to !== payload.sub) return err('This task is not assigned to you', 403);
+      if (task.assigned_to === null) return err('Task is already unassigned', 409);
+
+      // Unassign
+      await db.update(tasks).set({ assignedTo: null, status: 'unassigned', updatedAt: now })
+        .where(eq(tasks.id, taskId));
+
+      // Auto-reassign to next available staff (area-based preferred)
+      const reassigned = await autoAssignTask(db, taskId);
+
+      return ok({
+        reassigned,
+        message: reassigned ? 'Task reassigned to another staff member' : 'No available staff found. Admin will assign manually.'
+      });
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);
     }

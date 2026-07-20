@@ -479,7 +479,7 @@ async function getSetting(db: AppDb, key: string): Promise<string> {
   return row?.value || '';
 }
 
-async function autoAssignTask(db: AppDb, taskId: string): Promise<boolean> {
+export async function autoAssignTask(db: AppDb, taskId: string): Promise<boolean> {
   const rule = await getSetting(db, 'auto_assign_rule') || 'round_robin';
   const task = await db.select({ id: tasks.id }).from(tasks)
     .where(and(eq(tasks.id, taskId), sql`${tasks.assignedTo} IS NULL`)).get();
