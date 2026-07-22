@@ -127,7 +127,7 @@
     .trust-item strong{display:block;margin-bottom:3px;color:var(--green-900);font-size:1.02rem}
     .trust-item span{display:block;color:var(--grey-600);font-size:.9rem;line-height:1.45}
 
-    .emotion-section{position:relative;overflow:hidden;background:var(--white)}
+    .emotion-section{position:relative;overflow:hidden;background:var(--green-50)}
     .emotion-grid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
     .emotion-copy h2{max-width:14ch}
     .emotion-copy .lead{color:#1a4031}
@@ -558,7 +558,7 @@
             <div class="form-step"><span>3</span>Butiran anda</div>
             <div class="form-grid">
               <div class="field"><label for="customerName">Nama penuh</label><input id="customerName" name="name" type="text" autocomplete="name" placeholder="Contoh: Ahmad Firdaus" aria-describedby="nameError" aria-invalid="false"><span class="error" id="nameError">Sila isi nama penuh.</span></div>
-              <div class="field"><label for="customerEmail">Emel <span class="field-optional">(pilihan)</span></label><input id="customerEmail" name="email" type="email" autocomplete="email" placeholder="emel@contoh.com" aria-invalid="false"><span class="error" id="emailError">Sila isi emel yang sah.</span></div>
+              <div class="field"><label for="customerEmail">Emel</label><input id="customerEmail" name="email" type="email" autocomplete="email" placeholder="emel@contoh.com" required aria-describedby="emailError" aria-invalid="false"><span class="error" id="emailError">Sila isi emel yang sah.</span></div>
               <div class="field"><label for="customerPhone">Nombor telefon</label><input id="customerPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Contoh: 0123456789" aria-describedby="phoneError" aria-invalid="false"><span class="error" id="phoneError">Masukkan nombor Malaysia yang sah.</span></div>
               <div class="field full"><label for="customerAddress">Alamat &amp; poskod</label><textarea id="customerAddress" name="address" autocomplete="street-address" placeholder="No. rumah, jalan, taman dan poskod" aria-describedby="addressError" aria-invalid="false"></textarea><span class="error" id="addressError">Sila masukkan alamat lengkap dan poskod.</span></div>
             </div>
@@ -710,7 +710,7 @@
         var address=document.getElementById('customerAddress').value.trim();
         var valid=true;
         showError('nameError','customerName',!name);if(!name)valid=false;
-        showError('emailError','customerEmail',!!(emailVal&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)));if(emailVal&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal))valid=false;
+        showError('emailError','customerEmail',!emailVal||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal));if(!emailVal||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal))valid=false;
         showError('phoneError','customerPhone',!/^01\d{8,9}$/.test(phone));if(!/^01\d{8,9}$/.test(phone))valid=false;
         showError('addressError','customerAddress',address.length<10);if(address.length<10)valid=false;
         if(!selectedDate){document.getElementById('selectedDate').textContent='Sila pilih tarikh.';document.getElementById('selectedDate').style.color='var(--error)';valid=false}else{document.getElementById('selectedDate').style.color=''}
