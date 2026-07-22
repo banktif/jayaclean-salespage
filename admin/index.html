@@ -1437,7 +1437,7 @@ async function loadTemplates(){
       var res=await websiteRequest('/templates?type='+types[i]),body=await res.json();
       if(!res.ok)throw new Error(body.error||'Unable to load templates');
       websiteState.templates[types[i]]=body.data.templates;
-      var active=body.data.templates.find(function(t){return t.is_active===1});
+      var active=body.data.templates.find(function(t){return t.isActive===1});
       websiteState.activeSlots[types[i]]=active?active.slot:0;
       websiteState.templateDirty[types[i]]=false;
     }
@@ -1460,11 +1460,11 @@ function selectTemplateSlot(type){
   var slotEl=document.getElementById('tplSlot_'+type),codeEl=document.getElementById('tplCode_'+type),msgEl=document.getElementById('tplMsg_'+type);
   if(!slotEl||!codeEl||!msgEl)return;
   var slot=parseInt(slotEl.value),templates=websiteState.templates[type]||[],tmpl=templates.find(function(t){return t.slot===slot});
-  codeEl.value=tmpl?tmpl.html_content:'';
+  codeEl.value=tmpl?tmpl.htmlContent:'';
   websiteState.templateDirty[type]=false;
   msgEl.style.color='var(--text3)';
-  var isActive=websiteState.activeSlots[type]===slot;
-  msgEl.textContent=tmpl&&tmpl.html_content?(isActive?'Template '+slot+' — currently active on website.':'Template '+slot+' — '+(tmpl.updated_at?'Saved '+tmpl.updated_at:'Not yet saved')+'.'):'Template '+slot+' is empty. Paste or upload HTML and save.';
+    var isActive=websiteState.activeSlots[type]===slot;
+    msgEl.textContent=tmpl&&tmpl.htmlContent?(isActive?'Template '+slot+' — currently active on website.':'Template '+slot+' — '+(tmpl.updatedAt?'Saved '+tmpl.updatedAt:'Not yet saved')+'.'):'Template '+slot+' is empty. Paste or upload HTML and save.';
 }
 async function saveTemplate(type){
   var slotEl=document.getElementById('tplSlot_'+type),codeEl=document.getElementById('tplCode_'+type),msgEl=document.getElementById('tplMsg_'+type);
@@ -1476,7 +1476,7 @@ async function saveTemplate(type){
     if(!res.ok)throw new Error(body.error||'Unable to save template');
     websiteState.templateDirty[type]=false;
     var templates=websiteState.templates[type]||[],idx=templates.findIndex(function(t){return t.slot===slot});
-    if(idx>=0){templates[idx].html_content=html;templates[idx].updated_at=new Date().toISOString()}else{templates.push({id:type+'-'+slot,type:type,slot:slot,name:'Template '+slot,html_content:html,is_active:0,created_at:new Date().toISOString(),updated_at:new Date().toISOString()})}
+    if(idx>=0){templates[idx].htmlContent=html;templates[idx].updatedAt=new Date().toISOString()}else{templates.push({id:type+'-'+slot,type:type,slot:slot,name:'Template '+slot,htmlContent:html,isActive:0,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()})}
     msgEl.style.color='var(--accent)';msgEl.textContent='Template '+slot+' saved.';
   }catch(e){msgEl.style.color='var(--danger)';msgEl.textContent='Error: '+errorMessage(e);}
 }
@@ -1490,7 +1490,7 @@ async function activateTemplate(type){
     if(!res.ok)throw new Error(body.error||'Unable to activate template');
     websiteState.activeSlots[type]=slot;
     var templates=websiteState.templates[type]||[];
-    templates.forEach(function(t){t.is_active=t.slot===slot?1:0});
+    templates.forEach(function(t){t.isActive=t.slot===slot?1:0});
     renderTemplates();
   }catch(e){msgEl.style.color='var(--danger)';msgEl.textContent='Error: '+errorMessage(e);}
 }
