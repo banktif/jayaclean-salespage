@@ -1448,8 +1448,14 @@ async function loadTemplates(){
 function renderTemplates(){
   var el=document.getElementById('tplContent');if(!el)return;
   var types=['header','footer_desktop','footer_mobile'],h='';
-  // Color theme section — header and footer separate
-  h+='<div class="panel" style="display:grid;gap:12px;border-left:3px solid var(--accent2);background:var(--accent-light)"><div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:10px"><i data-lucide="palette" style="color:var(--accent2);width:20px;height:20px"></i><b style="font-size:1rem;color:var(--text)">Color Theme</b></div><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:.72rem;color:var(--text2);white-space:nowrap">Header:</span><select id="tplThemeHeader" onchange="applyColorTheme()" style="font-size:.78rem;padding:6px 10px;border:1px solid var(--text3);border-radius:8px;background:var(--white);color:var(--text)"><option value="">...</option></select></div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:.72rem;color:var(--text2);white-space:nowrap">Footer:</span><select id="tplThemeFooter" onchange="applyColorTheme()" style="font-size:.78rem;padding:6px 10px;border:1px solid var(--text3);border-radius:8px;background:var(--white);color:var(--text)"><option value="">...</option></select></div></div></div><p style="margin:0;color:var(--text2);font-size:.82rem">Pick gradient colors independently for header and footer. All 10 are gradient-based (like the final CTA section).</p><div id="tplThemeMsg" style="font-size:.75rem;color:var(--text3)"></div></div>';
+  // Color theme section — color pickers with hex inputs
+  h+='<div class="panel" style="display:grid;gap:14px;border-left:3px solid var(--accent2);background:var(--accent-light)"><div style="display:flex;align-items:center;gap:10px"><i data-lucide="palette" style="color:var(--accent2);width:20px;height:20px"></i><b style="font-size:1rem;color:var(--text)">Color Theme</b></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+    '<div style="display:grid;gap:8px"><span style="font-size:.72rem;font-weight:700;color:var(--text)">Header Gradient</span><div style="display:flex;gap:8px;align-items:center"><input type="color" id="tplH1" value="#0d3b2e" style="width:36px;height:34px;border:0;border-radius:8px;cursor:pointer" onchange="tplSyncGradient(\'header\')"><input type="text" id="tplH1Hex" value="#0d3b2e" maxlength="7" style="width:80px;font-size:.78rem;padding:5px 8px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'header\')"><span style="font-size:.78rem;color:var(--text3)">→</span><input type="color" id="tplH2" value="#146c43" style="width:36px;height:34px;border:0;border-radius:8px;cursor:pointer" onchange="tplSyncGradient(\'header\')"><input type="text" id="tplH2Hex" value="#146c43" maxlength="7" style="width:80px;font-size:.78rem;padding:5px 8px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'header\')"></div><div id="tplPreviewH" style="height:20px;border-radius:6px;background:linear-gradient(135deg,#0d3b2e,#146c43)"></div></div>'+
+    '<div style="display:grid;gap:8px"><span style="font-size:.72rem;font-weight:700;color:var(--text)">Footer Gradient</span><div style="display:flex;gap:8px;align-items:center"><input type="color" id="tplF1" value="#0d3b2e" style="width:36px;height:34px;border:0;border-radius:8px;cursor:pointer" onchange="tplSyncGradient(\'footer\')"><input type="text" id="tplF1Hex" value="#0d3b2e" maxlength="7" style="width:80px;font-size:.78rem;padding:5px 8px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'footer\')"><span style="font-size:.78rem;color:var(--text3)">→</span><input type="color" id="tplF2" value="#146c43" style="width:36px;height:34px;border:0;border-radius:8px;cursor:pointer" onchange="tplSyncGradient(\'footer\')"><input type="text" id="tplF2Hex" value="#146c43" maxlength="7" style="width:80px;font-size:.78rem;padding:5px 8px;border:1px solid var(--text3);border-radius:6px;font-family:monospace" oninput="tplSyncGradient(\'footer\')"></div><div id="tplPreviewF" style="height:20px;border-radius:6px;background:linear-gradient(135deg,#0d3b2e,#146c43)"></div></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px"><button class="d-btn acc" onclick="applyColorTheme()"><i data-lucide="check"></i> Apply Colors &amp; Deploy</button></div>'+
+    '<div id="tplThemeMsg" style="font-size:.75rem;color:var(--text3)"></div></div>';
   types.forEach(function(type){
     var info=TPL_TYPES[type],templates=websiteState.templates[type]||[],activeSlot=websiteState.activeSlots[type];
     h+='<div class="panel" style="display:grid;gap:14px;border-left:3px solid var(--accent)"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:10px"><i data-lucide="'+info.icon+'" style="color:var(--accent);width:20px;height:20px"></i><b style="font-size:1rem;color:var(--text)">'+info.label+'</b>'+(activeSlot?'<span class="tpl-badge active">Active: Template '+activeSlot+'</span>':'<span class="tpl-badge inactive">No active template</span>')+'</div><div style="display:flex;gap:8px;align-items:center"><select id="tplSlot_'+type+'" onchange="selectTemplateSlot(\''+type+'\')" style="font-size:.78rem;padding:6px 10px;border:1px solid var(--text3);border-radius:8px;background:var(--white);color:var(--text)">'+[1,2,3].map(function(s){return'<option value="'+s+'"'+(websiteState.activeSlots[type]===s?' selected':'')+'>Template '+s+(websiteState.activeSlots[type]===s?' (active)':'')+'</option>'}).join('')+'</select></div></div><p style="margin:0;color:var(--text2);font-size:.82rem">'+info.desc+'</p><textarea id="tplCode_'+type+'" class="site-code" style="min-height:200px;font-size:.78rem;font-family:monospace" spellcheck="false" placeholder="Edit template HTML..."></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="d-btn acc" onclick="saveTemplate(\''+type+'\')"><i data-lucide="save"></i> Save template</button><button class="d-btn" onclick="activateTemplate(\''+type+'\')" title="Set this as the active template"><i data-lucide="check-circle"></i> Make active</button><label class="d-btn" style="cursor:pointer"><i data-lucide="upload"></i> Upload HTML<input type="file" accept=".html,.htm" style="display:none" onchange="uploadTemplateFile(event,\''+type+'\')"></label></div><div id="tplMsg_'+type+'" style="font-size:.75rem;color:var(--text3)">Select a template slot to load its HTML.</div></div>';
@@ -1506,31 +1512,45 @@ async function syncTemplates(){
     if(msgEl){msgEl.style.color='var(--accent)';msgEl.textContent='Templates synced! Website deploying (~1-3 min). Commit: '+esc((body.data.commit_sha||'').slice(0,7))}
   }catch(e){if(msgEl){msgEl.style.color='var(--danger)';msgEl.textContent='Error: '+errorMessage(e)}}
 }
+function tplSyncGradient(side){
+  var pfx=side==='header'?'H':'F';
+  var c1=document.getElementById('tpl'+pfx+'1'),c2=document.getElementById('tpl'+pfx+'2');
+  var h1=document.getElementById('tpl'+pfx+'1Hex'),h2=document.getElementById('tpl'+pfx+'2Hex');
+  var preview=document.getElementById('tplPreview'+pfx);
+  if(c1&&h1)h1.value=c1.value;if(c2&&h2)h2.value=c2.value;
+  if(c1&&c2&&preview)preview.style.background='linear-gradient(135deg,'+c1.value+','+c2.value+')';
+  // Also sync hex → color
+  var t1=document.getElementById('tpl'+pfx+'1'),t2=document.getElementById('tpl'+pfx+'2');
+  var x1=document.getElementById('tpl'+pfx+'1Hex'),x2=document.getElementById('tpl'+pfx+'2Hex');
+  if(t1&&x1&&/^#[0-9a-fA-F]{6}$/.test(x1.value))t1.value=x1.value;
+  if(t2&&x2&&/^#[0-9a-fA-F]{6}$/.test(x2.value))t2.value=x2.value;
+}
 async function loadColorTheme(){
   try{
     var res=await websiteRequest('/templates/theme'),body=await res.json();
     if(!res.ok)return;
-    var selH=document.getElementById('tplThemeHeader'),selF=document.getElementById('tplThemeFooter');
-    if(!selH||!selF)return;
-    var themes=body.data.themes,currentH=body.data.header,currentF=body.data.footer;
-    selH.innerHTML='';selF.innerHTML='';
-    Object.keys(themes).forEach(function(key){
-      var opt='<option value="'+key+'"';
-      selH.innerHTML+=opt+(key===currentH?' selected':'')+'>'+themes[key].name+'</option>';
-      selF.innerHTML+=opt+(key===currentF?' selected':'')+'>'+themes[key].name+'</option>';
-    });
+    var h=body.data.header.split(':'),f=body.data.footer.split(':');
+    setColor('H',h[0],h[1]);setColor('F',f[0],f[1]);
   }catch(e){}
 }
+function setColor(pfx,c1,c2){
+  var e1=document.getElementById('tpl'+pfx+'1'),e2=document.getElementById('tpl'+pfx+'2');
+  var x1=document.getElementById('tpl'+pfx+'1Hex'),x2=document.getElementById('tpl'+pfx+'2Hex');
+  var pv=document.getElementById('tplPreview'+pfx);
+  if(e1&&e2){e1.value=c1;e2.value=c2}if(x1&&x2){x1.value=c1;x2.value=c2}
+  if(pv)pv.style.background='linear-gradient(135deg,'+c1+','+c2+')';
+}
 async function applyColorTheme(){
-  var selH=document.getElementById('tplThemeHeader'),selF=document.getElementById('tplThemeFooter'),msg=document.getElementById('tplThemeMsg');
-  if(!selH||!selF||!msg)return;
-  var header=selH.value,footer=selF.value;if(!header||!footer)return;
-  if(!confirm('Change header to '+selH.options[selH.selectedIndex].text+' and footer to '+selF.options[selF.selectedIndex].text+'? This deploys immediately.'))return;
+  var msg=document.getElementById('tplThemeMsg');if(!msg)return;
+  var h1=document.getElementById('tplH1Hex').value,h2=document.getElementById('tplH2Hex').value;
+  var f1=document.getElementById('tplF1Hex').value,f2=document.getElementById('tplF2Hex').value;
+  if(!h1||!h2||!f1||!f2)return;
+  if(!confirm('Apply header '+h1+'→'+h2+' and footer '+f1+'→'+f2+'?'))return;
   msg.style.color='var(--text3)';msg.textContent='Applying...';
   try{
-    var res=await websiteRequest('/templates/theme',{method:'PUT',body:{header:header,footer:footer}}),body=await res.json();
+    var res=await websiteRequest('/templates/theme',{method:'PUT',body:{header:h1+':'+h2,footer:f1+':'+f2}}),body=await res.json();
     if(!res.ok)throw new Error(body.error||'Unable to apply theme');
-    msg.style.color='var(--accent)';msg.textContent='Theme applied! Deploying (~1-2 min).';
+    msg.style.color='var(--accent)';msg.textContent='Colors applied! Deploying (~1-2 min).';
   }catch(e){msg.style.color='var(--danger)';msg.textContent='Error: '+errorMessage(e);}
 }
 async function seedTemplates(){

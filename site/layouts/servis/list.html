@@ -1,4 +1,282 @@
 {{ define "main" }}
-<header class="page-hero"><div class="container"><span class="section-kicker">TIGA SERVIS UTAMA</span><h1>Pilih servis mengikut masalah rumah atau ofis anda.</h1><p class="lead">Setiap halaman menerangkan keadaan yang dinilai, proses umum dan maklumat yang perlu anda kongsi untuk langkah seterusnya.</p></div></header>
-<section class="section"><div class="container service-grid">{{ range hugo.Data.services }}{{ $base := "/images/roof/roof-hero" }}{{ if eq .key "tank" }}{{ $base = "/images/tank/tank-emotional" }}{{ else if eq .key "paint" }}{{ $base = "/images/paint/paint-hero" }}{{ end }}<article class="service-card"><a class="service-image" href="{{ .url }}">{{ partial "responsive-image.html" (dict "base" $base "alt" .alt "sizes" "(max-width: 767px) calc(100vw - 32px), 31vw") }}</a><div class="service-body"><span class="card-kicker">{{ .kicker }}</span><h3>{{ .title }}</h3><p>{{ .summary }}</p><a class="btn btn-secondary" href="{{ .url }}">Lihat Salespage</a></div></article>{{ end }}</div></section>
+{{ $b := hugo.Data.business }}
+{{ $services := hugo.Data.services }}
+<style>
+.sv-services{padding:clamp(78px,9vw,124px) 0;background:linear-gradient(180deg,#f1fbf5 0%,#e8f5ee 40%,#f4faf6 100%);position:relative;overflow:hidden}
+.sv-services::before{content:'';position:absolute;width:560px;height:560px;right:-220px;top:-240px;border-radius:50%;border:1px solid rgba(20,108,67,.1);box-shadow:0 0 0 80px rgba(20,108,67,.035),0 0 0 160px rgba(20,108,67,.02)}
+.sv-services::after{content:'';position:absolute;width:460px;height:460px;left:-230px;bottom:-260px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,199,142,.14),transparent 72%)}
+
+.sv-services .section-head,.sv-guide .section-head,.sv-why .section-head{display:flex;align-items:end;justify-content:space-between;gap:38px;margin-bottom:48px}
+.sv-services .section-head h2,.sv-guide .section-head h2,.sv-why .section-head h2{margin-bottom:0}
+.sv-services .section-head p,.sv-guide .section-head p,.sv-why .section-head p{margin:0;color:var(--muted);max-width:44ch;flex-shrink:0}
+
+.sv-guide{padding:clamp(78px,9vw,124px) 0;background:var(--grey);position:relative;overflow:hidden}
+.sv-guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;position:relative;z-index:1}
+.sv-guide-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 10px 34px rgba(5,46,34,.06);padding:30px;display:flex;flex-direction:column;gap:16px;transition:transform .2s ease,box-shadow .2s ease}
+.sv-guide-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.sv-guide-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:var(--mint);color:var(--green-800);font-family:var(--display);font-size:1.1rem;font-weight:800;margin-bottom:2px}
+.sv-guide-card h3{font-size:clamp(1.1rem,1.02rem + .3vw,1.35rem);margin-bottom:0}
+.sv-guide-symptoms{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.sv-guide-symptoms li{padding:10px 12px 10px 32px;border-radius:10px;background:var(--mint-soft);color:var(--muted);font-size:var(--font-small);line-height:1.5;position:relative}
+.sv-guide-symptoms li::before{content:'!';position:absolute;left:10px;top:10px;width:16px;height:16px;display:grid;place-items:center;border-radius:50%;background:var(--amber);color:var(--green-950);font-size:.65rem;font-weight:800;line-height:1}
+.sv-guide-match{padding:14px 0 0;border-top:1px solid var(--line);margin-top:auto}
+.sv-guide-match strong{display:block;color:var(--green-700);font-size:.74rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.sv-guide-match span{display:block;font-family:var(--display);font-size:1.12rem;font-weight:800;color:var(--ink)}
+
+.sv-why{padding:clamp(78px,9vw,124px) 0;background:linear-gradient(180deg,#f8faf9 0%,#eef7f1 100%);position:relative;overflow:hidden}
+.sv-why::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(20,108,67,.07) 1px,transparent 1.6px);background-size:24px 24px}
+.sv-why::after{content:'';position:absolute;width:420px;height:420px;right:-180px;bottom:-220px;border-radius:50%;background:radial-gradient(closest-side,rgba(157,227,186,.3),transparent 70%)}
+.sv-benefits-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;position:relative;z-index:1}
+.sv-benefit-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 10px 34px rgba(5,46,34,.06);padding:30px;display:grid;grid-template-columns:48px 1fr;gap:20px;align-items:start;transition:transform .2s ease,box-shadow .2s ease}
+.sv-benefit-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.sv-benefit-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:var(--mint);color:var(--green-800);font-family:var(--display);font-weight:800}
+.sv-benefit-card h3{font-size:clamp(1.12rem,1.05rem + .24vw,1.32rem);margin-bottom:8px}
+.sv-benefit-card p{margin:0;color:var(--muted);font-size:var(--font-small);line-height:1.6}
+
+.sv-steps{padding:clamp(78px,9vw,124px) 0;background:var(--white);position:relative}
+.sv-faq{padding:clamp(78px,9vw,124px) 0;background:linear-gradient(180deg,#f1fbf5 0%,#e8f5ee 50%,#f4faf6 100%);position:relative;overflow:hidden}
+.sv-faq::before{content:'';position:absolute;width:480px;height:480px;right:-200px;top:-220px;border-radius:50%;border:1px solid rgba(20,108,67,.1);box-shadow:0 0 0 70px rgba(20,108,67,.03)}
+.sv-faq::after{content:'';position:absolute;width:300px;height:300px;left:-140px;bottom:-160px;border-radius:50%;border:1px solid rgba(20,108,67,.09);box-shadow:0 0 0 55px rgba(20,108,67,.03)}
+
+.sv-final{padding-block:clamp(68px,7vw,92px);background:linear-gradient(135deg,var(--green-900),var(--green-700));color:var(--white);position:relative;overflow:hidden}
+.sv-final::before{content:'';position:absolute;width:620px;height:620px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-190px;top:-250px;box-shadow:0 0 0 90px rgba(255,255,255,.025),0 0 0 180px rgba(255,255,255,.018)}
+.sv-final-inner{display:flex;align-items:center;justify-content:space-between;gap:50px;position:relative;z-index:1}
+.sv-final h2{color:var(--white);margin-bottom:14px}
+.sv-final p{margin-bottom:0;color:#c9ddd3;max-width:60ch}
+.sv-final-actions{display:flex;gap:12px;flex-wrap:wrap;flex-shrink:0}
+
+@media(max-width:1023px){
+  .sv-guide-grid{grid-template-columns:repeat(2,1fr)}
+  .sv-guide-card:last-child:nth-child(odd){grid-column:1/3}
+}
+@media(max-width:767px){
+  .sv-services .section-head,.sv-guide .section-head,.sv-why .section-head{display:block;margin-bottom:32px}
+  .sv-services .section-head h2,.sv-guide .section-head h2,.sv-why .section-head h2{margin-bottom:14px}
+  .sv-guide-grid{grid-template-columns:1fr}
+  .sv-guide-card:last-child:nth-child(odd){grid-column:auto}
+  .sv-benefits-grid{grid-template-columns:1fr}
+  .sv-benefit-card{grid-template-columns:42px 1fr;padding:24px;gap:16px}
+  .sv-benefit-icon{width:42px;height:42px}
+  .sv-final-inner{align-items:flex-start;flex-direction:column;gap:28px}
+  .sv-final-actions{flex-direction:column;width:100%}
+  .sv-final-actions .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .sv-guide-card,.sv-benefit-card{transition-duration:.01ms !important}
+}
+</style>
+
+<header class="page-hero">
+  <div class="container">
+    <span class="section-kicker">TIGA SERVIS UTAMA</span>
+    <h1>Satu pasukan, tiga servis. Semua untuk rumah dan premis anda.</h1>
+    <p class="lead">Pilih servis yang anda perlukan. Setiap halaman menerangkan masalah yang dinilai, proses umum, dan maklumat yang perlu anda kongsi untuk langkah seterusnya.</p>
+  </div>
+</header>
+
+<section class="sv-services">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="section-kicker">Servis Kami</span><h2>Pilih servis yang anda perlu. Kami uruskan yang lain.</h2></div>
+      <p>Satu pasukan, tiga servis. Mula dengan satu — kami masih ada untuk selebihnya.</p>
+    </div>
+    <div class="service-grid">
+      {{ range $services }}
+      {{ $base := replace (replace .image "-800.webp" "") "-1200.webp" "" }}
+      <article class="service-card">
+        <a class="service-image" href="{{ .url }}">
+          {{ partial "responsive-image.html" (dict "base" $base "alt" .alt "sizes" "(max-width: 767px) calc(100vw - 32px), 31vw") }}
+        </a>
+        <div class="service-body">
+          <span class="card-kicker">{{ .kicker }}</span>
+          <h3>{{ .title }}</h3>
+          <p>{{ .summary }}</p>
+          <a class="btn btn-primary" href="{{ .url }}">
+            {{ if eq .key "tank" }}Tempah Cuci Tangki — Deposit RM150{{ else }}Dapatkan Sebut Harga{{ end }}
+          </a>
+        </div>
+      </article>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<section class="sv-guide">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="section-kicker">Panduan Memilih</span><h2>Servis mana yang anda perlukan?</h2></div>
+      <p>Kenal pasti simptom di bawah. Kalau masih tak pasti, WhatsApp kami — kami bantu tanpa syorkan benda yang anda tak perlu.</p>
+    </div>
+    <div class="sv-guide-grid">
+      <div class="sv-guide-card">
+        <div class="sv-guide-icon">01</div>
+        <h3>Masalah Atap</h3>
+        <ul class="sv-guide-symptoms">
+          <li>Atap bocor bila hujan lebat</li>
+          <li>Tampalan berkali-kali masih gagal</li>
+          <li>Kesan air kekuningan pada siling</li>
+          <li>Kayu kerangka atap mula reput</li>
+        </ul>
+        <div class="sv-guide-match">
+          <strong>Servis yang sesuai</strong>
+          <span>Tukar Atap Baharu</span>
+        </div>
+        <a class="btn btn-primary" href="https://wa.me/{{ $b.whatsapp }}?text={{ "Assalamualaikum JAYABINA. Saya ada masalah atap bocor. Poskod saya: ____. Saya nak tanya pasal servis tukar atap baharu." | urlquery }}" target="_blank" rel="noopener">WhatsApp — Tanya Pasal Atap</a>
+      </div>
+      <div class="sv-guide-card">
+        <div class="sv-guide-icon">02</div>
+        <h3>Masalah Tangki Air</h3>
+        <ul class="sv-guide-symptoms">
+          <li>Air paip keluar berkarat atau berpasir</li>
+          <li>Mandi terasa gatal-gatal</li>
+          <li>Bau pelik dari air paip</li>
+          <li>Tekanan air tiba-tiba rendah</li>
+        </ul>
+        <div class="sv-guide-match">
+          <strong>Servis yang sesuai</strong>
+          <span>Cuci Tangki Air</span>
+        </div>
+        <a class="btn btn-primary" href="https://wa.me/{{ $b.whatsapp }}?text={{ "Assalamualaikum JAYABINA. Saya nak tanya pasal servis cuci tangki air. Poskod saya: ____." | urlquery }}" target="_blank" rel="noopener">WhatsApp — Tanya Pasal Tangki</a>
+      </div>
+      <div class="sv-guide-card">
+        <div class="sv-guide-icon">03</div>
+        <h3>Masalah Dinding</h3>
+        <ul class="sv-guide-symptoms">
+          <li>Cat dinding mengelupas atau melecet</li>
+          <li>Warna dah pudar berbanding dulu</li>
+          <li>Kesan kulat atau lembapan pada dinding</li>
+          <li>Ingin segarkan ruang sebelum dijual atau disewa</li>
+        </ul>
+        <div class="sv-guide-match">
+          <strong>Servis yang sesuai</strong>
+          <span>Cat Rumah &amp; Ofis</span>
+        </div>
+        <a class="btn btn-primary" href="https://wa.me/{{ $b.whatsapp }}?text={{ "Assalamualaikum JAYABINA. Saya nak tanya pasal servis mengecat rumah. Poskod saya: ____." | urlquery }}" target="_blank" rel="noopener">WhatsApp — Tanya Pasal Cat</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sv-why">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="section-kicker">Kenapa Pilih JAYABINA</span><h2>Bukan kami yang cakap. Sistem kami yang buktikan.</h2></div>
+      <p>Setiap langkah direkod, setiap keputusan anda yang tentukan.</p>
+    </div>
+    <div class="sv-benefits-grid">
+      <article class="sv-benefit-card">
+        <span class="sv-benefit-icon">01</span>
+        <div>
+          <h3>Satu pasukan untuk tiga servis</h3>
+          <p>Tak perlu cari kontraktor berbeza untuk atap, tangki, dan cat. Satu pasukan kami uruskan semua — jimat masa dan koordinasi anda.</p>
+        </div>
+      </article>
+      <article class="sv-benefit-card">
+        <span class="sv-benefit-icon">02</span>
+        <div>
+          <h3>Sebut harga percuma</h3>
+          <p>Hantar gambar dan poskod di WhatsApp. Kami semak dulu, anda tak wajib teruskan. Tiada bayaran untuk semakan awal.</p>
+        </div>
+      </article>
+      <article class="sv-benefit-card">
+        <span class="sv-benefit-icon">03</span>
+        <div>
+          <h3>Rekod foto lengkap</h3>
+          <p>Foto sebelum, semasa, dan selepas dihantar ke WhatsApp anda. Anda nampak sendiri apa yang dibuat — bukan sekadar janji.</p>
+        </div>
+      </article>
+      <article class="sv-benefit-card">
+        <span class="sv-benefit-icon">04</span>
+        <div>
+          <h3>Harga anda setuju dulu</h3>
+          <p>Tiada kos tersembunyi. Skop kerja dan harga ditetapkan sebelum kami mula. Jumpa isu lain? Kami bagitahu dan tunggu kebenaran anda dulu.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sv-steps">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-kicker">Cara Nak Mula</span>
+      <h2>Tiga langkah mudah. Satu WhatsApp. Kerja siap.</h2>
+      <p>Proses kami ringkas dan telus. Anda tahu setiap langkah sebelum ia berlaku.</p>
+    </div>
+    <div class="step-grid">
+      <article class="step-card">
+        <div class="step-number">01</div>
+        <h3>Pilih servis yang anda perlukan</h3>
+        <p>Pilih antara tukar atap, cuci tangki air, atau mengecat — berdasarkan masalah yang anda hadapi sekarang.</p>
+      </article>
+      <article class="step-card">
+        <div class="step-number">02</div>
+        <h3>Hantar gambar dan poskod di WhatsApp</h3>
+        <p>Snap gambar masalah, hantar ke {{ $b.whatsapp }} bersama poskod. Kami semak dan beri sebut harga.</p>
+      </article>
+      <article class="step-card">
+        <div class="step-number">03</div>
+        <h3>Kami semak, beri harga, anda setuju baru mula</h3>
+        <p>Tiada komitmen sehingga anda setuju. Selepas setuju, kami jadualkan dan jalankan kerja — dengan rekod foto penuh.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sv-faq">
+  <div class="container faq-layout">
+    <div><span class="section-kicker">Soalan Lazim</span><h2>Jawapan jujur tentang servis kami.</h2><p class="muted">Kalau dah jelas — terus WhatsApp. Kalau belum, baca dulu.</p></div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false" aria-controls="sv-faq1">
+          <span>Saya tak pasti servis mana yang saya perlu. Macam mana?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer" id="sv-faq1" hidden>
+          <p>Hantar gambar dan ceritakan masalah anda di WhatsApp. Kami bantu kenal pasti tanpa syorkan benda yang anda tak perlu. Kadang-kadang masalah yang nampak kecil sebenarnya perlukan servis berbeza — kami beritahu terus terang.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false" aria-controls="sv-faq2">
+          <span>Boleh minta sebut harga untuk lebih dari satu servis?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer" id="sv-faq2" hidden>
+          <p>Boleh. Hantar maklumat untuk setiap servis yang anda perlukan — kami beri sebut harga untuk setiap satu secara berasingan. Anda boleh pilih nak teruskan yang mana dulu, ikut keutamaan anda.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false" aria-controls="sv-faq3">
+          <span>Kenapa harga atap dan cat tak tetap?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer" id="sv-faq3" hidden>
+          <p>Harga atap bergantung pada saiz bumbung, jenis atap, dan keadaan kerangka sedia ada. Harga cat bergantung pada keluasan dinding dan keadaan permukaan. Setiap rumah berbeza — sebab itu kami perlu semak gambar dan maklumat tapak dulu sebelum beri harga tepat. Cuci tangki air sahaja yang harga tetap RM300 kerana skop kerjanya seragam.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" type="button" aria-expanded="false" aria-controls="sv-faq4">
+          <span>Kalau saya perlukan dua servis, boleh buat sekali?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer" id="sv-faq4" hidden>
+          <p>Boleh. Kami boleh jadualkan dua servis dalam satu lawatan jika sesuai. Bagitahu di WhatsApp servis mana yang anda perlukan — kami aturkan jadual yang paling efisien untuk anda.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sv-final">
+  <div class="container sv-final-inner">
+    <div>
+      <h2>Apa masalah rumah anda hari ini?</h2>
+      <p>Satu WhatsApp, ceritakan masalah anda. Atap bocor, tangki kotor, atau dinding kusam — kami semak dan beri maklumat yang anda perlu, tanpa komitmen.</p>
+    </div>
+    <div class="sv-final-actions">
+      <a class="btn btn-wa" href="https://wa.me/{{ $b.whatsapp }}?text={{ "Assalamualaikum JAYABINA. Saya nak tanya pasal servis: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____. Cerita masalah: ____." | urlquery }}" target="_blank" rel="noopener">WhatsApp — Dapatkan Sebut Harga Percuma</a>
+      <a class="btn btn-outline" href="#top">Lihat Semua Servis</a>
+    </div>
+  </div>
+</section>
 {{ end }}

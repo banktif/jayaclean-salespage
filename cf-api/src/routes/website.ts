@@ -672,7 +672,7 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     return ok({ seeded: inserts.length, types: ['header', 'footer_desktop', 'footer_mobile'] });
   }
 
-  // ═══════════════ COLOR THEME — header & footer independent, all gradient ═══════════════
+  // ═══════════════ COLOR THEME — custom gradient via color picker ═══════════════
   if (path === '/api/website/templates/theme' && req.method === 'GET') {
     const db = createDb(env);
     const rows = await db.select({ key: appSettings.key, value: appSettings.value })
@@ -682,27 +682,22 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     const map: Record<string, string> = {};
     rows.forEach(r => { map[r.key] = r.value || ''; });
     return ok({
-      header: map['template_color_header'] || THEMES_DEFAULT.header,
-      footer: map['template_color_footer'] || THEMES_DEFAULT.footer,
-      themes: THEMES,
-      gradients: GRADIENTS
+      header: map['template_color_header'] || '#0d3b2e:#146c43',
+      footer: map['template_color_footer'] || '#0d3b2e:#146c43'
     });
   }
 
   if (path === '/api/website/templates/theme' && req.method === 'PUT') {
     if (!env.GH_PAT) return err('GitHub publishing is not configured', 503);
     const body = await safeJson(req);
-    const headerKey = typeof body.header === 'string' ? body.header : '';
-    const footerKey = typeof body.footer === 'string' ? body.footer : '';
-
-    if (headerKey && !GRADIENTS[headerKey]) return err('Invalid header theme key', 400);
-    if (footerKey && !GRADIENTS[footerKey]) return err('Invalid footer theme key', 400);
+    const headerVal = typeof body.header === 'string' ? body.header : '';
+    const footerVal = typeof body.footer === 'string' ? body.footer : '';
+    const re = /^#[0-9a-fA-F]{6}:#[0-9a-fA-F]{6}$/;
+    if (headerVal && !re.test(headerVal)) return err('Header must be format: #RRGGBB:#RRGGBB', 400);
+    if (footerVal && !re.test(footerVal)) return err('Footer must be format: #RRGGBB:#RRGGBB', 400);
 
     const db = createDb(env);
     const now = nowISO();
-    const updates: Array<{ key: string; value: string }> = [];
-
-    // Load current settings
     const existing = await db.select({ key: appSettings.key, value: appSettings.value })
       .from(appSettings).where(
         sql`${appSettings.key} IN ('template_color_header', 'template_color_footer')`
@@ -710,18 +705,18 @@ export async function handleWebsite(req: Request, env: Env, path: string): Promi
     const map: Record<string, string> = {};
     existing.forEach(r => { map[r.key] = r.value || ''; });
 
-    const currentHeader = map['template_color_header'] || THEMES_DEFAULT.header;
-    const currentFooter = map['template_color_footer'] || THEMES_DEFAULT.footer;
+    const finalHeader = headerVal || map['template_color_header'] || '#0d3b2e:#146c43';
+    const finalFooter = footerVal || map['template_color_footer'] || '#0d3b2e:#146c43';
 
-    const finalHeader = headerKey || currentHeader;
-    const finalFooter = footerKey || currentFooter;
+    const [h1, h2] = finalHeader.split(':');
+    const [f1, f2] = finalFooter.split(':');
 
     await db.insert(appSettings).values({ key: 'template_color_header', value: finalHeader, updatedAt: now })
       .onConflictDoUpdate({ target: appSettings.key, set: { value: finalHeader, updatedAt: now } });
     await db.insert(appSettings).values({ key: 'template_color_footer', value: finalFooter, updatedAt: now })
       .onConflictDoUpdate({ target: appSettings.key, set: { value: finalFooter, updatedAt: now } });
 
-    const css = generateThemeCSS(finalHeader, finalFooter);
+    const css = generateThemeCSS(h1, h2, f1, f2);
     try {
       const result = await multiFileGithubCommit(env.GH_PAT,
         { [THEME_PATH]: css },
@@ -754,62 +749,31 @@ const TEMPLATE_PATHS: Record<string, string> = {
 
 const THEME_PATH = 'site/layouts/partials/theme-colors.html';
 
-const THEMES_DEFAULT = { header: 'green', footer: 'green' };
-
-const GRADIENTS: Record<string, { name: string; gradient: string }> = {
-  green:   { name: 'JAYABINA Green',     gradient: 'linear-gradient(135deg,#0d3b2e,#146c43)' },
-  forest:  { name: 'Deep Forest',        gradient: 'linear-gradient(135deg,#052e22,#0d3b2e)' },
-  emerald: { name: 'Emerald',            gradient: 'linear-gradient(135deg,#064e3b,#059669)' },
-  teal:    { name: 'Teal Ocean',         gradient: 'linear-gradient(135deg,#115e59,#0d9488)' },
-  navy:    { name: 'Navy Blue',          gradient: 'linear-gradient(135deg,#1e3a5f,#2563eb)' },
-  slate:   { name: 'Slate Grey',         gradient: 'linear-gradient(135deg,#1e293b,#475569)' },
-  charcoal:{ name: 'Warm Charcoal',      gradient: 'linear-gradient(135deg,#292524,#57534e)' },
-  plum:    { name: 'Deep Plum',          gradient: 'linear-gradient(135deg,#4c1d95,#7c3aed)' },
-  burgundy:{ name: 'Burgundy',           gradient: 'linear-gradient(135deg,#7f1d1d,#dc2626)' },
-  dark:    { name: 'Classic Dark',       gradient: 'linear-gradient(135deg,#0a0a0a,#1c1c1c)' },
-};
-
-const THEMES: Record<string, { name: string }> = Object.fromEntries(
-  Object.entries(GRADIENTS).map(([k, v]) => [k, { name: v.name }])
-);
-
-function generateThemeCSS(headerKey: string, footerKey: string): string {
-  const hg = GRADIENTS[headerKey]?.gradient;
-  const fg = GRADIENTS[footerKey]?.gradient;
-  const isHeaderDark = !!hg;
-  const isFooterDark = !!fg;
-  const rules: string[] = ['<style>'];
-
-  if (fg) {
-    rules.push(
-      `.site-footer{background:${fg} !important;color:#fff}`,
-      `.site-footer a{color:#c7d8d1}`,
-      `.site-footer a:hover{color:#fff}`,
-      `.footer-col1 strong{color:#fff}`,
-      `.footer-col1 p{color:#c7d8d1}`,
-      `.footer-bottom{color:#9fb8ae;border-top-color:rgba(255,255,255,.12)}`,
-      `.f-acc{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.04)}`,
-      `.f-acc summary{color:#fff}`,
-      `.f-acc summary::after{color:#9de3ba}`,
-      `.f-links a{color:#c7d8d1}`,
-      `.f-links a:hover{color:#fff}`,
-      `.f-acc.static summary{color:#9de3ba}`
-    );
-  }
-
-  if (hg) {
-    rules.push(
-      `.site-nav{background:${hg} !important}`,
-      `.site-nav .brand{color:#fff}`,
-      `.site-nav .nav-links a{color:#fff}`,
-      `.site-nav .nav-links a:hover,.site-nav .nav-links a.active{color:#9de3ba}`,
-      `.site-nav .menu-toggle{border-color:rgba(255,255,255,.25)}`,
-      `.site-nav .menu-toggle span{background:#fff}`
-    );
-  }
-
-  rules.push('</style>');
-  return rules.join('\n');
+function generateThemeCSS(h1: string, h2: string, f1: string, f2: string): string {
+  const headerGradient = `linear-gradient(135deg,${h1},${h2})`;
+  const footerGradient = `linear-gradient(135deg,${f1},${f2})`;
+  return [
+    '<style>',
+    `.site-nav{background:${headerGradient} !important}`,
+    `.site-nav .brand{color:#fff}`,
+    `.site-nav .nav-links a{color:#fff}`,
+    `.site-nav .nav-links a:hover,.site-nav .nav-links a.active{color:#9de3ba}`,
+    `.site-nav .menu-toggle{border-color:rgba(255,255,255,.25)}`,
+    `.site-nav .menu-toggle span{background:#fff}`,
+    `.site-footer{background:${footerGradient} !important;color:#fff}`,
+    `.site-footer a{color:#c7d8d1}`,
+    `.site-footer a:hover{color:#fff}`,
+    `.footer-col1 strong{color:#fff}`,
+    `.footer-col1 p{color:#c7d8d1}`,
+    `.footer-bottom{color:#9fb8ae;border-top-color:rgba(255,255,255,.12)}`,
+    `.f-acc{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.04)}`,
+    `.f-acc summary{color:#fff}`,
+    `.f-acc summary::after{color:#9de3ba}`,
+    `.f-links a{color:#c7d8d1}`,
+    `.f-links a:hover{color:#fff}`,
+    `.f-acc.static summary{color:#9de3ba}`,
+    '</style>',
+  ].join('\n');
 }
 
 async function multiFileGithubCommit(token: string, files: Record<string, string>, message: string): Promise<{ commitSha: string }> {

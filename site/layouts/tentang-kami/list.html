@@ -1,0 +1,364 @@
+{{ define "main" }}
+{{ $b := hugo.Data.business }}
+{{ $services := hugo.Data.services }}
+
+<style>
+  .tk-page{overflow:hidden}
+  .tk-page .page-hero{padding:82px 0;background:var(--mint-soft)}
+  .tk-page .page-hero .container{max-width:880px}
+  .tk-page .page-hero h1{font-size:clamp(2.7rem,5vw,4.8rem)}
+  .tk-page .page-hero .lead{max-width:760px;color:var(--muted)}
+
+  /* siapa kami */
+  .tk-siapa{overflow:hidden;background:linear-gradient(180deg,var(--white) 0%,#f8faf9 60%,#f1fbf5 100%)}
+  .tk-siapa::before{content:'';position:absolute;width:560px;height:560px;right:-260px;bottom:-280px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,199,142,.11),transparent 72%)}
+  .tk-siapa::after{content:'';position:absolute;width:420px;height:420px;left:-180px;top:-120px;border-radius:50%;border:1px solid rgba(20,108,67,.08);box-shadow:0 0 0 60px rgba(20,108,67,.03)}
+  .tk-siapa-layout{display:grid;grid-template-columns:1fr 1fr;gap:clamp(44px,7vw,80px);align-items:center}
+  .tk-siapa-copy h2{max-width:22ch;margin-bottom:22px}
+  .tk-siapa-copy p{color:var(--grey-600);max-width:58ch}
+  .tk-facts-card{display:grid;gap:14px;padding:clamp(28px,5vw,46px);border-radius:30px;color:var(--white);background:var(--green-950);box-shadow:var(--shadow-green);position:relative;overflow:hidden}
+  .tk-facts-card::before{content:'';position:absolute;width:300px;height:300px;right:-120px;bottom:-140px;border-radius:50%;background:radial-gradient(closest-side,rgba(157,227,186,.18),transparent 70%)}
+  .tk-facts-card::after{content:'';position:absolute;width:200px;height:200px;left:-80px;top:-60px;border-radius:50%;border:1px solid rgba(255,255,255,.08)}
+  .tk-fact-item{position:relative;z-index:1;padding:16px 18px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.05)}
+  .tk-fact-item span{display:block;margin-bottom:2px;color:#9de1b9;font-size:.76rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .tk-fact-item strong{display:block;font-size:1.05rem;font-weight:700}
+  .tk-fact-item a{color:#9de3ba;text-decoration:underline;text-underline-offset:3px}
+  .tk-fact-item a:hover{color:#b7f0d0}
+
+  /* tiga servis */
+  .tk-servis{overflow:hidden;background:linear-gradient(180deg,var(--mint-soft) 0%,#e8f5ee 50%,var(--mint-soft) 100%)}
+  .tk-servis::before{content:'';position:absolute;width:480px;height:480px;left:-200px;bottom:-240px;border-radius:50%;border:1px solid rgba(20,108,67,.09);box-shadow:0 0 0 60px rgba(20,108,67,.025)}
+  .tk-servis::after{content:'';position:absolute;width:380px;height:380px;right:-160px;top:-170px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,199,142,.08),transparent 72%)}
+  .tk-servis .section-head{max-width:820px;margin-bottom:48px}
+  .tk-servis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .tk-svc-card{display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);background:var(--white);box-shadow:var(--shadow-sm);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+  .tk-svc-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#b9dec9}
+  .tk-svc-img{display:block;aspect-ratio:16/10;overflow:hidden;background:var(--grey)}
+  .tk-svc-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s ease}
+  .tk-svc-card:hover .tk-svc-img img{transform:scale(1.035)}
+  .tk-svc-body{display:flex;flex:1;flex-direction:column;padding:26px;gap:10px}
+  .tk-svc-body h3{font-size:clamp(1.12rem,1.05rem+.4vw,1.45rem);margin:0}
+  .tk-svc-body p{margin:0;color:var(--muted);font-size:.95rem;line-height:1.55;flex:1}
+  .tk-svc-body .btn{align-self:flex-start;margin-top:4px}
+
+  /* apa yang membezakan */
+  .tk-bezakan{overflow:hidden;background:linear-gradient(180deg,#f8faf9 0%,#eef7f1 100%)}
+  .tk-bezakan::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(20,108,67,.06) 1px,transparent 1.6px);background-size:22px 22px}
+  .tk-bezakan::after{content:'';position:absolute;width:460px;height:460px;right:-200px;bottom:-240px;border-radius:50%;background:radial-gradient(closest-side,rgba(157,227,186,.22),transparent 70%)}
+  .tk-bezakan .section-head{max-width:820px;margin-bottom:48px}
+  .tk-bezakan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .tk-benefit-card{display:grid;grid-template-columns:52px 1fr;gap:20px;align-items:start;padding:30px;border:1px solid var(--line);border-radius:var(--radius);background:var(--white);box-shadow:var(--shadow-sm);transition:transform .2s ease,box-shadow .2s ease}
+  .tk-benefit-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .tk-benefit-icon{width:52px;height:52px;display:grid;place-items:center;border-radius:15px;background:var(--mint);flex-shrink:0}
+  .tk-benefit-icon svg{width:24px;height:24px;color:var(--green-700)}
+  .tk-benefit-text h3{font-size:clamp(1.1rem,1.04rem+.22vw,1.3rem);margin-bottom:8px}
+  .tk-benefit-text p{margin:0;color:var(--muted);font-size:.94rem;line-height:1.6}
+
+  /* cara kami bekerja */
+  .tk-cara{overflow:hidden;background:linear-gradient(135deg,#f1fbf5 0%,var(--white) 45%,#f4faf6 100%)}
+  .tk-cara::before{content:'';position:absolute;width:540px;height:540px;left:-250px;top:-270px;border-radius:50%;border:1px solid rgba(20,108,67,.09);box-shadow:0 0 0 70px rgba(20,108,67,.03),0 0 0 140px rgba(20,108,67,.018)}
+  .tk-cara::after{content:'';position:absolute;width:360px;height:360px;right:-150px;bottom:-180px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,199,142,.1),transparent 72%)}
+  .tk-cara .section-head{max-width:820px;margin-bottom:48px}
+  .tk-cara-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .tk-step-card{position:relative;padding:30px;border:1px solid var(--line);border-radius:var(--radius);background:var(--white);box-shadow:var(--shadow-sm)}
+  .tk-step-card::after{content:'→';position:absolute;top:36px;right:-14px;z-index:2;width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--grey-200);border-radius:50%;background:var(--white);color:var(--green-700);font-weight:700;font-size:.95rem}
+  .tk-step-card:last-child::after{display:none}
+  .tk-step-num{font-family:'Bricolage Grotesque','Figtree',sans-serif;font-size:2.2rem;line-height:1;color:#83c8a0;font-weight:800;margin-bottom:16px}
+  .tk-step-card h3{font-size:clamp(1.12rem,1.06rem+.2vw,1.3rem);margin-bottom:8px}
+  .tk-step-card p{margin:0;color:var(--muted);font-size:.94rem;line-height:1.6}
+
+  /* faq */
+  .tk-faq{overflow:hidden;background:linear-gradient(135deg,#f1fbf5 0%,#e8f5ee 50%,#f4faf6 100%)}
+  .tk-faq::before{content:'';position:absolute;width:480px;height:480px;right:-200px;top:-220px;border-radius:50%;border:1px solid rgba(20,108,67,.1);box-shadow:0 0 0 70px rgba(20,108,67,.03)}
+  .tk-faq::after{content:'';position:absolute;width:300px;height:300px;left:-140px;bottom:-160px;border-radius:50%;border:1px solid rgba(20,108,67,.09);box-shadow:0 0 0 55px rgba(20,108,67,.03)}
+  .tk-faq-layout{display:grid;grid-template-columns:.65fr 1.35fr;gap:70px;align-items:start}
+  .tk-faq-list{border-top:1px solid var(--grey-200)}
+  .tk-faq-item{border-bottom:1px solid var(--grey-200)}
+  .tk-faq-q{width:100%;min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border:0;background:transparent;color:var(--grey-900);font-family:'Bricolage Grotesque','Figtree',sans-serif;font-size:1.08rem;font-weight:700;text-align:left;cursor:pointer}
+  .tk-faq-q:hover{color:var(--green-800)}
+  .tk-faq-plus{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:var(--mint);color:var(--green-700);font-family:'Figtree',sans-serif;font-size:1.2rem;transition:transform .2s ease,background .2s ease}
+  .tk-faq-q[aria-expanded="true"] .tk-faq-plus{transform:rotate(45deg);background:var(--green-700);color:var(--white)}
+  .tk-faq-a{padding:0 52px 22px 0;color:var(--muted);font-size:.95rem;line-height:1.65}
+  .tk-faq-a p{margin-bottom:0}
+
+  /* final cta */
+  .tk-cta{padding-block:clamp(68px,7vw,92px);background:linear-gradient(135deg,var(--green-900),var(--green-700));color:var(--white);position:relative;overflow:hidden}
+  .tk-cta::before{content:'';position:absolute;width:620px;height:620px;left:-280px;bottom:-320px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.06),transparent 65%)}
+  .tk-cta::after{content:'';position:absolute;width:400px;height:400px;right:-160px;top:-180px;border-radius:50%;border:1px solid rgba(255,255,255,.1);box-shadow:0 0 0 60px rgba(255,255,255,.025)}
+  .tk-cta-inner{display:flex;align-items:center;justify-content:space-between;gap:50px;position:relative;z-index:1}
+  .tk-cta h2{margin-bottom:14px;font-size:clamp(2.1rem,3.8vw,3.4rem);color:var(--white)}
+  .tk-cta p{margin-bottom:0;color:#d7e8e1;max-width:54ch}
+  .tk-cta-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
+
+  .js .tk-reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+  .js .tk-reveal.visible,.js.js-fallback .tk-reveal{opacity:1;transform:none}
+
+  @media(max-width:1023px){
+    .tk-siapa-layout{grid-template-columns:1fr;gap:40px}
+    .tk-servis-grid{grid-template-columns:repeat(2,1fr)}
+    .tk-servis-grid>article:last-child:nth-child(odd){grid-column:1/3}
+    .tk-bezakan-grid{grid-template-columns:1fr}
+    .tk-cara-grid{grid-template-columns:1fr}
+    .tk-step-card::after{display:none}
+    .tk-faq-layout{grid-template-columns:1fr;gap:44px}
+    .tk-cta-inner{align-items:flex-start;flex-direction:column;gap:28px}
+    .tk-cta-actions{justify-content:flex-start}
+    .tk-faq-a{padding-right:18px}
+  }
+
+  @media(max-width:767px){
+    .tk-siapa-layout{gap:32px}
+    .tk-servis-grid{grid-template-columns:1fr}
+    .tk-servis-grid>article:last-child:nth-child(odd){grid-column:auto}
+    .tk-bezakan-grid{grid-template-columns:1fr}
+    .tk-benefit-card{grid-template-columns:44px 1fr;padding:22px;gap:16px}
+    .tk-benefit-icon{width:44px;height:44px}
+    .tk-facts-card{padding:28px 22px;border-radius:24px}
+    .tk-svc-body{padding:22px}
+    .tk-step-card{padding:24px 22px}
+    .tk-faq-q{font-size:1rem;min-height:64px;padding:15px 0}
+    .tk-faq-a{padding-right:0;font-size:.9rem}
+    .tk-cta-actions{flex-direction:column;width:100%}
+    .tk-cta-actions .btn{width:100%;justify-content:center}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+    .js .tk-reveal{opacity:1;transform:none}
+  }
+</style>
+<noscript><style>.tk-reveal{opacity:1!important;transform:none!important}</style></noscript>
+
+<div class="tk-page">
+  <header class="page-hero">
+    <div class="container">
+      <span class="section-kicker">{{ .Params.eyebrow | default "Tentang JAYABINA" }}</span>
+      <h1>{{ .Params.headline | default .Title }}</h1>
+      {{ with .Description }}<p class="lead">{{ . }}</p>{{ end }}
+    </div>
+  </header>
+
+  <section class="section tk-siapa" id="siapa-kami">
+    <div class="container tk-siapa-layout">
+      <div class="tk-siapa-copy tk-reveal">
+        <span class="section-kicker">Siapa kami</span>
+        <h2>Primex Jaya Bina Solutions — syarikat servis rumah berdaftar di sebalik jenama JAYABINA.</h2>
+        <p>Kami bukan platform yang menyenaraikan kontraktor pihak ketiga. Setiap kerja yang dijalankan di bawah jenama JAYABINA diuruskan oleh pasukan syarikat yang sama. Anda berurusan terus — tanpa orang tengah, tanpa yuran tambahan.</p>
+        <p>Kami percaya servis rumah yang baik tak perlukan gimik rating, jumlah projek yang tak dapat disahkan, atau janji manis tanpa bukti. Yang kami ada: harga telus, rekod foto untuk setiap langkah kerja, dan komunikasi terbuka melalui WhatsApp.</p>
+      </div>
+      <div class="tk-facts-card tk-reveal">
+        <div class="tk-fact-item"><span>Nama syarikat</span><strong>{{ $b.legal_name }}</strong></div>
+        <div class="tk-fact-item"><span>No. pendaftaran</span><strong>{{ $b.company_number }}</strong></div>
+        <div class="tk-fact-item"><span>Domain rasmi</span><strong>{{ $b.domain }}</strong></div>
+        <div class="tk-fact-item"><span>Kawasan operasi</span><strong>{{ $b.service_area }}</strong></div>
+        <div class="tk-fact-item"><span>Hubungan</span><strong><a href="tel:{{ $b.phone_tel }}">{{ $b.phone_display }}</a></strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tk-servis" id="tiga-servis">
+    <div class="container">
+      <div class="section-head tk-reveal">
+        <div><span class="section-kicker">Servis kami</span><h2>Tiga servis di bawah satu jenama. Satu standard — anda tahu kos sebelum mula.</h2></div>
+        <p>Setiap servis diterangkan dalam halaman berasingan supaya anda faham masalah, proses, dan maklumat yang diperlukan untuk semakan awal.</p>
+      </div>
+      <div class="tk-servis-grid tk-reveal">
+        {{ range $services }}
+        <article class="tk-svc-card">
+          <a class="tk-svc-img" href="{{ .url }}" aria-label="{{ .name }}">
+            <img src="{{ .image }}" width="800" height="500" loading="lazy" decoding="async" alt="{{ .alt | default .name }}">
+          </a>
+          <div class="tk-svc-body">
+            <h3>{{ .name }}</h3>
+            <p>{{ .summary }}</p>
+            <a class="btn btn-primary" href="{{ .url }}">Lihat halaman {{ .name | lower }}</a>
+          </div>
+        </article>
+        {{ end }}
+      </div>
+    </div>
+  </section>
+
+  <section class="section tk-bezakan" id="membezakan">
+    <div class="container">
+      <div class="section-head tk-reveal">
+        <div><span class="section-kicker">Apa yang membezakan kami</span><h2>Kami tak janji. Kami tunjuk bukti.</h2></div>
+        <p>Setiap kerja direkod dengan foto. Harga ditetapkan sebelum mula. Tiada apa yang tersembunyi.</p>
+      </div>
+      <div class="tk-bezakan-grid tk-reveal">
+        <article class="tk-benefit-card">
+          <div class="tk-benefit-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+          </div>
+          <div class="tk-benefit-text">
+            <h3>Harga telus — anda tahu kos sebelum kerja mula</h3>
+            <p>Kami beri sebut harga lengkap berdasarkan skop sebenar. Tiada angka mengejut di akhir kerja. Anda setuju dulu, baru kami mula — prinsip ini tidak pernah berubah.</p>
+          </div>
+        </article>
+        <article class="tk-benefit-card">
+          <div class="tk-benefit-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="tk-benefit-text">
+            <h3>Rekod foto — setiap langkah direkod dan dihantar ke WhatsApp</h3>
+            <p>Foto sebelum kerja, foto semasa proses, dan foto selepas siap. Semua dihantar ke WhatsApp anda sebagai bukti kerja yang telah dijalankan.</p>
+          </div>
+        </article>
+        <article class="tk-benefit-card">
+          <div class="tk-benefit-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="tk-benefit-text">
+            <h3>Tiada kerja tambahan tersembunyi</h3>
+            <p>Kalau semasa kerja kami jumpa isu lain yang perlu ditangani, kami maklumkan kepada anda dulu. Anda yang putuskan — teruskan atau tidak. Tidak ada kerja tambahan dibuat tanpa kebenaran anda.</p>
+          </div>
+        </article>
+        <article class="tk-benefit-card">
+          <div class="tk-benefit-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <div class="tk-benefit-text">
+            <h3>Semakan WhatsApp percuma — tanpa kewajiban</h3>
+            <p>Hantar gambar masalah dan poskod anda ke WhatsApp. Kami semak secara percuma dan beri pandangan jujur. Tak perlu teruskan kalau tak bersedia — itu hak anda.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tk-cara" id="cara-bekerja">
+    <div class="container">
+      <div class="section-head tk-reveal">
+        <div><span class="section-kicker">Cara kami bekerja</span><h2>Tiga langkah mudah. Satu WhatsApp. Selesai.</h2></div>
+        <p>Tak perlu isi borang panjang, tak perlu tunggu panggilan. Hantar saja di WhatsApp.</p>
+      </div>
+      <div class="tk-cara-grid tk-reveal">
+        <article class="tk-step-card">
+          <div class="tk-step-num">01</div>
+          <h3>Anda hantar pertanyaan di WhatsApp</h3>
+          <p>Hantar gambar masalah yang anda alami bersama poskod lokasi. Terangkan sedikit apa yang berlaku dan servis mana yang anda perlukan. Tak pasti servis mana? Ceritakan saja — kami bantu kenal pasti.</p>
+        </article>
+        <article class="tk-step-card">
+          <div class="tk-step-num">02</div>
+          <h3>Kami semak dan beri sebut harga</h3>
+          <p>Kami lihat maklumat yang anda beri dan balas dengan anggaran atau sebut harga. Anda semak, tanya apa yang tak jelas, dan putuskan. Anda setuju dulu — baru kami jadualkan lawatan.</p>
+        </article>
+        <article class="tk-step-card">
+          <div class="tk-step-num">03</div>
+          <h3>Kerja siap, rekod foto dihantar</h3>
+          <p>Kerja dijalankan mengikut skop yang dipersetujui. Setiap langkah direkod dengan foto — sebelum, semasa, dan selepas. Semua dihantar ke WhatsApp anda sebagai rekod lengkap.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tk-faq" id="soalan-lazim">
+    <div class="container tk-faq-layout">
+      <div class="tk-reveal">
+        <span class="section-kicker">Soalan lazim</span>
+        <h2>Jawapan jujur untuk soalan yang sering ditanya.</h2>
+        <p class="muted">Kalau jawapan di bawah tak cukup jelas, WhatsApp terus — kami jawab secara peribadi.</p>
+      </div>
+      <div class="tk-faq-list tk-reveal">
+        <div class="tk-faq-item">
+          <button class="tk-faq-q" type="button" aria-expanded="false" aria-controls="tk-faq-1">
+            <span>Kenapa tiada rating atau jumlah projek dipaparkan di laman ini?</span>
+            <span class="tk-faq-plus" aria-hidden="true">+</span>
+          </button>
+          <div class="tk-faq-a" id="tk-faq-1" hidden>
+            <p>Kami memilih untuk tidak menggunakan rating, jumlah projek, tempoh pengalaman atau jaminan yang tidak dapat disahkan secara bebas. Laman ini direka untuk memberi maklumat tentang servis kami — bukan untuk mempengaruhi anda dengan angka yang tak boleh dibuktikan. Anda dinasihatkan untuk membuat penilaian sendiri berdasarkan maklumat yang diberi dan komunikasi terus dengan kami.</p>
+          </div>
+        </div>
+        <div class="tk-faq-item">
+          <button class="tk-faq-q" type="button" aria-expanded="false" aria-controls="tk-faq-2">
+            <span>Macam mana saya boleh pasti JAYABINA syarikat berdaftar?</span>
+            <span class="tk-faq-plus" aria-hidden="true">+</span>
+          </button>
+          <div class="tk-faq-a" id="tk-faq-2" hidden>
+            <p>Nama syarikat <strong>{{ $b.legal_name }}</strong> dan nombor pendaftaran <strong>{{ $b.company_number }}</strong> dipaparkan di laman ini. Anda boleh menyemak status pendaftaran ini melalui carian rasmi SSM (Suruhanjaya Syarikat Malaysia) atau menghubungi kami terus untuk sebarang pertanyaan lanjut.</p>
+          </div>
+        </div>
+        <div class="tk-faq-item">
+          <button class="tk-faq-q" type="button" aria-expanded="false" aria-controls="tk-faq-3">
+            <span>Kenapa servis atap dan cat tak boleh ditempah terus melalui laman ini?</span>
+            <span class="tk-faq-plus" aria-hidden="true">+</span>
+          </button>
+          <div class="tk-faq-a" id="tk-faq-3" hidden>
+            <p>Servis tukar atap dan mengecat memerlukan penilaian tapak — saiz, keadaan sedia ada, bahan diperlukan, dan akses ke lokasi. Setiap projek adalah unik dari segi skop dan harga. Oleh itu, semakan awal melalui WhatsApp adalah perlu supaya sebut harga yang diberi adalah tepat dan adil. Servis cuci tangki air pula mempunyai harga tetap RM300, dan boleh ditempah terus melalui halaman servis tersebut.</p>
+          </div>
+        </div>
+        <div class="tk-faq-item">
+          <button class="tk-faq-q" type="button" aria-expanded="false" aria-controls="tk-faq-4">
+            <span>Kawasan mana yang JAYABINA liputi?</span>
+            <span class="tk-faq-plus" aria-hidden="true">+</span>
+          </button>
+          <div class="tk-faq-a" id="tk-faq-4" hidden>
+            <p>Kawasan operasi kami ialah <strong>{{ $b.service_area }}</strong>. Jika lokasi anda di luar kawasan ini, WhatsApp kami dulu — kami akan beritahu terus terang sama ada kami boleh sampai atau tidak.</p>
+          </div>
+        </div>
+        <div class="tk-faq-item">
+          <button class="tk-faq-q" type="button" aria-expanded="false" aria-controls="tk-faq-5">
+            <span>Macam mana nak mula? Ada kos untuk bertanya?</span>
+            <span class="tk-faq-plus" aria-hidden="true">+</span>
+          </button>
+          <div class="tk-faq-a" id="tk-faq-5" hidden>
+            <p>Semakan awal adalah <strong>PERCUMA</strong> dan tanpa sebarang kewajiban. Hantar gambar masalah dan poskod anda ke WhatsApp <strong>{{ $b.phone_display }}</strong>. Kami semak dan beri maklum balas. Tak perlu bayar apa-apa untuk bertanya. Anda cuma teruskan jika bersedia dan berpuas hati dengan maklumat yang kami beri.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tk-cta">
+    <div class="container tk-cta-inner tk-reveal">
+      <div>
+        <h2>Hantar gambar sekarang. Kami beri sebut harga percuma.</h2>
+        <p>Satu WhatsApp, ceritakan masalah anda. Atap bocor, tangki kotor, atau dinding kusam — kami uruskan. Hantar gambar dan poskod ke {{ $b.phone_display }}. Semakan percuma, tanpa komitmen.</p>
+      </div>
+      <div class="tk-cta-actions">
+        <a class="btn btn-wa" href="https://wa.me/{{ $b.whatsapp }}?text={{ "Assalamualaikum JAYABINA. Saya mahu bertanya tentang servis. Jenis servis: ____. Poskod saya: ____. Cerita masalah: ____." | urlquery }}" target="_blank" rel="noopener">WhatsApp — Dapatkan Sebut Harga Percuma</a>
+        <a class="btn btn-outline" href="#tiga-servis" style="color:var(--white);border-color:rgba(255,255,255,.42)">Lihat Semua Servis</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var d=document;
+  d.querySelectorAll('.tk-faq-q').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var open=this.getAttribute('aria-expanded')==='true';
+      d.querySelectorAll('.tk-faq-q').forEach(function(other){
+        other.setAttribute('aria-expanded','false');
+        var target=d.getElementById(other.getAttribute('aria-controls'));
+        if(target)target.hidden=true;
+      });
+      if(!open){
+        this.setAttribute('aria-expanded','true');
+        var target=d.getElementById(this.getAttribute('aria-controls'));
+        if(target)target.hidden=false;
+      }
+    });
+  });
+
+  function initReveal(){
+    if(!('IntersectionObserver' in window)){
+      d.querySelectorAll('.tk-reveal').forEach(function(el){el.classList.add('visible')});
+      return;
+    }
+    var obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    },{threshold:.08});
+    d.querySelectorAll('.tk-reveal').forEach(function(el){obs.observe(el)});
+  }
+  if(d.readyState==='loading'){d.addEventListener('DOMContentLoaded',initReveal)}else{initReveal()}
+})();
+</script>
+
+{{ end }}
