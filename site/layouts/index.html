@@ -16,6 +16,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  {{ with resources.Get "css/main.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+  {{ end }}
   <title>JAYABINA — Servis Tukar Atap, Cuci Tangki Air &amp; Mengecat | KL &amp; Selangor</title>
   <script>document.documentElement.className='js';window.setTimeout(function(){document.documentElement.classList.add('js-fallback')},2500);</script>
   <style>
@@ -288,22 +291,7 @@
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
 <body>
-  <nav class="site-nav" aria-label="Navigasi utama">
-    <div class="container nav-inner">
-      <a class="brand" href="/" aria-label="JAYABINA - halaman utama"><img class="brand-mark" src="/logo.png" width="768" height="123" alt="JAYABINA"></a>
-      <ul class="nav-links">
-        <li><a href="#servis">Servis</a></li>
-        <li><a href="#kenapa">Kenapa Kami</a></li>
-        <li><a href="#proses">Proses</a></li>
-        <li><a href="#tentang">Tentang</a></li>
-        <li><a href="#faq">FAQ</a></li>
-      </ul>
-      <div class="nav-right">
-        <div class="nav-actions"><a class="btn btn-primary js-whatsapp" data-message="Assalamualaikum JAYABINA. Saya nak tanya pasal servis: ____ (tukar atap / cuci tangki / mengecat). Poskod saya: ____. Cerita masalah: ____." href="https://wa.me/60139373275" target="_blank" rel="noopener">WhatsApp Kami</a></div>
-        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Buka menu" aria-controls="mobileMenu" aria-expanded="false"><span></span><span></span><span></span></button>
-      </div>
-    </div>
-  </nav>
+  {{ partial "header.html" . }}
   {{ partial "burger-menu.html" . }}
 
   <main>
