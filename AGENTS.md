@@ -134,7 +134,49 @@ This section supersedes older Supabase architecture and deploy notes below.
   npx wrangler deploy
   git add -A && git commit -m "rollback: restore booking form template" && git push origin master
   ```
-- ⛔ **SERVICE PAGE HERO DESIGN LOCKED (owner order, 2026-07-20):** The hero sections of all 3 service pages (`site/layouts/partials/service-tank.html`, `service-paint.html`, `service-roof.html`) must NEVER have their mobile layout changed from: **center headline/subheadline → image → buttons, NO text below buttons**. Specific rules: 1) headline + subheadline text-align:center 2) image directly below subheadline 3) no hero-note or any text below buttons (deleted permanently). Desktop 2-column grid layout preserved via CSS grid (1fr 1fr or 1fr 1.5fr). These files are also covered by the GrapesJS `protectReason()` guard which blocks `site/` path edits.
+- ⛔ **HERO SECTION DESIGN LOCKED (owner order, 2026-07-22):** The hero sections of ALL pages (homepage `site/layouts/index.html` + 3 service pages `site/layouts/partials/service-tank.html`, `service-roof.html`, `service-paint.html`) must NEVER be modified, restructured, or reformatted by any AI agent or debug session. This lock protects HTML structure, CSS grid layout, spacing values, and mobile/desktop behavior. Violating ANY rule below will BREAK the hero section layout.
+
+  **🔒 HARD RULES — any violation = hero layout break:**
+
+  **A. HTML STRUCTURE (service pages):**
+  1. `.hero-actions` MUST be placed INSIDE `.hero-copy` — directly after `.lead` paragraph, NOT in a separate grid row.
+  2. `.hero-visual` MUST be a direct child of `.hero-grid` in grid column 2, spanning all rows.
+  3. Structure must match: `hero-copy > [hero-badge, h1, .lead, .hero-actions]` then `hero-visual`.
+
+  **B. CSS GRID LAYOUT (service pages, desktop):**
+  1. `.hero-grid` MUST use: `display:grid; grid-template-columns:1fr 1.5fr; column-gap:56px; row-gap:20px; align-items:center` (tank) or `1fr 1fr` (roof/paint).
+  2. `.hero-grid .hero-copy{grid-column:1; grid-row:1}`
+  3. `.hero-grid>.hero-visual{grid-column:2; grid-row:1/3}` (or `1/4` depending on content)
+  4. NEVER add `.hero-grid>.hero-actions` grid rule — hero-actions is inside hero-copy.
+  5. NEVER change `column-gap:56px` or `row-gap:20px`.
+
+  **C. SPACING (service pages, desktop):**
+  1. `.hero-copy>.lead{margin-bottom:30px}` — this creates the gap between subheadline and buttons. DO NOT change.
+  2. NO `margin-top` on `.hero-actions`.
+  3. `.hero-actions{display:flex; gap:12px; flex-wrap:wrap}` — DO NOT change.
+
+  **D. MOBILE LAYOUT (all pages, ≤1023px):**
+  1. Mobile order MUST be: **center headline → center subheadline → image → buttons, NO text below buttons**.
+  2. `.hero-grid` must collapse to single column: `grid-template-columns:1fr; row-gap:20px`.
+  3. All `.hero-grid>` children must have `grid-column:auto; grid-row:auto`.
+  4. `.hero-copy` must have `text-align:center` on mobile.
+  5. `.hero-copy h1, .hero-copy .lead` must have `text-align:center` on mobile.
+  6. NEVER add `.hero-note` or any text element below `.hero-actions`.
+
+  **E. HOMEPAGE HERO (site/layouts/index.html):**
+  1. Same rules as service pages for mobile layout.
+  2. Desktop grid: `grid-template-columns:minmax(0,1.12fr) minmax(390px,.88fr); gap:64px`.
+  3. `.hero-actions` inside `.hero-copy` with natural flow — DO NOT place in separate grid row.
+  4. `.hero-panel` (service preview cards) in column 2.
+
+  **🛡️ ROLLBACK to known-good hero state:**
+  ```bash
+  git show 1e611a7:site/layouts/partials/service-tank.html > site/layouts/partials/service-tank.html
+  git show 1e611a7:site/layouts/partials/service-roof.html > site/layouts/partials/service-roof.html
+  git show 1e611a7:site/layouts/partials/service-paint.html > site/layouts/partials/service-paint.html
+  git show d044ae6:site/layouts/index.html > site/layouts/index.html
+  ```
+  These tags are protected — never delete them.
 - ⛔ **FULLWIDTH LAYOUT LOCKED (owner order, 2026-07-20):** Both portals must remain fullwidth on desktop — `.d-main` has NO `max-width` constraint. Content stretches to fill available space.
 - ⛔ **PERSISTENT LOGIN LOCKED (owner order, 2026-07-20):** Login session must survive page refresh indefinitely. Worker: token in localStorage + `jc_user_cache` fallback. Customer: `jc_login_phone` in localStorage with `autoLogin()`. Only explicit logout clears the session. Do NOT change this behavior.
 - ⛔ **HEADER, FOOTER & BURGER-MENU SYSTEM LOCKED (owner order, 2026-07-22):** The following files form the UNIVERSAL template-driven header/footer system. They must NEVER be modified, deleted, reformatted, or have their structure changed by any AI agent, debug session, or automated tool — ONLY the admin template system (sync button) may write to the partial files listed below. Violating any rule in this section will BREAK the ENTIRE website header/footer across ALL pages.
