@@ -244,5 +244,8 @@ ul{margin:0;padding-left:1.2rem}
   .mosaic-large,.mosaic-small{min-height:0;margin-bottom:12px;aspect-ratio:4/3}
   .footer-grid{grid-template-columns:1fr}
   .footer-grid>div:first-child,.footer-grid>div:last-child{grid-column:auto}
+  .footer-col1{text-align:center}
+  .footer-col1 img{margin-inline:auto}
+  .footer-col1 p{max-width:none}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
