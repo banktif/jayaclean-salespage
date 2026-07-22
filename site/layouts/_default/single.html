@@ -1,5 +1,110 @@
 {{ define "main" }}
 {{ $b := site.Data.business }}
-<header class="page-hero"><div class="container"><span class="section-kicker">{{ .Params.eyebrow | default "JAYABINA" }}</span><h1>{{ .Params.headline | default .Title }}</h1>{{ with .Description }}<p class="lead">{{ . }}</p>{{ end }}</div></header>
-<section class="section"><div class="container content-layout"><article class="prose">{{ .Content }}</article>{{ if .Params.contactPage }}<aside class="contact-card"><span class="section-kicker">HUBUNGI TERUS</span><h2>WhatsApp JAYABINA</h2><p>Hantar maklumat servis, lokasi atau poskod dan gambar jika ada.</p><a class="btn btn-secondary" href="https://wa.me/{{ $b.whatsapp }}?text={{ "Assalamualaikum JAYABINA. Saya mahu bertanya tentang servis. Jenis servis: ____. Lokasi/poskod: ____." | urlquery }}" target="_blank" rel="noopener">Mulakan Pertanyaan</a><p class="fine-print">Telefon: <a href="tel:{{ $b.phone_tel }}">{{ $b.phone_display }}</a><br>{{ $b.legal_name }}<br>{{ $b.company_number }}</p></aside>{{ end }}</div></section>
+{{ $months := slice "Januari" "Februari" "Mac" "April" "Mei" "Jun" "Julai" "Ogos" "September" "Oktober" "November" "Disember" }}
+
+<header class="page-hero">
+  <div class="container">
+    {{ with .Params.categories }}
+    <div class="article-cats" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+      {{ range . }}
+      <a class="badge-pill" href="{{ "/categories/" | relURL }}{{ . | urlize }}/" style="display:inline-flex;align-items:center;padding:5px 13px;border-radius:50px;background:rgba(157,227,186,.15);color:#9de3ba;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(157,227,186,.2)">{{ . }}</a>
+      {{ end }}
+    </div>
+    {{ end }}
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p class="lead">{{ . }}</p>{{ end }}
+    <div style="display:flex;align-items:center;gap:16px;margin-top:14px;flex-wrap:wrap">
+      {{ $d := .Date }}
+      <time style="color:#9fb8ae;font-size:.9rem;font-weight:600" datetime="{{ $d.Format "2006-01-02" }}">{{ $d.Day }} {{ index $months (sub $d.Month 1) }} {{ $d.Year }}</time>
+      {{ with .Params.tags }}
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        {{ range . }}
+        <a href="{{ "/tags/" | relURL }}{{ . | urlize }}/" style="color:#9fb8ae;font-size:.78rem;text-decoration:none;border-bottom:1px dotted rgba(255,255,255,.2)">#{{ . }}</a>
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</header>
+
+<article class="section">
+  <div class="container content-layout">
+    <div class="prose">{{ .Content }}</div>
+    <aside class="article-sidebar">
+      <div class="sidebar-card">
+        <span class="section-kicker">KONGSI ARTIKEL</span>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+          <a class="btn btn-outline" href="https://wa.me/?text={{ .Title | urlquery }}%20{{ .Permalink }}" target="_blank" rel="noopener" style="flex:1;min-width:0;font-size:.8rem;min-height:40px">WhatsApp</a>
+          <a class="btn btn-outline" href="https://www.facebook.com/sharer/sharer.php?u={{ .Permalink }}" target="_blank" rel="noopener" style="flex:1;min-width:0;font-size:.8rem;min-height:40px">Facebook</a>
+        </div>
+      </div>
+
+      {{ if .Params.categories }}
+      <div class="sidebar-card" style="margin-top:18px">
+        <span class="section-kicker">KATEGORI</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+          {{ range .Params.categories }}
+          <a class="badge-pill" href="{{ "/categories/" | relURL }}{{ . | urlize }}/" style="display:inline-flex;align-items:center;padding:5px 13px;border-radius:50px;background:var(--mint-soft, #f1fbf5);color:var(--green-700, #146c43);font-size:.75rem;font-weight:700;text-transform:uppercase;text-decoration:none;letter-spacing:.04em">{{ . }}</a>
+          {{ end }}
+        </div>
+      </div>
+      {{ end }}
+
+      <div class="sidebar-card" style="margin-top:18px">
+        <span class="section-kicker">PERLU BANTUAN?</span>
+        <p style="color:var(--muted);font-size:.9rem;margin:10px 0">Hantar gambar atau ceritakan masalah anda di WhatsApp. Semakan percuma.</p>
+        <a class="btn btn-wa" href="https://wa.me/{{ $b.whatsapp }}?text={{ "Assalamualaikum JAYABINA. Saya mahu bertanya tentang servis. Jenis servis: ____. Lokasi/poskod: ____." | urlquery }}" target="_blank" rel="noopener" style="width:100%;font-size:.88rem">Tanya di WhatsApp</a>
+      </div>
+    </aside>
+  </div>
+</article>
+
+{{ $related := where (where site.RegularPages "Section" "blog") "RelPermalink" "!=" .RelPermalink | first 3 }}
+{{ if $related }}
+<section class="section section-mint" style="padding:clamp(50px,6vw,80px) 0">
+  <div class="container">
+    <div class="section-head"><span class="section-kicker">Artikel berkaitan</span><h2>Teruskan membaca</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px">
+      {{ range $related }}
+      <article style="border:1px solid var(--line,#d9e1dd);border-radius:18px;background:var(--white);overflow:hidden;box-shadow:0 2px 12px rgba(5,46,34,.05);transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column">
+        {{ if .Params.image }}
+        <a href="{{ .RelPermalink }}" style="aspect-ratio:16/10;overflow:hidden;display:block"><img src="{{ .Params.image }}" alt="{{ .Title }}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy"></a>
+        {{ else }}
+        <a href="{{ .RelPermalink }}" style="aspect-ratio:16/10;overflow:hidden;display:grid;place-items:center;background:linear-gradient(135deg,#f1fbf5,#dff5e8)"><svg width="48" height="48" viewBox="0 0 80 80"><rect width="80" height="80" rx="16" fill="#146c43" opacity=".08"/><path d="M28 56V28l24 14-24 14z" fill="#146c43" opacity=".2"/></svg></a>
+        {{ end }}
+        <div style="padding:20px;display:flex;flex-direction:column;gap:8px;flex:1">
+          <h3 style="font-size:1.05rem;font-weight:700;line-height:1.25;margin:0"><a href="{{ .RelPermalink }}" style="color:var(--ink,#10221b);text-decoration:none">{{ .Title }}</a></h3>
+          <p style="color:var(--muted,#5c6d65);font-size:.88rem;line-height:1.5;margin:0;flex:1">{{ .Description | default (.Summary | plainify | truncate 140) }}</p>
+        </div>
+      </article>
+      {{ end }}
+    </div>
+  </div>
+</section>
+{{ end }}
+
+<style>
+  .page-hero{position:relative;overflow:hidden;padding:clamp(60px,8vw,90px)0 clamp(50px,6vw,72px);background:linear-gradient(135deg,#0d3b2e 0%,#145c3d 40%,#146c43 70%,#0f8b5a 100%);color:#fff}
+  .page-hero::before{content:'';position:absolute;width:500px;height:500px;right:-200px;top:-220px;border-radius:50%;border:1px solid rgba(255,255,255,.08);box-shadow:0 0 0 80px rgba(74,222,128,.04),0 0 0 160px rgba(74,222,128,.02)}
+  .page-hero::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.03)1px,transparent 1px);background-size:28px 28px;pointer-events:none}
+  .page-hero .container{position:relative}
+  .page-hero h1{color:#fff;font-size:clamp(1.8rem,4vw,3rem);max-width:720px}
+  .page-hero .lead{color:#c7d8d1;max-width:600px}
+  .page-hero .section-kicker{color:#9de3ba}
+  .content-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:56px;align-items:start}
+  .prose{font-size:clamp(1.02rem,.98rem + .15vw,1.12rem);line-height:1.75;color:var(--ink,#10221b)}
+  .prose h2{font-size:clamp(1.5rem,2.5vw,2rem);margin-top:36px;color:var(--green-950,#052e22)}
+  .prose h3{font-size:clamp(1.2rem,1.8vw,1.4rem);margin-top:28px;color:var(--green-900,#0d3b2e)}
+  .prose p{margin-bottom:18px;max-width:none}
+  .prose ul,.prose ol{padding-left:1.5rem;margin-bottom:18px}
+  .prose li{margin-bottom:6px}
+  .prose a{color:var(--green-700,#146c43);font-weight:600;text-decoration:underline}
+  .prose a:hover{color:var(--green-900,#0d3b2e)}
+  .prose img{border-radius:16px;margin:24px 0;box-shadow:0 8px 32px rgba(5,46,34,.1)}
+  .prose blockquote{border-left:4px solid var(--green-600,#158957);padding:14px 22px;margin:24px 0;background:var(--mint-soft,#f1fbf5);border-radius:0 12px 12px 0;color:#35483f;font-style:italic}
+  .article-sidebar{position:sticky;top:100px}
+  .sidebar-card{padding:22px;border:1px solid var(--line,#d9e1dd);border-radius:18px;background:var(--white);box-shadow:0 2px 12px rgba(5,46,34,.04)}
+  @media(max-width:900px){.content-layout{grid-template-columns:1fr}.article-sidebar{position:static}}
+  @media(max-width:640px){.page-hero{padding:50px 0 40px}.page-hero h1{font-size:clamp(1.6rem,7vw,2.4rem)}}
+</style>
 {{ end }}
