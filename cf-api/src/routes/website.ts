@@ -767,7 +767,7 @@ function generateThemeCSS(h1: string, h2: string, hText: string, f1: string, f2:
     `.site-footer a:hover{color:${fText}}`,
     `.footer-col1 strong{color:${fText}}`,
     `.footer-col1 p{color:${fmuted}}`,
-    `.footer-info span{color:${fmuted}}`,
+    `.footer-info span{color:${fText}}`,
     `.footer-bottom{color:${fmuted};border-top-color:${fText}22}`,
     `.f-acc{border-color:${fText}22;background:${fText}11}`,
     `.f-acc summary{color:${fText}}`,
