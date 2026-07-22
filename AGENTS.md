@@ -243,6 +243,46 @@ This section supersedes older Supabase architecture and deploy notes below.
   - Worker: `cf-api/src/routes/website.ts` — template and theme route handlers
   - Worker: `cf-api/src/db/schema.ts` — `websiteTemplates` table definition
   - Admin UI: `admin/index.html` — Templates tab, template CRUD functions, color theme UI
+- ⛔ **4-PAGE LAYOUT SYSTEM LOCKED (owner order, 2026-07-22):** The custom layout templates for Tentang Kami, Servis, Blog, and Hubungi Kami must NEVER be replaced with generic/default templates or have their section structure removed. These files override Hugo's default list/single templates with multi-section modern layouts:
+  - `site/layouts/tentang-kami/list.html` — 6 sections: siapa kami, tiga servis, membezakan kami, cara bekerja, FAQ, final CTA. Uses tk-* prefixed CSS classes, reveal animations, dark green company facts panel, 4 benefit cards with SVG icons.
+  - `site/layouts/servis/list.html` — 7 sections: service cards, decision guide (sv-guide with symptom→match cards), why choose (sv-benefits), process steps, FAQ, final CTA. Uses sv-* prefixed CSS, gradient backgrounds.
+  - `site/layouts/blog/list.html` — 8 sections: hero, featured article card, article grid (rotating gradient thumbnails), category pills, empty state (SVG illustration), subscribe CTA, related services, pagination. Uses self-contained CSS with --b-* variables.
+  - `site/layouts/hubungi-kami/list.html` — 7 sections: contact methods (hk-card with WhatsApp primary), checklist (hk-checklist numbered), timeline (hk-timeline with vertical line), business info panel, FAQ, coverage tags. Uses hk-* prefixed CSS.
+  - Content files renamed to `_index.md` for proper Hugo branch bundle resolution: `site/content/tentang-kami/_index.md`, `site/content/hubungi-kami/_index.md`.
+  - DO NOT revert these to `_default/single.html` or `_default/list.html`.
+- ⛔ **BURGER MENU SYSTEM LOCKED (owner order, 2026-07-22):** The mobile burger menu design and behavior must NEVER be reverted or altered without explicit owner instruction:
+  - **Icons:** `>` arrow in green (#146c43) replacing emoji. White on green portal buttons.
+  - **Accordion behavior:** Auto-close — only ONE section open at a time (main.js line 24 + homepage inline JS). Clicking a new section closes the previously open one.
+  - **Colors:** Menu background = mint (#f1fbf5, from theme-colors.html). Menu toggle (burger icon) = green (#146c43). Accordion toggle (::after +) = green on mint bg, white on green bg when open.
+  - **Text alignment:** Left-aligned via `justify-content:flex-start` + `text-align:left` on `.mm-summary`, with `margin-left:auto` on `::after` to keep + icon right.
+  - **Portal buttons:** Solid green (`btn-primary`) instead of outline. Width: 60% of menu. Open in new tab (`target="_blank"`).
+  - Locked files: `site/layouts/partials/burger-menu.html`, `site/assets/js/main.js` (line 24 accordion logic), `site/layouts/index.html` (inline accordion JS), `site/layouts/partials/theme-colors.html` (burger menu color rules).
+  - **🔁 ROLLBACK:**
+    ```bash
+    git show 2462e45:site/layouts/partials/burger-menu.html > site/layouts/partials/burger-menu.html
+    git show 2462e45:site/assets/js/main.js > site/assets/js/main.js
+    ```
+- ⛔ **FOOTER THEME SYSTEM LOCKED (owner order, 2026-07-22):** The footer color and background settings must NEVER be hardcoded in page-level CSS or bypass the admin theme system:
+  - **Homepage:** Footer CSS REMOVED from inline `<style>` block. Footer now relies on `main.css` (structure) + `theme-colors.html` (admin-set colors), same as all other pages.
+  - **Missing rule added:** `.footer-info span{color:...}` in both `theme-colors.html` and `cf-api/src/routes/website.ts` `generateThemeCSS()` function — ensures company name/registration text follows admin footer text color.
+  - **Background gradient:** Footer uses same dark green hero gradient: `linear-gradient(135deg,#052e22,#0d3b2e 58%,#126044 100%)`. Applied via `theme-colors.html` with `!important`.
+  - DO NOT re-add footer CSS to homepage inline `<style>` — this will override admin theme settings.
+- ⛔ **HOMEPAGE HERO BADGE LOCKED (owner order, 2026-07-22):** The homepage hero badge (`<div class="hero-badge">`) text and structure must NEVER be changed without explicit owner instruction:
+  - Current: `<span class="pulse"></span>servis selenggara rumah` — lowercase, single pulse dot, no location suffix.
+  - DO NOT capitalize or add "KL & Selangor" back.
+- ⛔ **FINAL CTA REMOVAL LOCKED (owner order, 2026-07-22):** The final-cta section has been REMOVED from all 4 pages. DO NOT re-add it:
+  - `site/layouts/index.html` — final-cta HTML + CSS removed
+  - `site/layouts/partials/service-tank.html` — final-cta HTML + CSS removed
+  - `site/layouts/partials/service-roof.html` — final-cta HTML + CSS removed
+  - `site/layouts/partials/service-paint.html` — final-cta HTML + CSS removed
+- ⛔ **DATA ACCESS PATTERN LOCKED (owner order, 2026-07-22):** All templates MUST use `site.Data.business` and `site.Data.services` (NOT `hugo.Data.*`). The `hugo.Data` module is not available locally and causes build failures. Files locked to this pattern:
+  - `site/layouts/_default/baseof.html`
+  - `site/layouts/_default/single.html`
+  - `site/layouts/partials/seo.html`
+  - `site/layouts/partials/footer-desktop.html`
+  - `site/layouts/partials/footer-mobile.html`
+  - `site/layouts/partials/other-services.html`
+  - All 4 page templates (tentang-kami, hubungi-kami, blog, servis)
 - ⛔ **MASTER ROLLBACK SNAPSHOT (2026-07-22):** This tag is the canonical known-good state of the entire website:
   ```bash
   git tag lock-master-20260722 af2bcb0
