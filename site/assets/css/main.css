@@ -190,7 +190,7 @@ ul{margin:0;padding-left:1.2rem}
   body.has-mobile-sticky{padding-bottom:74px}
   .container{width:min(calc(100% - 40px),var(--container))}
   .site-nav{height:64px}
-  .site-nav .nav-inner{justify-content:center}
+  .site-nav .nav-inner{justify-content:center;position:relative}
   .site-nav .brand-mark{height:22px}
   .site-nav .menu-toggle{position:absolute;right:0;top:50%;transform:translateY(-50%);border:0;background:transparent}
   .menu-toggle{display:grid;place-items:center}
