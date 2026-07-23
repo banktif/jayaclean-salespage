@@ -246,7 +246,7 @@ tbody tr:hover{background:var(--card-muted)}
 
 /* ── Mobile Responsive ── */
 @media(max-width:1023px){
-  body{padding:60px 0 100px 0;overflow-x:hidden}
+  body{padding:60px 0 116px 0;overflow-x:hidden}
   .hdr{position:fixed;top:0;left:0;right:0;z-index:50;background:var(--nav-glass)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;border-bottom:1px solid var(--border);height:56px;padding:0 16px;display:flex!important;align-items:center;justify-content:space-between;width:100%}
   .hdr-l{display:flex;align-items:center;gap:8px;width:auto}
   .bnav{display:flex;min-height:70px;padding:7px 8px calc(7px + env(safe-area-inset-bottom))!important;background:var(--nav-glass)!important;border-color:var(--border);box-shadow:var(--shadow-lg);backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important}
@@ -263,7 +263,7 @@ tbody tr:hover{background:var(--card-muted)}
   .stat-icon{margin-bottom:12px}
   .stat-val{font-size:28px}
   .sec{padding:20px 16px 9px}
-  .list{padding:10px 14px 44px}
+  .list{padding:10px 14px 52px}
   .card{padding:16px;border-radius:14px}
 }
 
