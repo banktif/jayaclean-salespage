@@ -90,6 +90,18 @@ body{font-family:var(--font);background:radial-gradient(circle at 90% 0,var(--ca
 .card-date{font-size:.72rem;font-weight:600;color:var(--text2);background:var(--bg);padding:3px 10px;border-radius:20px;white-space:nowrap}
 .card-name{font-size:.92rem;font-weight:700;color:var(--text);margin-bottom:1px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-addr{font-size:.7rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.card-phone{font-size:.7rem;color:var(--accent);font-weight:600}
+
+/* ── Quick Action Buttons (shared across all portals) ── */
+.qact{display:flex;gap:6px;margin-top:10px}
+.qact-btn{flex:1;border:1px solid var(--border-strong);background:transparent;color:var(--text2);padding:8px 0;border-radius:8px;font-size:.66rem;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--font)}
+.qact-btn:active{transform:scale(.96)}
+.qact-btn.accept{color:var(--accent);border-color:var(--accent)}.qact-btn.accept:active,.qact-btn.accept:hover{background:var(--accent);color:#fff}
+.qact-btn.done{color:var(--accent2);border-color:var(--accent2)}.qact-btn.done:active,.qact-btn.done:hover{background:var(--accent2);color:#fff}
+.qact-btn.decline,.qact-btn.reject{color:var(--danger);border-color:var(--danger)}.qact-btn.decline:active,.qact-btn.decline:hover,.qact-btn.reject:active,.qact-btn.reject:hover{background:var(--danger);color:#fff}
+
+/* ── Mobile: hide card buttons, modal becomes bottom sheet ── */
+@media(max-width:1023px){.card .qact,.ctl-card .qact{display:none}.card-phone{display:none}}
 
 /* ── Desktop Table ── */
 .d-card{background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--card-border);overflow:hidden;box-shadow:var(--card-shadow)}
