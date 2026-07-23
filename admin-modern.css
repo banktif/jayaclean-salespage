@@ -424,7 +424,7 @@ body.admin-app{
   .admin-app .d-hdr h1{font-size:28px;letter-spacing:-.04em}
   .admin-app .d-hdr p{font-size:13px;margin-top:3px}
   .admin-app .stats-grid{gap:18px;margin-bottom:28px}
-  .admin-app .stat{min-height:142px;padding:24px;text-align:left}
+  .admin-app .stat{min-height:142px;padding:24px;text-align:center}
   .admin-app .stat-icon{width:44px;height:44px;border-radius:14px;font-size:22px;margin-bottom:18px}
   .admin-app .stat-val{font-size:36px}
   .admin-app .stat-lbl{font-size:11px;margin-top:8px}
@@ -442,7 +442,7 @@ body.admin-app{
   }
   .admin-app .d-main{padding:0}
   .admin-app .stats-grid{padding:18px 14px 0;gap:8px}
-  .admin-app .stat{min-height:110px;padding:15px 12px;text-align:left;border-radius:16px}
+  .admin-app .stat{min-height:110px;padding:15px 12px;text-align:center;border-radius:16px}
   .admin-app .stat-icon{width:36px;height:36px;border-radius:11px;font-size:18px;margin-bottom:12px}
   .admin-app .stat-val{font-size:28px}
   .admin-app .stat-lbl{font-size:10px;letter-spacing:.04em;line-height:1.3}
