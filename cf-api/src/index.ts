@@ -13,6 +13,9 @@ import { handleSlots } from './routes/slots';
 import { handleWhatsapp } from './routes/whatsapp';
 import { handleBackup } from './routes/backup';
 import { handleWebsite } from './routes/website';
+import { handleQuotations } from './routes/quotations';
+import { handleInvoices } from './routes/invoices';
+import { handleReceipts } from './routes/receipts';
 import { createDb } from './db/client';
 import { bookings as bookingsTable } from './db/schema';
 
@@ -135,6 +138,27 @@ const handleWebsiteRoute = (req: Request, env: Env) => {
 };
 app.all('/api/website', (c) => handleWebsiteRoute(c.req.raw, c.env));
 app.all('/api/website/*', (c) => handleWebsiteRoute(c.req.raw, c.env));
+
+const handleQuotationsRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleQuotations(req, env, path);
+};
+app.all('/api/quotations', (c) => handleQuotationsRoute(c.req.raw, c.env));
+app.all('/api/quotations/*', (c) => handleQuotationsRoute(c.req.raw, c.env));
+
+const handleInvoicesRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleInvoices(req, env, path);
+};
+app.all('/api/invoices', (c) => handleInvoicesRoute(c.req.raw, c.env));
+app.all('/api/invoices/*', (c) => handleInvoicesRoute(c.req.raw, c.env));
+
+const handleReceiptsRoute = (req: Request, env: Env) => {
+  const path = new URL(req.url).pathname.replace(/\/+$/, '') || '/';
+  return handleReceipts(req, env, path);
+};
+app.all('/api/receipts', (c) => handleReceiptsRoute(c.req.raw, c.env));
+app.all('/api/receipts/*', (c) => handleReceiptsRoute(c.req.raw, c.env));
 
 app.notFound(() => err('Not found', 404));
 

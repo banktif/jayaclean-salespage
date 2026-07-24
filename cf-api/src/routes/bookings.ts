@@ -4,6 +4,7 @@ import { json, err, ok, uuid, nowISO, normPhone, todayStr } from '../utils/helpe
 import { requireAuth } from '../utils/middleware';
 import { createDb, type AppDb } from '../db/client';
 import { appSettings, bookings, customers, profiles, slots, tasks } from '../db/schema';
+import { distributeTask, bulkDistributeUnassigned } from './distribution';
 
 const bookingFields = {
   id: bookings.id,
@@ -97,7 +98,7 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
   // POST /api/bookings - public booking creation
   if (path === '/api/bookings' && req.method === 'POST') {
     const body = await req.json() as any;
-    const { customer_name, customer_phone, customer_address, booking_date, booking_time } = body;
+    const { customer_name, customer_phone, customer_address, booking_date, booking_time, zone_id, idempotency_key } = body;
 
     if (!customer_name || !customer_phone || !customer_address || !booking_date || !booking_time) {
       return err('Missing required fields: customer_name, customer_phone, customer_address, booking_date, booking_time');
@@ -106,14 +107,34 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
       return err('Booking date must be today or later');
     }
 
-    const maxSlots = parseInt(await getSetting(db, 'max_slots_per_day') || '100');
-    const allowedSlots = (await getSetting(db, 'slots') || '9am,11am,2pm,4pm')
+    const maxSlots = parseInt(await getSetting(db, 'max_slots_per_day') || '200');
+    const allowedSlots = (await getSetting(db, 'booking_time_slots') || await getSetting(db, 'slots') || '9am,11am,2pm,4pm')
       .split(',').map(s => s.trim()).filter(Boolean);
     if (!allowedSlots.includes(booking_time)) return err('Invalid booking time');
 
-    const existing = await db.select({ cnt: count() }).from(slots)
+    const slotCapsStr = await getSetting(db, 'slot_caps') || '{}';
+    let slotCaps: Record<string, number> = {};
+    try { slotCaps = JSON.parse(slotCapsStr); } catch {}
+
+    const perSlotCap = slotCaps[booking_time] || 25;
+
+    const existingDay = await db.select({ cnt: count() }).from(slots)
       .where(and(eq(slots.date, booking_date), eq(slots.isBooked, 1))).get();
-    if (existing && existing.cnt >= maxSlots) return err('No slots available for this date', 409);
+    if (existingDay && existingDay.cnt >= maxSlots) return err('No slots available for this date', 409);
+
+    const existingSlot = await db.select({ cnt: count() }).from(slots)
+      .where(and(eq(slots.date, booking_date), eq(slots.timeSlot, booking_time), eq(slots.isBooked, 1))).get();
+    if (existingSlot && existingSlot.cnt >= perSlotCap) return err('This time slot is fully booked', 409);
+
+    if (idempotency_key) {
+      const dup = await db.select({ id: bookings.id }).from(bookings)
+        .where(and(eq(bookings.customerPhone, normPhone(customer_phone)),
+          eq(bookings.bookingDate, booking_date), eq(bookings.bookingTime, booking_time))).get();
+      if (dup) {
+        const b = await db.select(bookingFields).from(bookings).where(eq(bookings.id, dup.id)).get();
+        return ok(b);
+      }
+    }
 
     const priceTotal = parseFloat(await getSetting(db, 'price_total') || '300');
     const priceDeposit = parseFloat(await getSetting(db, 'price_deposit') || '150');
@@ -189,7 +210,7 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
         return err('Booking date must be today or later');
       }
       if (body.booking_time !== undefined) {
-        const allowedSlots = (await getSetting(db, 'slots') || '9am,11am,2pm,4pm').split(',').map(s => s.trim()).filter(Boolean);
+        const allowedSlots = (await getSetting(db, 'booking_time_slots') || await getSetting(db, 'slots') || '9am,11am,2pm,4pm').split(',').map(s => s.trim()).filter(Boolean);
         if (!allowedSlots.includes(nextTime)) return err('Invalid booking time');
       }
       if (body.booking_date !== undefined || body.booking_time !== undefined || body.status === 'confirmed') {
@@ -212,10 +233,22 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
             const taskId = uuid();
             await db.insert(tasks).values({ id: taskId, bookingId, status: 'unassigned' });
 
-            // Auto-assign if enabled
             const autoEnabled = await getSetting(db, 'auto_assign_enabled');
             if (autoEnabled === 'true') {
-              await autoAssignTask(db, taskId);
+              const b = await db.select({ customer_address: bookings.customerAddress })
+                .from(bookings).where(eq(bookings.id, bookingId)).get();
+              let zid: string | undefined;
+              if (b?.customer_address) {
+                try {
+                  const z = await db.get<{ id: string }>(sql`
+                    SELECT id FROM zones
+                    WHERE lower(name) LIKE '%' || lower(${b.customer_address}) || '%'
+                    LIMIT 1
+                  `);
+                  if (z?.id) zid = z.id;
+                } catch {}
+              }
+              await distributeTask(db, taskId, zid);
             }
           } else if (existingTask.status === 'cancelled') {
             await db.update(tasks).set({
@@ -397,7 +430,20 @@ export async function handleBayarcashCallback(req: Request, env: Env): Promise<R
 
         const autoEnabled = await getSetting(db, 'auto_assign_enabled');
         if (autoEnabled === 'true') {
-          await autoAssignTask(db, taskId);
+          const b = await db.select({ customer_address: bookings.customerAddress })
+            .from(bookings).where(eq(bookings.id, booking.id)).get();
+          let zid: string | undefined;
+          if (b?.customer_address) {
+            try {
+              const z = await db.get<{ id: string }>(sql`
+                SELECT id FROM zones
+                WHERE lower(name) LIKE '%' || lower(${b.customer_address}) || '%'
+                LIMIT 1
+              `);
+              if (z?.id) zid = z.id;
+            } catch {}
+          }
+          await distributeTask(db, taskId, zid);
         }
       }
     }
@@ -528,13 +574,8 @@ export async function handleDistributeUnassigned(req: Request, env: Env): Promis
     if (payload.role !== 'admin') return err('Admin only', 403);
 
     const db = createDb(env);
-    const unassignedTasks = await db.select({ id: tasks.id }).from(tasks)
-      .where(and(sql`${tasks.assignedTo} IS NULL`, eq(tasks.status, 'unassigned')));
-    let count = 0;
-    for (const task of unassignedTasks) {
-      if (await autoAssignTask(db, task.id)) count++;
-    }
-    return ok({ assigned: count });
+    const { assigned } = await bulkDistributeUnassigned(db);
+    return ok({ assigned });
   } catch (e: any) {
     return err(e.msg || 'Error', e.status || 400);
   }

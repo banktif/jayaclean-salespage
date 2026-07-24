@@ -4,7 +4,7 @@ import { err, ok, uuid, nowISO } from '../utils/helpers';
 import { requireAuth } from '../utils/middleware';
 import { createDb, type AppDb } from '../db/client';
 import { appSettings, bookings, customers, profiles, slots, taskPhotos, tasks } from '../db/schema';
-import { autoAssignTask } from './bookings';
+import { distributeTask } from './distribution';
 
 const taskFields = {
   id: tasks.id,
@@ -219,12 +219,25 @@ export async function handleTasks(req: Request, env: Env, path: string): Promise
       await db.update(tasks).set({ assignedTo: null, status: 'unassigned', updatedAt: now })
         .where(eq(tasks.id, taskId));
 
-      // Auto-reassign to next available staff (area-based preferred)
-      const reassigned = await autoAssignTask(db, taskId);
+      // Auto-reassign using distribution engine
+      const booking = await db.select({ address: bookings.customerAddress })
+        .from(bookings).where(eq(bookings.id, task.booking_id)).get();
+      let zid: string | undefined;
+      if (booking?.address) {
+        try {
+          const z = await db.get<{ id: string }>(sql`
+            SELECT id FROM zones
+            WHERE lower(name) LIKE '%' || lower(${booking.address}) || '%'
+            LIMIT 1
+          `);
+          if (z?.id) zid = z.id;
+        } catch {}
+      }
+      const result = await distributeTask(db, taskId, zid);
 
       return ok({
-        reassigned,
-        message: reassigned ? 'Task reassigned to another staff member' : 'No available staff found. Admin will assign manually.'
+        reassigned: result.assigned,
+        message: result.assigned ? 'Task reassigned to another staff member' : 'No available staff found. Admin will assign manually.'
       });
     } catch (e: any) {
       return err(e.msg || 'Error', e.status || 400);

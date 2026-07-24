@@ -13,11 +13,17 @@ export const profiles = sqliteTable('profiles', {
   address: text('address').default(''),
   avatarUrl: text('avatar_url').default(''),
   serviceArea: text('service_area').default(''),
+  priority: integer('priority').default(999),
+  maxJobsPerDay: integer('max_jobs_per_day').default(4),
+  minJobsPerDay: integer('min_jobs_per_day').default(2),
+  jobCountToday: integer('job_count_today').default(0),
+  lastAssignedAt: text('last_assigned_at'),
   password: text('password').notNull().default(''),
   createdAt: text('created_at').notNull().default(sqliteNow)
 }, (table) => [
   index('idx_profiles_phone').on(table.phone),
   index('idx_profiles_role').on(table.role),
+  index('idx_profiles_priority').on(table.priority),
   uniqueIndex('idx_profiles_email_unique').on(table.email).where(sql`${table.email} <> ''`),
   check('profiles_role_check', sql`${table.role} IN ('admin','staff')`),
   check('profiles_active_check', sql`${table.isActive} IN (0,1)`)
@@ -100,6 +106,16 @@ export const tasks = sqliteTable('tasks', {
   startedAt: text('started_at'),
   finishedAt: text('finished_at'),
   completedAt: text('completed_at'),
+  workflowStep: integer('workflow_step').default(0),
+  staffAcceptedAt: text('staff_accepted_at'),
+  staffConfirmedAt: text('staff_confirmed_at'),
+  headingAt: text('heading_at'),
+  arrivedAt: text('arrived_at'),
+  staffRejected: integer('staff_rejected').default(0),
+  beforePhotosCount: integer('before_photos_count').default(0),
+  afterPhotosCount: integer('after_photos_count').default(0),
+  paymentRequestedAt: text('payment_requested_at'),
+  customerPaidOnSite: integer('customer_paid_on_site').default(0),
   createdAt: text('created_at').notNull().default(sqliteNow),
   updatedAt: text('updated_at').notNull().default(sqliteNow)
 }, (table) => [
@@ -149,6 +165,165 @@ export const websiteTemplates = sqliteTable('website_templates', {
   check('templates_active_check', sql`${table.isActive} IN (0,1)`)
 ]);
 
+export const zones = sqliteTable('zones', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  adjacentZones: text('adjacent_zones').default('[]'),
+  displayOrder: integer('display_order').default(0),
+  isActive: integer('is_active').notNull().default(1),
+  createdAt: text('created_at').notNull().default(sqliteNow)
+}, (table) => [
+  check('zones_active_check', sql`${table.isActive} IN (0,1)`)
+]);
+
+export const staffZones = sqliteTable('staff_zones', {
+  staffId: text('staff_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  zoneId: text('zone_id').notNull().references(() => zones.id, { onDelete: 'cascade' })
+}, (table) => [
+  index('idx_staff_zones_zone').on(table.zoneId)
+]);
+
+export const waConversations = sqliteTable('wa_conversations', {
+  id: text('id').primaryKey(),
+  waPhone: text('wa_phone').notNull(),
+  state: text('state').notNull(),
+  context: text('context').default('{}'),
+  bookingId: text('booking_id').references(() => bookings.id, { onDelete: 'set null' }),
+  status: text('status').default('active'),
+  createdAt: text('created_at').notNull().default(sqliteNow),
+  updatedAt: text('updated_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_wa_conv_phone').on(table.waPhone, table.status),
+  check('wa_conv_status_check', sql`${table.status} IN ('active','completed','abandoned')`)
+]);
+
+export const analyticsEvents = sqliteTable('analytics_events', {
+  id: text('id').primaryKey(),
+  eventType: text('event_type').notNull(),
+  bookingId: text('booking_id').references(() => bookings.id, { onDelete: 'set null' }),
+  customerId: text('customer_id').references(() => customers.id, { onDelete: 'set null' }),
+  metadata: text('metadata').default('{}'),
+  createdAt: text('created_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_analytics_type').on(table.eventType),
+  index('idx_analytics_booking').on(table.bookingId),
+  index('idx_analytics_created').on(table.createdAt)
+]);
+
+export const quotations = sqliteTable('quotations', {
+  id: text('id').primaryKey(),
+  customerId: text('customer_id').references(() => customers.id, { onDelete: 'set null' }),
+  customerName: text('customer_name').notNull().default(''),
+  customerPhone: text('customer_phone').notNull().default(''),
+  customerAddress: text('customer_address').notNull().default(''),
+  serviceType: text('service_type').notNull(),
+  amount: real('amount').notNull().default(0),
+  details: text('details').default(''),
+  zoneId: text('zone_id').references(() => zones.id, { onDelete: 'set null' }),
+  status: text('status').notNull().default('draft'),
+  validUntil: text('valid_until'),
+  convertedBookingId: text('converted_booking_id').references(() => bookings.id, { onDelete: 'set null' }),
+  notes: text('notes').default(''),
+  createdAt: text('created_at').notNull().default(sqliteNow),
+  updatedAt: text('updated_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_quotations_customer').on(table.customerId),
+  index('idx_quotations_status').on(table.status),
+  check('quotations_status_check', sql`${table.status} IN ('draft','sent','accepted','rejected','expired')`)
+]);
+
+export const invoices = sqliteTable('invoices', {
+  id: text('id').primaryKey(),
+  bookingId: text('booking_id').unique().references(() => bookings.id, { onDelete: 'set null' }),
+  quotationId: text('quotation_id').references(() => quotations.id, { onDelete: 'set null' }),
+  number: text('number').notNull().unique(),
+  customerName: text('customer_name').notNull().default(''),
+  customerPhone: text('customer_phone').notNull().default(''),
+  customerAddress: text('customer_address').notNull().default(''),
+  items: text('items').notNull().default('[]'),
+  subtotal: real('subtotal').notNull().default(0),
+  depositPaid: real('deposit_paid').default(0),
+  balanceDue: real('balance_due').notNull().default(0),
+  status: text('status').notNull().default('pending'),
+  pdfUrl: text('pdf_url'),
+  waSentAt: text('wa_sent_at'),
+  emailSentAt: text('email_sent_at'),
+  paidAt: text('paid_at'),
+  createdAt: text('created_at').notNull().default(sqliteNow),
+  updatedAt: text('updated_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_invoices_booking').on(table.bookingId),
+  index('idx_invoices_status').on(table.status),
+  check('invoices_status_check', sql`${table.status} IN ('pending','paid','cancelled')`)
+]);
+
+export const receipts = sqliteTable('receipts', {
+  id: text('id').primaryKey(),
+  bookingId: text('booking_id').references(() => bookings.id, { onDelete: 'set null' }),
+  invoiceId: text('invoice_id').references(() => invoices.id, { onDelete: 'set null' }),
+  number: text('number').notNull().unique(),
+  paymentType: text('payment_type').notNull(),
+  amount: real('amount').notNull().default(0),
+  paymentMethod: text('payment_method').default(''),
+  transactionRef: text('transaction_ref').default(''),
+  customerName: text('customer_name').notNull().default(''),
+  customerPhone: text('customer_phone').notNull().default(''),
+  pdfUrl: text('pdf_url'),
+  waSentAt: text('wa_sent_at'),
+  emailSentAt: text('email_sent_at'),
+  createdAt: text('created_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_receipts_booking').on(table.bookingId),
+  index('idx_receipts_payment_type').on(table.paymentType),
+  check('receipts_payment_type_check', sql`${table.paymentType} IN ('deposit','balance','full')`)
+]);
+
+export const partners = sqliteTable('partners', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  contactPhone: text('contact_phone').default(''),
+  contactEmail: text('contact_email').default(''),
+  apiKey: text('api_key').notNull().unique(),
+  webhookUrl: text('webhook_url').default(''),
+  commissionRate: real('commission_rate').default(0),
+  isActive: integer('is_active').notNull().default(1),
+  rateLimitPerHour: integer('rate_limit_per_hour').default(10),
+  totalBookings: integer('total_bookings').default(0),
+  createdAt: text('created_at').notNull().default(sqliteNow),
+  updatedAt: text('updated_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_partners_api_key').on(table.apiKey),
+  check('partners_active_check', sql`${table.isActive} IN (0,1)`)
+]);
+
+export const subscriptions = sqliteTable('subscriptions', {
+  id: text('id').primaryKey(),
+  customerId: text('customer_id').notNull().references(() => customers.id, { onDelete: 'cascade' }),
+  serviceType: text('service_type').notNull(),
+  zoneId: text('zone_id').references(() => zones.id, { onDelete: 'set null' }),
+  intervalDays: integer('interval_days').notNull().default(180),
+  nextBookingDate: text('next_booking_date').notNull(),
+  status: text('status').notNull().default('active'),
+  lastBookingId: text('last_booking_id').references(() => bookings.id, { onDelete: 'set null' }),
+  createdAt: text('created_at').notNull().default(sqliteNow),
+  updatedAt: text('updated_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_subs_customer').on(table.customerId),
+  index('idx_subs_next_date').on(table.nextBookingDate, table.status),
+  check('subscriptions_status_check', sql`${table.status} IN ('active','paused','cancelled')`)
+]);
+
+export const rateLimits = sqliteTable('rate_limits', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  endpoint: text('endpoint').notNull(),
+  count: integer('count').notNull().default(1),
+  windowStart: text('window_start').notNull(),
+  createdAt: text('created_at').notNull().default(sqliteNow)
+}, (table) => [
+  index('idx_rate_limits_lookup').on(table.identifier, table.endpoint, table.windowStart)
+]);
+
 export const schema = {
   profiles,
   appSettings,
@@ -159,6 +334,16 @@ export const schema = {
   tasks,
   taskPhotos,
   backupLog,
-  websiteTemplates
+  websiteTemplates,
+  zones,
+  staffZones,
+  waConversations,
+  analyticsEvents,
+  quotations,
+  invoices,
+  receipts,
+  partners,
+  subscriptions,
+  rateLimits
 };
 

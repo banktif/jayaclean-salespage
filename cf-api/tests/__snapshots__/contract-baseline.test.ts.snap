@@ -189,7 +189,7 @@ exports[`legacy Worker behavior snapshot > freezes every route group before Hono
     },
     "publishUnavailable": {
       "body": {
-        "error": "GitHub token is not configured in Cloudflare Worker secrets",
+        "error": "Not found",
       },
       "headers": {
         "cacheControl": "no-store",
@@ -198,7 +198,7 @@ exports[`legacy Worker behavior snapshot > freezes every route group before Hono
         "noSniff": "nosniff",
         "referrerPolicy": "no-referrer",
       },
-      "status": 503,
+      "status": 404,
     },
     "r2Test": {
       "body": {
@@ -333,7 +333,7 @@ exports[`legacy Worker behavior snapshot > freezes every route group before Hono
       "body": {
         "data": {
           "database": "ok",
-          "service": "jayaclean-api",
+          "service": "jayabina-api",
         },
         "status": "ok",
       },
@@ -580,9 +580,24 @@ exports[`legacy Worker behavior snapshot > freezes every route group before Hono
             "value": "v1",
           },
           {
+            "key": "ai_verify_confidence_threshold",
+            "updated_at": "<db-timestamp>",
+            "value": "80",
+          },
+          {
+            "key": "ai_verify_enabled",
+            "updated_at": "<db-timestamp>",
+            "value": "false",
+          },
+          {
             "key": "auto_assign_enabled",
             "updated_at": "<db-timestamp>",
             "value": "false",
+          },
+          {
+            "key": "auto_assign_retry_on_reject",
+            "updated_at": "<db-timestamp>",
+            "value": "true",
           },
           {
             "key": "auto_assign_rule",
@@ -620,6 +635,11 @@ exports[`legacy Worker behavior snapshot > freezes every route group before Hono
             "value": "",
           },
           {
+            "key": "booking_time_slots",
+            "updated_at": "<db-timestamp>",
+            "value": "8am,9am,10am,11am,12pm,1pm,2pm,3pm,4pm,5pm",
+          },
+          {
             "key": "business_name",
             "updated_at": "<db-timestamp>",
             "value": "Jaya Bina Services",
@@ -635,14 +655,44 @@ exports[`legacy Worker behavior snapshot > freezes every route group before Hono
             "value": "Lembah Klang",
           },
           {
+            "key": "default_max_jobs_per_staff",
+            "updated_at": "<db-timestamp>",
+            "value": "4",
+          },
+          {
+            "key": "default_min_jobs_per_staff",
+            "updated_at": "<db-timestamp>",
+            "value": "2",
+          },
+          {
+            "key": "distribution_mode",
+            "updated_at": "<db-timestamp>",
+            "value": "samarata",
+          },
+          {
+            "key": "email_enabled",
+            "updated_at": "<db-timestamp>",
+            "value": "false",
+          },
+          {
             "key": "folder",
             "updated_at": "<db-timestamp>",
-            "value": "jayaclean/tasks",
+            "value": "jayabina/tasks",
+          },
+          {
+            "key": "invoice_prefix",
+            "updated_at": "<db-timestamp>",
+            "value": "INV",
           },
           {
             "key": "max_slots_per_day",
             "updated_at": "<db-timestamp>",
             "value": "4",
+          },
+          {
+            "key": "max_staff_rejects",
+            "updated_at": "<db-timestamp>",
+            "value": "3",
           },
           {
             "key": "price_balance",
@@ -665,9 +715,24 @@ exports[`legacy Worker behavior snapshot > freezes every route group before Hono
             "value": "",
           },
           {
+            "key": "quotation_prefix",
+            "updated_at": "<db-timestamp>",
+            "value": "QT",
+          },
+          {
+            "key": "receipt_prefix",
+            "updated_at": "<db-timestamp>",
+            "value": "RCP",
+          },
+          {
             "key": "service_areas",
             "updated_at": "<db-timestamp>",
             "value": "",
+          },
+          {
+            "key": "slot_caps",
+            "updated_at": "<db-timestamp>",
+            "value": "{"8am":20,"9am":20,"10am":25,"11am":25,"12pm":20,"1pm":20,"2pm":25,"3pm":25,"4pm":15,"5pm":5}",
           },
           {
             "key": "slots",
@@ -677,10 +742,15 @@ exports[`legacy Worker behavior snapshot > freezes every route group before Hono
           {
             "key": "upload_preset",
             "updated_at": "<db-timestamp>",
-            "value": "jayaclean_tasks",
+            "value": "jayabina_tasks",
           },
           {
             "key": "wa_api_enabled",
+            "updated_at": "<db-timestamp>",
+            "value": "false",
+          },
+          {
+            "key": "wa_bot_enabled",
             "updated_at": "<db-timestamp>",
             "value": "false",
           },
