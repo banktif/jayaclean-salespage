@@ -310,8 +310,14 @@
   <button class="d-nav-item" id="dsDone" onclick="showBookings('completed')"><span class="dni"><i data-lucide="check-check"></i></span> Completed</button>
   <button class="d-nav-item" id="dsSchedule" onclick="showSchedule()"><span class="dni"><i data-lucide="calendar"></i></span> Schedule</button>
   <button class="d-nav-item" id="dsCustomers" onclick="showCustomers()"><span class="dni"><i data-lucide="contact"></i></span> Customers</button>
+  <div class="d-nav-label">Biz</div>
+  <button class="d-nav-item" id="dsQuotations" onclick="showQuotations()"><span class="dni"><i data-lucide="file-text"></i></span> Quotations</button>
+  <button class="d-nav-item" id="dsInvoices" onclick="showInvoices()"><span class="dni"><i data-lucide="receipt"></i></span> Invoices</button>
+  <button class="d-nav-item" id="dsReceipts" onclick="showReceipts()"><span class="dni"><i data-lucide="file-check"></i></span> Receipts</button>
   <div class="d-nav-label">Team &amp; Analytics</div>
+  <button class="d-nav-item" id="dsAutopilot" onclick="showAutopilot()"><span class="dni"><i data-lucide="bot"></i></span> Autopilot</button>
   <button class="d-nav-item" id="dsStaff" onclick="showStaff()"><span class="dni"><i data-lucide="users"></i></span> Staff</button>
+  <button class="d-nav-item" id="dsStaffPriority" onclick="showStaffPriority()"><span class="dni"><i data-lucide="list-ordered"></i></span> Priority</button>
   <button class="d-nav-item" id="dsReports" onclick="showReports()"><span class="dni"><i data-lucide="bar-chart-3"></i></span> Reports</button>
   <div class="d-nav-label">System</div>
   <button class="d-nav-item" id="dsWebsite" onclick="showWebsite()"><span class="dni"><i data-lucide="globe-2"></i></span> Website</button>
@@ -365,6 +371,9 @@
     <button class="drawer-item" onclick="showBookings();toggleDrawer()"><span><i data-lucide="layout-grid"></i></span> All bookings</button>
     <button class="drawer-item" onclick="showBookings('pending_payment');toggleDrawer()"><span><i data-lucide="clock"></i></span> Pending payment <span class="d-nav-badge" id="drBadge" style="margin-left:auto">0</span></button>
     <button class="drawer-item" onclick="showSchedule();toggleDrawer()"><span><i data-lucide="calendar"></i></span> Schedule</button>
+    <button class="drawer-item" onclick="showQuotations();toggleDrawer()"><span><i data-lucide="file-text"></i></span> Quotations</button>
+    <button class="drawer-item" onclick="showInvoices();toggleDrawer()"><span><i data-lucide="receipt"></i></span> Invoices</button>
+    <button class="drawer-item" onclick="showAutopilot();toggleDrawer()"><span><i data-lucide="bot"></i></span> Autopilot</button>
     <button class="drawer-item" onclick="showStaff();toggleDrawer()"><span><i data-lucide="users"></i></span> Staff</button>
     <button class="drawer-item" onclick="showCustomers();toggleDrawer()"><span><i data-lucide="contact"></i></span> Customers</button>
     <button class="drawer-item" onclick="showReports();toggleDrawer()"><span><i data-lucide="bar-chart-3"></i></span> Reports</button>
@@ -554,7 +563,7 @@ function clearNav(){document.querySelectorAll('.d-nav-item,.bnav-item').forEach(
 function setNav(id){var el=document.getElementById(id);if(el){el.classList.add('active');el.setAttribute('aria-current','page')}}
 function setHeader(title,sub){var t=document.getElementById('dTitle'),s=document.getElementById('dSub'),m=document.getElementById('mTitleView');if(t)t.textContent=title;if(s)s.textContent=sub;if(m)m.textContent=title;document.title=title+' — JAYABINA';}
 function showBookings(filter){setChrome(true);setHeader('Bookings','All customer bookings');var tm={'today':"Today's Bookings",'pending_payment':'Pending Payment','confirmed':'Confirmed','completed':'Completed'};document.getElementById('secTitle').textContent=tm[filter]||'Bookings';location.hash=filter==='pending_payment'?'#pending':'#bookings';load(filter);}
-function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else if(currentView==='backup')showBackup();else if(currentView==='customers')showCustomers();else if(currentView==='website')showWebsite();else load(cf);}
+function refreshView(){if(currentView==='staff')showStaff();else if(currentView==='settings')showSettings();else if(currentView==='schedule')showSchedule();else if(currentView==='dashboard')showDashboard();else if(currentView==='reports')showReports();else if(currentView==='backup')showBackup();else if(currentView==='customers')showCustomers();else if(currentView==='website')showWebsite();else if(currentView==='autopilot')showAutopilot();else if(currentView==='quotations')showQuotations();else if(currentView==='invoices')showInvoices();else if(currentView==='receipts')showReceipts();else if(currentView==='staffPriority')showStaffPriority();else load(cf);}
 
 // ═══════════ CUSTOMER CRM ═══════════
 var custState={q:'',status:'',sort:'last',page:0,per:25,total:0,timer:null,sel:{},req:0};
@@ -1702,6 +1711,161 @@ async function autoAssignAll(){
   }catch(e){alert('Error: '+e.message);}
 }
 
+// AUTOPILOT DASHBOARD
+async function showAutopilot(){
+  var viewId=beginView('autopilot');setChrome(false);clearNav();setNav('dsAutopilot');
+  setHeader('Autopilot','97% autonomous operations');location.hash='#autopilot';
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  try{
+    var bq=await SB.from('bookings').select('*').order('created_at',{ascending:false});if(bq.error)throw bq.error;
+    if(!viewActive(viewId,'autopilot'))return;var bkgs=bq.data||[];
+    var tq=await SB.from('tasks').select('*');var tasks2=tq.data||[];
+    var t=new Date().toISOString().split('T')[0];
+    var todayJobs=tasks2.filter(function(x){return x.booking_date===t}).length;
+    var inProgress=tasks2.filter(function(x){return x.status==='in_progress'}).length;
+    var completed=tasks2.filter(function(x){return x.status==='completed'}).length;
+    var pending=tasks2.filter(function(x){return x.status==='unassigned'||x.status==='assigned'}).length;
+
+    var mode=settings.distribution_mode||'samarata';
+
+    var h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">';
+    h+='<div class="stat total" style="padding:16px"><div class="stat-val">'+todayJobs+'</div><div class="stat-lbl">Job Today</div></div>';
+    h+='<div class="stat active" style="padding:16px"><div class="stat-val">'+inProgress+'</div><div class="stat-lbl">In Progress</div></div>';
+    h+='<div class="stat done" style="padding:16px"><div class="stat-val">'+completed+'</div><div class="stat-lbl">Completed</div></div>';
+    h+='<div class="stat wait" style="padding:16px"><div class="stat-val">'+pending+'</div><div class="stat-lbl">Pending</div></div>';
+    h+='</div>';
+
+    h+='<div class="panel"><h3 style="margin:0 0 12px;font-size:.88rem">Distribution Mode</h3>';
+    h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">';
+    ['samarata','priority','area'].forEach(function(m){
+      h+='<button onclick="setDistMode(\''+m+'\')" class="d-btn" style="'+(mode===m?'background:var(--accent);color:#fff;border-color:var(--accent)':'')+'">'+(m==='samarata'?'Equal':m==='priority'?'Priority':'Area')+'</button>';
+    });
+    h+='</div></div>';
+
+    h+='<div class="panel"><h3 style="margin:0 0 12px;font-size:.88rem">Job Pipeline</h3>';
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">';
+    var stages=[
+      {label:'Pending Pay',count:bkgs.filter(function(x){return x.status==='pending_payment'}).length,color:'var(--warning)'},
+      {label:'Confirmed',count:bkgs.filter(function(x){return x.status==='confirmed'}).length,color:'var(--accent)'},
+      {label:'In Progress',count:inProgress,color:'var(--accent2)'},
+      {label:'Completed Today',count:bkgs.filter(function(x){return x.status==='completed'&&x.updated_at&&x.updated_at.split('T')[0]===t}).length,color:'var(--accent)'}
+    ];
+    stages.forEach(function(s){
+      h+='<div style="text-align:center;padding:14px 8px;border-radius:12px;background:var(--elevated);border:1px solid var(--border)"><div style="font-size:1.5rem;font-weight:800;color:'+s.color+'">'+s.count+'</div><div style="font-size:.68rem;color:var(--text3)">'+s.label+'</div></div>';
+    });
+    h+='</div></div>';
+
+    var zonesStr=settings.slot_caps||'{}';
+    try{
+      var caps=JSON.parse(zonesStr);
+      h+='<div class="panel" style="margin-top:16px"><h3 style="margin:0 0 12px;font-size:.88rem">Slot Capacity</h3>';
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:6px">';
+      Object.keys(caps).forEach(function(k){
+        h+='<div style="text-align:center;padding:8px;border-radius:8px;background:var(--elevated);border:1px solid var(--border)"><div style="font-size:.72rem;font-weight:700">'+k+'</div><div style="font-size:.62rem;color:var(--text3)">'+caps[k]+' slots</div></div>';
+      });
+      h+='</div></div>';
+    }catch(e){}
+
+    l.innerHTML=h;
+  }catch(e){if(viewActive(viewId,'autopilot'))l.innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'}
+}
+async function setDistMode(m){
+  try{
+    await SB.from('app_settings').upsert({key:'distribution_mode',value:m});
+    settings.distribution_mode=m;showAutopilot();
+  }catch(e){alert(errorMessage(e))}
+}
+
+// QUOTATIONS, INVOICES, RECEIPTS
+async function showQuotations(){
+  var viewId=beginView('quotations');setChrome(false);clearNav();setNav('dsQuotations');
+  setHeader('Quotations','Sealed quotes sent to customers');location.hash='#quotations';
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  try{
+    var res=await SB.from('quotations').select('*').order('created_at',{ascending:false});
+    if(!viewActive(viewId,'quotations'))return;var rows=res.data||[];
+    if(!rows.length){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="file-text"></i></div><h2>No quotations</h2><p>Create quotations from booking or manual entry.</p></div>';return}
+    var h='<div class="d-card"><table><thead><tr><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      h+='<tr><td><strong>'+esc(r.customer_name)+'</strong></td><td>'+esc(r.service_type)+'</td><td>RM'+(r.amount||0)+'</td><td><span class="bc-badge '+r.status+'"><span class="bdot"></span>'+r.status+'</span></td><td><button class="d-btn" onclick="openQuote(\''+r.id+'\')">View</button></td></tr>';
+    });
+    h+='</tbody></table></div>';
+    l.innerHTML=h;
+  }catch(e){if(viewActive(viewId,'quotations'))l.innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'}
+  relucide();
+}
+function openQuote(id){alert('Quotation ID: '+id+'\n\nUse API to manage quotations: /api/quotations/'+id)}
+
+async function showInvoices(){
+  var viewId=beginView('invoices');setChrome(false);clearNav();setNav('dsInvoices');
+  setHeader('Invoices','Customer invoices and payment tracking');location.hash='#invoices';
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  try{
+    var res=await SB.from('invoices').select('*').order('created_at',{ascending:false});
+    if(!viewActive(viewId,'invoices'))return;var rows=res.data||[];
+    if(!rows.length){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="receipt"></i></div><h2>No invoices</h2><p>Invoices auto-generate when jobs complete.</p></div>';return}
+    var h='<div class="d-card"><table><thead><tr><th>#</th><th>Customer</th><th>Total</th><th>Deposit</th><th>Balance</th><th>Status</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      h+='<tr><td>'+esc(r.number)+'</td><td>'+esc(r.customer_name)+'</td><td>RM'+(r.subtotal||0)+'</td><td>RM'+(r.deposit_paid||0)+'</td><td>RM'+(r.balance_due||0)+'</td><td><span class="bc-badge '+r.status+'"><span class="bdot"></span>'+r.status+'</span></td></tr>';
+    });
+    h+='</tbody></table></div>';
+    l.innerHTML=h;
+  }catch(e){if(viewActive(viewId,'invoices'))l.innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'}
+  relucide();
+}
+
+async function showReceipts(){
+  var viewId=beginView('receipts');setChrome(false);clearNav();setNav('dsReceipts');
+  setHeader('Receipts','Payment receipts issued');location.hash='#receipts';
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  try{
+    var res=await SB.from('receipts').select('*').order('created_at',{ascending:false});
+    if(!viewActive(viewId,'receipts'))return;var rows=res.data||[];
+    if(!rows.length){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="file-check"></i></div><h2>No receipts</h2><p>Receipts auto-generate when payments are received.</p></div>';return}
+    var h='<div class="d-card"><table><thead><tr><th>#</th><th>Customer</th><th>Type</th><th>Amount</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      h+='<tr><td>'+esc(r.number)+'</td><td>'+esc(r.customer_name)+'</td><td>'+esc(r.payment_type)+'</td><td>RM'+(r.amount||0)+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    l.innerHTML=h;
+  }catch(e){if(viewActive(viewId,'receipts'))l.innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'}
+  relucide();
+}
+
+// STAFF PRIORITY
+async function showStaffPriority(){
+  var viewId=beginView('staffPriority');setChrome(false);clearNav();setNav('dsStaffPriority');
+  setHeader('Staff Priority','Rank staff 1-200 for priority distribution');location.hash='#staff-priority';
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="spin"><div class="spin-dot"></div><div class="spin-dot"></div><div class="spin-dot"></div></div>';
+  try{
+    var pq=await SB.from('profiles').select('*').eq('role','staff').eq('is_active',1).order('priority','asc');
+    if(!viewActive(viewId,'staffPriority'))return;var staff=pq.data||[];
+    if(!staff.length){l.innerHTML='<div class="empty"><p>No active staff</p></div>';return}
+    var h='<div class="panel"><p>Drag-and-drop ranking coming soon. Set priorities below:</p>';
+    h+='<div style="display:flex;flex-direction:column;gap:8px">';
+    staff.forEach(function(s,i){
+      h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:var(--elevated);border:1px solid var(--border)">';
+      h+='<div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.72rem">'+(s.priority||999)+'</div>';
+      h+='<div style="flex:1"><strong>'+esc(s.full_name)+'</strong><div style="font-size:.68rem;color:var(--text3)">'+esc(s.phone)+' &middot; '+s.job_count_today+'/'+s.max_jobs_per_day+' jobs today</div></div>';
+      h+='<input type="number" value="'+(s.priority||i+1)+'" min="1" max="200" style="width:60px;padding:6px;border:1px solid var(--border);border-radius:8px;text-align:center;font-family:var(--font)" onchange="setStaffPriority(\''+s.id+'\',this.value)">';
+      h+='</div>';
+    });
+    h+='</div></div>';
+    l.innerHTML=h;
+  }catch(e){if(viewActive(viewId,'staffPriority'))l.innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'}
+  relucide();
+}
+async function setStaffPriority(id,val){
+  try{
+    await SB.from('profiles').update({priority:parseInt(val)||999}).eq('id',id);
+  }catch(e){}
+}
+
 // AUTH (Cloudflare Worker + D1)
 async function doLogin(){
   var msg=document.getElementById('authErr');
@@ -1731,6 +1895,11 @@ async function checkAccess(){
     else if(h==='#settings')showSettings();
     else if(h==='#customers')showCustomers();
     else if(h==='#backup')showBackup();
+    else if(h==='#autopilot')showAutopilot();
+    else if(h==='#quotations')showQuotations();
+    else if(h==='#invoices')showInvoices();
+    else if(h==='#receipts')showReceipts();
+    else if(h==='#staff-priority')showStaffPriority();
     else showDashboard();
   }catch(e){showLogin()}
 }
