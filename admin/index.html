@@ -394,8 +394,10 @@
     <button class="drawer-item" onclick="showSchedule();toggleDrawer()"><span><i data-lucide="calendar"></i></span> Schedule</button>
     <button class="drawer-item" onclick="showQuotations();toggleDrawer()"><span><i data-lucide="file-text"></i></span> Quotations</button>
     <button class="drawer-item" onclick="showInvoices();toggleDrawer()"><span><i data-lucide="receipt"></i></span> Invoices</button>
+    <button class="drawer-item" onclick="showReceipts();toggleDrawer()"><span><i data-lucide="file-check"></i></span> Receipts</button>
     <button class="drawer-item" onclick="showAutopilot();toggleDrawer()"><span><i data-lucide="bot"></i></span> Autopilot</button>
     <button class="drawer-item" onclick="showStaff();toggleDrawer()"><span><i data-lucide="users"></i></span> Staff</button>
+    <button class="drawer-item" onclick="showStaffPriority();toggleDrawer()"><span><i data-lucide="list-ordered"></i></span> Priority</button>
     <button class="drawer-item" onclick="showCustomers();toggleDrawer()"><span><i data-lucide="contact"></i></span> Customers</button>
     <button class="drawer-item" onclick="showReports();toggleDrawer()"><span><i data-lucide="bar-chart-3"></i></span> Reports</button>
     <button class="drawer-item" onclick="showWebsite();toggleDrawer()"><span><i data-lucide="globe-2"></i></span> Website</button>
@@ -412,8 +414,9 @@
 <!-- ═══════════ MOBILE BOTTOM NAV ═══════════ -->
 <nav class="bnav">
   <button class="bnav-item active" id="navDash" onclick="showDashboard()"><span class="bni"><i data-lucide="layout-dashboard"></i></span><span class="bnl">Home</span></button>
-  <button class="bnav-item" id="navAll" onclick="showBookings()"><span class="bni"><i data-lucide="layout-grid"></i></span><span class="bnl">Bookings</span></button>
+  <button class="bnav-item" id="navAll" onclick="showBookings()"><span class="bni"><i data-lucide="layout-grid"></i></span><span class="bnl">Jobs</span></button>
   <button class="bnav-item" id="navSchedule" onclick="showSchedule()"><span class="bni"><i data-lucide="calendar"></i></span><span class="bnl">Schedule</span></button>
+  <button class="bnav-item" id="navStaff" onclick="showStaff()"><span class="bni"><i data-lucide="users"></i></span><span class="bnl">Staff</span></button>
   <button class="bnav-item" id="navMore" onclick="toggleDrawer()"><span class="bni"><i data-lucide="menu"></i></span><span class="bnl">More</span></button>
 </nav>
 
