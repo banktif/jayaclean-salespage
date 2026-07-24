@@ -212,6 +212,11 @@
       case 'private_settings': apiPath = '/api/settings/private'; break;
       case 'customers':     apiPath = '/api/customers'; break;
       case 'slots':         apiPath = '/api/slots'; break;
+      case 'quotations':    apiPath = '/api/quotations'; break;
+      case 'invoices':      apiPath = '/api/invoices'; break;
+      case 'receipts':      apiPath = '/api/receipts'; break;
+      case 'zones':         apiPath = '/api/slots/zones'; break;
+      case 'subscriptions': apiPath = '/api/subscriptions'; break;
       default: throw new Error('Unknown table: ' + t);
     }
 
