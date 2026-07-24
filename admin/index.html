@@ -1786,17 +1786,65 @@ async function showQuotations(){
   try{
     var res=await SB.from('quotations').select('*').order('created_at',{ascending:false});
     if(!viewActive(viewId,'quotations'))return;var rows=res.data||[];
-    if(!rows.length){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="file-text"></i></div><h2>No quotations</h2><p>Create quotations from booking or manual entry.</p></div>';return}
-    var h='<div class="d-card"><table><thead><tr><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody>';
-    rows.forEach(function(r){
-      h+='<tr><td><strong>'+esc(r.customer_name)+'</strong></td><td>'+esc(r.service_type)+'</td><td>RM'+(r.amount||0)+'</td><td><span class="bc-badge '+r.status+'"><span class="bdot"></span>'+r.status+'</span></td><td><button class="d-btn" onclick="openQuote(\''+r.id+'\')">View</button></td></tr>';
-    });
-    h+='</tbody></table></div>';
+
+    var h='<button class="btn-primary" style="margin-bottom:16px" onclick="showQuoteForm()"><i data-lucide="plus"></i> New Quotation</button>';
+
+    if(!rows.length){
+      h+='<div class="empty"><div class="eicon"><i data-lucide="file-text"></i></div><h2>No quotations yet</h2><p>Click "New Quotation" to create one.</p></div>';
+    }else{
+      h+='<div class="d-card"><table><thead><tr><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody>';
+      rows.forEach(function(r){
+        h+='<tr><td><strong>'+esc(r.customer_name)+'</strong></td><td>'+esc(r.service_type)+'</td><td>RM'+(r.amount||0)+'</td><td><span class="bc-badge '+r.status+'"><span class="bdot"></span>'+r.status+'</span></td><td><div style="display:flex;gap:4px">';
+        if(r.status==='draft')h+='<button class="d-btn acc" onclick="updateQuoteStatus(\''+r.id+'\',\'sent\')">Send</button>';
+        if(r.status==='sent')h+='<button class="d-btn don" onclick="updateQuoteStatus(\''+r.id+'\',\'accepted\')">Accept</button>';
+        h+='<button class="d-btn del" onclick="updateQuoteStatus(\''+r.id+'\',\'rejected\')">Reject</button></div></td></tr>';
+      });
+      h+='</tbody></table></div>';
+    }
     l.innerHTML=h;
-  }catch(e){if(viewActive(viewId,'quotations'))l.innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'}
+  }catch(e){if(viewActive(viewId,'quotations'))l.innerHTML='<div class="empty"><p>Error: '+esc(e.message||e)+'</p></div>'}
   relucide();
 }
-function openQuote(id){alert('Quotation ID: '+id+'\n\nUse API to manage quotations: /api/quotations/'+id)}
+
+function showQuoteForm(){
+  var l=document.getElementById('list');
+  l.innerHTML='<div class="panel"><h3>New Quotation</h3>'+
+    '<div style="display:flex;flex-direction:column;gap:10px;max-width:480px">'+
+    '<div class="pf-field"><label>Customer Name</label><input id="qfName" class="sInp" placeholder="Full name"></div>'+
+    '<div class="pf-field"><label>Phone</label><input id="qfPhone" class="sInp" placeholder="0123456789"></div>'+
+    '<div class="pf-field"><label>Address</label><input id="qfAddr" class="sInp" placeholder="Full address"></div>'+
+    '<div class="pf-field"><label>Service Type</label><select id="qfService" class="sInp"><option value="cuci_tangki">Cuci Tangki Air</option><option value="tukar_atap">Tukar Atap</option><option value="cat_rumah">Cat Rumah</option></select></div>'+
+    '<div class="pf-field"><label>Amount (RM)</label><input id="qfAmt" class="sInp" type="number" value="300"></div>'+
+    '<div style="display:flex;gap:8px;margin-top:8px"><button class="btn-primary" onclick="createQuote()">Create Quotation</button><button class="d-btn" onclick="showQuotations()">Cancel</button></div>'+
+    '<div id="qfMsg" style="font-size:.72rem;margin-top:8px"></div>'+
+    '</div></div>';
+  relucide();
+}
+
+async function createQuote(){
+  var m=document.getElementById('qfMsg');m.textContent='Creating...';
+  try{
+    var body={
+      customer_name:document.getElementById('qfName').value.trim(),
+      customer_phone:document.getElementById('qfPhone').value.trim(),
+      customer_address:document.getElementById('qfAddr').value.trim(),
+      service_type:document.getElementById('qfService').value,
+      amount:parseFloat(document.getElementById('qfAmt').value)||300
+    };
+    if(!body.customer_name||!body.customer_phone){m.textContent='Name and phone required';return}
+    var res=await SB.from('quotations').insert(body);
+    if(res.error)throw res.error;
+    m.textContent='Created!';setTimeout(showQuotations,800);
+  }catch(e){m.textContent='Error: '+(e.message||e)}
+}
+
+async function updateQuoteStatus(id,status){
+  try{
+    var res=await SB.from('quotations').update({status:status}).eq('id',id);
+    if(res.error)throw res.error;
+    showQuotations();
+  }catch(e){alert('Error: '+(e.message||e))}
+}
 
 async function showInvoices(){
   var viewId=beginView('invoices');setChrome(false);clearNav();setNav('dsInvoices');
@@ -1806,15 +1854,38 @@ async function showInvoices(){
   try{
     var res=await SB.from('invoices').select('*').order('created_at',{ascending:false});
     if(!viewActive(viewId,'invoices'))return;var rows=res.data||[];
-    if(!rows.length){l.innerHTML='<div class="empty"><div class="eicon"><i data-lucide="receipt"></i></div><h2>No invoices</h2><p>Invoices auto-generate when jobs complete.</p></div>';return}
-    var h='<div class="d-card"><table><thead><tr><th>#</th><th>Customer</th><th>Total</th><th>Deposit</th><th>Balance</th><th>Status</th></tr></thead><tbody>';
-    rows.forEach(function(r){
-      h+='<tr><td>'+esc(r.number)+'</td><td>'+esc(r.customer_name)+'</td><td>RM'+(r.subtotal||0)+'</td><td>RM'+(r.deposit_paid||0)+'</td><td>RM'+(r.balance_due||0)+'</td><td><span class="bc-badge '+r.status+'"><span class="bdot"></span>'+r.status+'</span></td></tr>';
-    });
-    h+='</tbody></table></div>';
+
+    var h='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'+
+      '<div class="pf-field" style="flex:1;min-width:200px"><input id="invBid" class="sInp" placeholder="Booking ID to generate invoice"></div>'+
+      '<button class="btn-primary" onclick="generateInvoice()">Generate Invoice</button>'+
+      '<span id="invMsg" style="font-size:.72rem;align-self:center"></span></div>';
+
+    if(!rows.length){
+      h+='<div class="empty"><div class="eicon"><i data-lucide="receipt"></i></div><h2>No invoices yet</h2><p>Enter a Booking ID and click "Generate Invoice".</p></div>';
+    }else{
+      h+='<div class="d-card"><table><thead><tr><th>#</th><th>Customer</th><th>Total</th><th>Deposit</th><th>Balance</th><th>Status</th></tr></thead><tbody>';
+      rows.forEach(function(r){
+        h+='<tr><td>'+esc(r.number)+'</td><td>'+esc(r.customer_name)+'</td><td>RM'+(r.subtotal||0)+'</td><td>RM'+(r.deposit_paid||0)+'</td><td>RM'+(r.balance_due||0)+'</td><td><span class="bc-badge '+r.status+'"><span class="bdot"></span>'+r.status+'</span></td></tr>';
+      });
+      h+='</tbody></table></div>';
+    }
     l.innerHTML=h;
-  }catch(e){if(viewActive(viewId,'invoices'))l.innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'}
+  }catch(e){if(viewActive(viewId,'invoices'))l.innerHTML='<div class="empty"><p>Error: '+esc(e.message||e)+'</p></div>'}
   relucide();
+}
+
+async function generateInvoice(){
+  var m=document.getElementById('invMsg');var bid=document.getElementById('invBid').value.trim();
+  if(!bid){m.textContent='Enter a Booking ID';return}
+  m.textContent='Generating...';
+  try{
+    var token=localStorage.getItem('jc_token');
+    var res=await fetch(API_URL+'/api/invoices/generate',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({booking_id:bid})});
+    var d=await res.json();
+    if(!res.ok)throw new Error(d.error||'Failed');
+    m.textContent='Invoice generated!';
+    setTimeout(showInvoices,600);
+  }catch(e){m.textContent='Error: '+(e.message||e)}
 }
 
 async function showReceipts(){
