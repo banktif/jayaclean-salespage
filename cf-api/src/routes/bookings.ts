@@ -5,6 +5,7 @@ import { requireAuth } from '../utils/middleware';
 import { createDb, type AppDb } from '../db/client';
 import { appSettings, bookings, customers, profiles, slots, tasks } from '../db/schema';
 import { distributeTask, bulkDistributeUnassigned } from './distribution';
+import { enqueue } from '../queue/events';
 
 const bookingFields = {
   id: bookings.id,
@@ -172,6 +173,8 @@ export async function handleBookings(req: Request, env: Env, path: string): Prom
 
     // Update customer stats
     await refreshCustomerStats(db, cust.id);
+
+    await enqueue(db, 'booking.created', { booking_id: bookingId, customer_id: cust.id, phone: phoneDigits, name: customer_name });
 
     const booking = await db.select(bookingFields).from(bookings).where(eq(bookings.id, bookingId)).get();
     return ok(booking);
@@ -424,9 +427,10 @@ export async function handleBayarcashCallback(req: Request, env: Env): Promise<R
     // Trigger task creation if confirmed
     if (bookingStatus === 'confirmed') {
       const existingTask = await db.select({ id: tasks.id }).from(tasks).where(eq(tasks.bookingId, booking.id)).get();
+      let tid = existingTask?.id || '';
       if (!existingTask) {
-        const taskId = uuid();
-        await db.insert(tasks).values({ id: taskId, bookingId: booking.id, status: 'unassigned' });
+        tid = uuid();
+        await db.insert(tasks).values({ id: tid, bookingId: booking.id, status: 'unassigned' });
 
         const autoEnabled = await getSetting(db, 'auto_assign_enabled');
         if (autoEnabled === 'true') {
@@ -443,9 +447,10 @@ export async function handleBayarcashCallback(req: Request, env: Env): Promise<R
               if (z?.id) zid = z.id;
             } catch {}
           }
-          await distributeTask(db, taskId, zid);
+          await distributeTask(db, tid, zid);
         }
       }
+      await enqueue(db, 'payment.received', { booking_id: booking.id, task_id: tid });
     }
   } else if (status === 2 || status === 4) {
     await db.update(bookings).set({

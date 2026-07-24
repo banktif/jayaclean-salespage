@@ -25,6 +25,7 @@ import { handleSubscriptions } from './routes/subscriptions';
 import { handleAbandon } from './routes/analytics';
 import { handleTracking } from './routes/tracking';
 import { handleRefund } from './routes/payments';
+import { processNotifications, sendScheduledReminders } from './queue/notification-processor';
 import { createDb } from './db/client';
 import { bookings as bookingsTable } from './db/schema';
 
@@ -249,6 +250,9 @@ const worker = {
       ctx.waitUntil(handlers.handleBackup(fakeReq, env, '/api/backup/db'));
     }
 
+    // Process notification queue + scheduled reminders
+    ctx.waitUntil(processNotifications(env));
+    ctx.waitUntil(sendScheduledReminders(env));
   }
 };
 

@@ -2,6 +2,7 @@ import { and, asc, count, eq, sql } from 'drizzle-orm';
 import { createDb, type AppDb } from '../db/client';
 import { appSettings as appSettingsTbl, bookings, profiles, tasks, staffZones, zones } from '../db/schema';
 import { nowISO } from '../utils/helpers';
+import { enqueue } from '../queue/events';
 
 export type DistributionMode = 'samarata' | 'priority' | 'area';
 
@@ -198,6 +199,8 @@ export async function distributeTask(
     jobCountToday: sql`${profiles.jobCountToday} + 1`,
     lastAssignedAt: nowISO()
   }).where(eq(profiles.id, staffId));
+
+  await enqueue(db, 'task.assigned', { task_id: taskId, booking_id: task.bookingId, staff_id: staffId });
 
   return { assigned: true, staffId, mode: usedMode };
 }
